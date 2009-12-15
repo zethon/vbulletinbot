@@ -17,3 +17,4 @@ Command instructions for the bot
   * lp XX YY - list the XXth page of YY posts per page in the current thread
   * n - read the next post
   * p - read the previous post
+  * r - reply to the current thread
