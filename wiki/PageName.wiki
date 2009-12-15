@@ -8,6 +8,7 @@ Command instructions for the bot
 = Details =
 
   * lf - list forums
+  * / - go to root forum
   * lt - list first page of threads in the current forum
   * lt XX - list the XXth page of threads in the current forum (ie. "lt 2" will list the second page of 5 threads in a forum)
   * lt XX YY - list the XXth page of YY threads per page in the current forum (ie. "lt 2 10" will list threads 11 thru 20 in the current forum)
