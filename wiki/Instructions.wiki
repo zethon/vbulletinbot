@@ -16,6 +16,8 @@ Command instructions for the bot
   * lp - list the first page of posts in the current thread
   * lp XX - list the XXth page of posts in the current thread
   * lp XX YY - list the XXth page of YY posts per page in the current thread
+  * mfr - mark the current forum as read
+  * mtr - mark the current thread as read
   * n - read the next post
   * p - read the previous post
   * r - reply to the current thread
