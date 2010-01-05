@@ -17,6 +17,7 @@ Command instructions for the bot
   * lt - list first page of threads in the current forum
   * lt XX - list the XXth page of threads in the current forum (ie. "lt 2" will list the second page of 5 threads in a forum)
   * lt XX YY - list the XXth page of YY threads per page in the current forum (ie. "lt 2 10" will list threads 11 thru 20 in the current forum)
+  * r - reply to the current thread
 
 === Post Commands === 
   * lp - list the first page of posts in the current thread
@@ -24,7 +25,6 @@ Command instructions for the bot
   * lp XX YY - list the XXth page of YY posts per page in the current thread
   * n - read the next post
   * p - read the previous post
-  * r - reply to the current thread
 
 === Misc === 
   * im [on|off] - turns IM Notifications on or off
