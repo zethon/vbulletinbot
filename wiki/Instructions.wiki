@@ -33,3 +33,5 @@ Command instructions for the bot
   * sub - subscribe to current thread
   * unsub - unsubscribe to current thread
   * unsub all - unsubscribe to all threads
+  * whereami - show your current forum and thread location
+  * whoami - shows your vbulletin user info
