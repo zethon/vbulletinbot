@@ -8,15 +8,17 @@ Command instructions for the bot
 = Details =
 
 === Forum Commands === 
-  * lf - list forums
   * / - go to root forum
   * . - go to parent forum of current forum
+  * lf - list forums
+  * mfr - mark the current forum as read
 
 === Thread Commands === 
   * gt XX - go to threadid XX
   * lt - list first page of threads in the current forum
   * lt XX - list the XXth page of threads in the current forum (ie. "lt 2" will list the second page of 5 threads in a forum)
   * lt XX YY - list the XXth page of YY threads per page in the current forum (ie. "lt 2 10" will list threads 11 thru 20 in the current forum)
+  * mtr - mark the current thread as read
   * r - reply to the current thread
 
 === Post Commands === 
@@ -28,8 +30,6 @@ Command instructions for the bot
 
 === Misc === 
   * im [on|off] - turns IM Notifications on or off
-  * mfr - mark the current forum as read
-  * mtr - mark the current thread as read
   * sub - subscribe to current thread
   * unsub - unsubscribe to current thread
   * unsub all - unsubscribe to all threads
