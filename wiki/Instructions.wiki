@@ -32,3 +32,4 @@ Command instructions for the bot
   * mtr - mark the current thread as read
   * sub - subscribe to current thread
   * unsub - unsubscribe to current thread
+  * unsub all - unsubscribe to all threads
