@@ -7,18 +7,18 @@ Command instructions for the bot
 
 = Details =
 
-== Forum Commands == 
+=== Forum Commands === 
   * lf - list forums
   * / - go to root forum
   * . - go to parent forum of current forum
 
-== Thread Commands ==
+=== Thread Commands === 
   * lt - list first page of threads in the current forum
   * lt XX - list the XXth page of threads in the current forum (ie. "lt 2" will list the second page of 5 threads in a forum)
   * lt XX YY - list the XXth page of YY threads per page in the current forum (ie. "lt 2 10" will list threads 11 thru 20 in the current forum)
   * gt XX - to to threadid XX
 
-== Post Commands ==
+=== Post Commands === 
   * lp - list the first page of posts in the current thread
   * lp XX - list the XXth page of posts in the current thread
   * lp XX YY - list the XXth page of YY posts per page in the current thread
@@ -26,7 +26,7 @@ Command instructions for the bot
   * p - read the previous post
   * r - reply to the current thread
 
-== Misc == 
+=== Misc === 
   * im [on|off] - turns IM Notifications on or off
   * mfr - mark the current forum as read
   * mtr - mark the current thread as read
