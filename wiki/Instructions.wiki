@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Command instructions for the bot
+Command instructions for the bot. You can send multiple commands to the bot with one IM by seperating the commans using a semicolon. For example: {{{/;1;lt}}}
 
 
 = Details =
