@@ -1,4 +1,6 @@
+#summary How to configure the vbserver
 #labels Phase-Deploy
+
 === XML Elements ===
   * *webservicepw* - defines the password for your board's webservice, this option is set in the board's control panel
   * *webserviceurl* - points to the location of the vbotservice.php
