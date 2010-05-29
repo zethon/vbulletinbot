@@ -1,3 +1,4 @@
+{{{
 <botconfig> 
      <webservicepw>password</webservicepw> 
      <webserviceurl>http://www.website.com/vbotservice.php</webserviceurl> 
@@ -9,3 +10,4 @@
           </imservice> 
      </imservices> 
 </botconfig>
+}}}
