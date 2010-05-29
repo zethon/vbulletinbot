@@ -1,6 +1,6 @@
-*webservicepw* - defines the password for your board's webservice, this option is set in the board's control panel
-*webserviceurl* - points to the location of the vbotservice.php
-*imservices* - defines the imservices
+  * *webservicepw* - defines the password for your board's webservice, this option is set in the board's control panel
+  * *webserviceurl* - points to the location of the vbotservice.php
+  * *imservices* - defines the imservices
 
 {{{
 <botconfig> 
