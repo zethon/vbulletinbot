@@ -1,0 +1,11 @@
+<botconfig> 
+     <webservicepw>password</webservicepw> 
+     <webserviceurl>http://www.website.com/vbotservice.php</webserviceurl> 
+     <imservices> 
+          <imservice type="aimconnection" vbalias="aim"> 
+               <newline>HTML</newline> 
+               <screenname>aimscreenname</screenname>
+               <password>password</password>
+          </imservice> 
+     </imservices> 
+</botconfig>
