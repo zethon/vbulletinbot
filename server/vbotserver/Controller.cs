@@ -67,23 +67,12 @@ namespace vbotserver
         }
 
 
-        public bool Init(XDocument config)
+        public bool Init()
         {
             // load the bot config from the app config
             BotConfigSection botconfig = (BotConfigSection)ConfigurationManager.GetSection("botconfig");
             log.InfoFormat("ServiceURL: {0}", botconfig.WebServiceURL);
             log.InfoFormat("Total IM Services Loaded: {0}", botconfig.IMServices.Count);
-
-            //// initialize the path we store user states in
-            //var xPath = (from path in config.Descendants(@"userstatepath")
-            //             select path).Single();
-            //_strStatePath = xPath.Value;
-
-            //if (!Directory.Exists(_strStatePath))
-            //{
-            //    Directory.CreateDirectory(_strStatePath);
-            //    log.InfoFormat("User State Path created: {0}", _strStatePath);
-            //}
 
             _conComp = ConnectionComposite.MakeConnectionComposite(botconfig);
             foreach (Connection conn in _conComp.Connections)

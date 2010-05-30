@@ -21,13 +21,8 @@ namespace vbotserver
                 log4net.Config.XmlConfigurator.Configure();
                 log.Info("vbotserver started");
 
-                
-
-                XDocument doc = XDocument.Load(@"config.xml");
-
                 Controller app = new Controller();
-
-                if (app.Init(doc))
+                if (app.Init())
                 {
                     app.MainLoop();
                 }
