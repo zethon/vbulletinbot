@@ -1203,7 +1203,7 @@ namespace vbotserver
             }
             catch (Exception ex)
             {
-                //log.Debug(@"Service error", ex);
+                log.Debug(@"Service error", ex);
                 return retval;
             }
 

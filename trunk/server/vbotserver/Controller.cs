@@ -8,6 +8,7 @@ using System.Data.SQLite;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Timers;
+using System.Configuration;
 using log4net;
 
 namespace vbotserver
@@ -44,7 +45,6 @@ namespace vbotserver
         
         static ILog log = LogManager.GetLogger(typeof(Controller));
 
-        string _strStatePath = string.Empty;
         CommandClass _commands = null;
 
         ConnectionComposite _conComp = null;
@@ -69,18 +69,23 @@ namespace vbotserver
 
         public bool Init(XDocument config)
         {
-            // initialize the path we store user states in
-            var xPath = (from path in config.Descendants(@"userstatepath")
-                         select path).Single();
-            _strStatePath = xPath.Value;
+            // load the bot config from the app config
+            BotConfigSection botconfig = (BotConfigSection)ConfigurationManager.GetSection("botconfig");
+            log.InfoFormat("ServiceURL: {0}", botconfig.WebServiceURL);
+            log.InfoFormat("Total IM Services Loaded: {0}", botconfig.IMServices.Count);
 
-            if (!Directory.Exists(_strStatePath))
-            {
-                Directory.CreateDirectory(_strStatePath);
-                log.InfoFormat("User State Path created: {0}", _strStatePath);
-            }
+            //// initialize the path we store user states in
+            //var xPath = (from path in config.Descendants(@"userstatepath")
+            //             select path).Single();
+            //_strStatePath = xPath.Value;
 
-            _conComp = ConnectionComposite.MakeConnectionComposite(config);
+            //if (!Directory.Exists(_strStatePath))
+            //{
+            //    Directory.CreateDirectory(_strStatePath);
+            //    log.InfoFormat("User State Path created: {0}", _strStatePath);
+            //}
+
+            _conComp = ConnectionComposite.MakeConnectionComposite(botconfig);
             foreach (Connection conn in _conComp.Connections)
             {
                 conn.OnConnect += new OnConnectHandler(OnConnectCallback);
@@ -91,17 +96,11 @@ namespace vbotserver
 
             _commands = new CommandClass(this);
 
-            var wsvc = (from xElem in config.Descendants(@"webserviceurl")
-                        select xElem).Single();
-
-            var wsvcpw = (from xElem in config.Descendants(@"webservicepw")
-                        select xElem).Single();
-
-            VB.Instance.ServiceURL = wsvc.Value;
-            VB.Instance.ServicePassword = wsvcpw.Value;
+            VB.Instance.ServiceURL = botconfig.WebServiceURL;
+            VB.Instance.ServicePassword = botconfig.WebServicePassword;
 
              // start the notification timer
-            _notTimer = new System.Timers.Timer(1000 * 60); // every 5 minutes
+            _notTimer = new System.Timers.Timer(1000 * 60); 
             _notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
             _notTimer.Enabled = true;
 
