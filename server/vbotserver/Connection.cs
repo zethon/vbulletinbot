@@ -9,7 +9,7 @@ namespace vbotserver
 
     public abstract class Connection
     {
-        private string _strNewLine = "<br/>";
+        private string _strNewLine = "<br>";
         public string NewLine
         {
             get { return _strNewLine; }
