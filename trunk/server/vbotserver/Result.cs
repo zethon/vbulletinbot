@@ -41,10 +41,5 @@ namespace vbotserver
             _strMessage = strMsg;
             _code = code;
         }
-
-        static public Result MakeResult(ResultCode code, string strMsg)
-        {
-            return new Result(code, strMsg);
-        }
     }
 }
