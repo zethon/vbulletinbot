@@ -209,7 +209,6 @@ namespace vbotserver
 
         public Result DoCommand(string strCommand,User user)
         {
-            bool @bool = false;
             Result retval = new Result();
             CommandParser parser = new CommandParser(strCommand);
 
