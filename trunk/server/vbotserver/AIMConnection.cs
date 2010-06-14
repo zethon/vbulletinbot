@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using dotTOC;
+using log4net;
 
 namespace vbotserver
 {
     class AIMConnection : Connection
     {
+        static ILog log = LogManager.GetLogger(typeof(User));
+
         private TOC _toc = new TOC();
         private string _strUsername = string.Empty;
         private string _strPassword = string.Empty;
@@ -20,6 +23,12 @@ namespace vbotserver
             _toc.OnSignedOn += new IncomingHandlers.OnSignedOnHandler(_toc_OnSignedOn);
             _toc.OnIMIn += new IncomingHandlers.OnIMInHandler(_toc_OnIMIn);
             _toc.OnDisconnect += new TOC.OnDisconnectHandler(_toc_OnDisconnect);
+            _toc.OnTOCError += new TOC.OnTOCErrorHandler(_toc_OnTOCError);
+        }
+
+        void _toc_OnTOCError(TOCError error)
+        {
+            log.ErrorFormat("Could not log into AIM: {0} - {1}", error.Code, error.Argument);
         }
 
         void _toc_OnIMIn(dotTOC.InstantMessage im)
