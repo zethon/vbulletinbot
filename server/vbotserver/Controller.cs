@@ -480,7 +480,7 @@ namespace vbotserver
 
                 if (upi != null)
                 {
-                    int iPostIndex = (int)upi.PostIndex;
+                    int iPostIndex = upi.PostIndex.Value;
 
                     if (bGotoNext)
                         iPostIndex++;
