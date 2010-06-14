@@ -68,37 +68,13 @@ namespace vbotserver
             _controller.Connections.Connect();
         }
 
-        [CommandMethod("database", "[open|close]")]
-        public void Database(CommandParser parser)
+        [CommandMethod("resetdb", "reset the local database")]
+        public void ResetDatabase(CommandParser parser)
         {
-            if (parser.Parameters != null && parser.Parameters.Length > 0)
-            {
-                switch (parser.Parameters[0].ToLower())
-                {
-                    case "open":
-                        if (DB.Instance.Connection.State != ConnectionState.Open)
-                        {
-                            DB.Instance.Connection.Open();
-                        }
-                    break;
-
-                    case "close":
-                        if (DB.Instance.Connection.State == ConnectionState.Open)
-                        {
-                            DB.Instance.Connection.Close();
-                        }
-                    break;
-
-                    default:
-                        Console.WriteLine("Unkown database option");
-                    break;
-                }
-            }
-            else
-            {
-                Console.WriteLine("No database action given");
-            }
-               
+            Database.Instance.Connection.Close();
+            Database.Instance.DeleteDatabase();
+            Database.Instance.CreateDatabase();
+            log.Info("Database reset");
         }
 
         public void Em(CommandParser parser)
