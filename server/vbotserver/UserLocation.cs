@@ -14,9 +14,9 @@ namespace vbotserver
         POST
     }
 
-    public class UserLocation
+    public class UserLocationT
     {
-        static ILog log = LogManager.GetLogger(typeof(UserLocation));
+        static ILog log = LogManager.GetLogger(typeof(UserLocationT));
 
         private int _iUserLocationID = 0;
         public int UserLocationID
@@ -72,7 +72,7 @@ namespace vbotserver
             set { _iPerPage = value; }
         }
 
-        public UserLocation(Dictionary<string, string> info,User owner)
+        public UserLocationT(Dictionary<string, string> info,User owner)
         {
             if (owner == null)
             {
@@ -277,9 +277,9 @@ namespace vbotserver
 
         }
 
-        static public UserLocation GetDefaultLocation(UserLocationType locType,User owner)
+        static public UserLocationT GetDefaultLocation(UserLocationType locType,User owner)
         {
-            UserLocation loc = null;
+            UserLocationT loc = null;
 
             if (locType == UserLocationType.FORUM)
             {
@@ -294,7 +294,7 @@ namespace vbotserver
                 info.Add(@"userlocationtype", @"forum");
                 info.Add(@"localuserid", owner.LocalUserID.ToString());
 
-                loc = new UserLocation(info, owner);
+                loc = new UserLocationT(info, owner);
             }
             else if (locType == UserLocationType.THREAD)
             {
@@ -309,7 +309,7 @@ namespace vbotserver
                 info.Add(@"userlocationtype", @"thread");
                 info.Add(@"localuserid", owner.LocalUserID.ToString());
 
-                loc = new UserLocation(info, owner);
+                loc = new UserLocationT(info, owner);
             }
             else if (locType == UserLocationType.POST)
             {
@@ -324,7 +324,7 @@ namespace vbotserver
                 info.Add(@"userlocationtype", @"post");
                 info.Add(@"localuserid", owner.LocalUserID.ToString());
 
-                loc = new UserLocation(info, owner);
+                loc = new UserLocationT(info, owner);
             }
 
             return loc;
@@ -332,9 +332,9 @@ namespace vbotserver
 
 
 
-        static public UserLocation LoadLocation(UserLocationType locType, User user)
+        static public UserLocationT LoadLocation(UserLocationType locType, User user)
         {
-            UserLocation retVal = null;
+            UserLocationT retVal = null;
             string strLocType = locType.ToString().ToLower();
 
             try
@@ -348,7 +348,7 @@ namespace vbotserver
 
                 if (locInfo != null)
                 {
-                    retVal = new UserLocation(locInfo, user);
+                    retVal = new UserLocationT(locInfo, user);
                 }
             }
             catch (System.Data.SQLite.SQLiteException ex)

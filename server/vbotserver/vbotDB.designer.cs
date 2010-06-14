@@ -33,6 +33,9 @@ namespace vbotserver
     partial void InsertUserLastList(UserLastList instance);
     partial void UpdateUserLastList(UserLastList instance);
     partial void DeleteUserLastList(UserLastList instance);
+    partial void InsertUserLocation(UserLocation instance);
+    partial void UpdateUserLocation(UserLocation instance);
+    partial void DeleteUserLocation(UserLocation instance);
     partial void InsertUserPostIndex(UserPostIndex instance);
     partial void UpdateUserPostIndex(UserPostIndex instance);
     partial void DeleteUserPostIndex(UserPostIndex instance);
@@ -67,6 +70,14 @@ namespace vbotserver
 			get
 			{
 				return this.GetTable<UserLastList>();
+			}
+		}
+		
+		public System.Data.Linq.Table<UserLocation> UserLocations
+		{
+			get
+			{
+				return this.GetTable<UserLocation>();
 			}
 		}
 		
@@ -164,6 +175,236 @@ namespace vbotserver
 					this._Name = value;
 					this.SendPropertyChanged("Name");
 					this.OnNameChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute()]
+	public partial class UserLocation : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _UserLocationID;
+		
+		private System.Nullable<int> _LocalUserID;
+		
+		private string _UserLocationType;
+		
+		private string _List;
+		
+		private System.Nullable<int> _LocationRemoteID;
+		
+		private string _Title;
+		
+		private System.Nullable<int> _PageNumber;
+		
+		private System.Nullable<int> _PerPage;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnUserLocationIDChanging(int value);
+    partial void OnUserLocationIDChanged();
+    partial void OnLocalUserIDChanging(System.Nullable<int> value);
+    partial void OnLocalUserIDChanged();
+    partial void OnUserLocationTypeChanging(string value);
+    partial void OnUserLocationTypeChanged();
+    partial void OnListChanging(string value);
+    partial void OnListChanged();
+    partial void OnLocationRemoteIDChanging(System.Nullable<int> value);
+    partial void OnLocationRemoteIDChanged();
+    partial void OnTitleChanging(string value);
+    partial void OnTitleChanged();
+    partial void OnPageNumberChanging(System.Nullable<int> value);
+    partial void OnPageNumberChanged();
+    partial void OnPerPageChanging(System.Nullable<int> value);
+    partial void OnPerPageChanged();
+    #endregion
+		
+		public UserLocation()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserLocationID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int UserLocationID
+		{
+			get
+			{
+				return this._UserLocationID;
+			}
+			set
+			{
+				if ((this._UserLocationID != value))
+				{
+					this.OnUserLocationIDChanging(value);
+					this.SendPropertyChanging();
+					this._UserLocationID = value;
+					this.SendPropertyChanged("UserLocationID");
+					this.OnUserLocationIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocalUserID", DbType="Int")]
+		public System.Nullable<int> LocalUserID
+		{
+			get
+			{
+				return this._LocalUserID;
+			}
+			set
+			{
+				if ((this._LocalUserID != value))
+				{
+					this.OnLocalUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._LocalUserID = value;
+					this.SendPropertyChanged("LocalUserID");
+					this.OnLocalUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserLocationType", DbType="NVarChar(100)")]
+		public string UserLocationType
+		{
+			get
+			{
+				return this._UserLocationType;
+			}
+			set
+			{
+				if ((this._UserLocationType != value))
+				{
+					this.OnUserLocationTypeChanging(value);
+					this.SendPropertyChanging();
+					this._UserLocationType = value;
+					this.SendPropertyChanged("UserLocationType");
+					this.OnUserLocationTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_List", DbType="NVarChar(100)")]
+		public string List
+		{
+			get
+			{
+				return this._List;
+			}
+			set
+			{
+				if ((this._List != value))
+				{
+					this.OnListChanging(value);
+					this.SendPropertyChanging();
+					this._List = value;
+					this.SendPropertyChanged("List");
+					this.OnListChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocationRemoteID", DbType="Int")]
+		public System.Nullable<int> LocationRemoteID
+		{
+			get
+			{
+				return this._LocationRemoteID;
+			}
+			set
+			{
+				if ((this._LocationRemoteID != value))
+				{
+					this.OnLocationRemoteIDChanging(value);
+					this.SendPropertyChanging();
+					this._LocationRemoteID = value;
+					this.SendPropertyChanged("LocationRemoteID");
+					this.OnLocationRemoteIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Title", DbType="NVarChar(100)")]
+		public string Title
+		{
+			get
+			{
+				return this._Title;
+			}
+			set
+			{
+				if ((this._Title != value))
+				{
+					this.OnTitleChanging(value);
+					this.SendPropertyChanging();
+					this._Title = value;
+					this.SendPropertyChanged("Title");
+					this.OnTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PageNumber", DbType="Int")]
+		public System.Nullable<int> PageNumber
+		{
+			get
+			{
+				return this._PageNumber;
+			}
+			set
+			{
+				if ((this._PageNumber != value))
+				{
+					this.OnPageNumberChanging(value);
+					this.SendPropertyChanging();
+					this._PageNumber = value;
+					this.SendPropertyChanged("PageNumber");
+					this.OnPageNumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PerPage", DbType="Int")]
+		public System.Nullable<int> PerPage
+		{
+			get
+			{
+				return this._PerPage;
+			}
+			set
+			{
+				if ((this._PerPage != value))
+				{
+					this.OnPerPageChanging(value);
+					this.SendPropertyChanging();
+					this._PerPage = value;
+					this.SendPropertyChanged("PerPage");
+					this.OnPerPageChanged();
 				}
 			}
 		}
