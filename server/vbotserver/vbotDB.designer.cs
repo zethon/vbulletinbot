@@ -30,6 +30,9 @@ namespace vbotserver
 		
     #region Extensibility Method Definitions
     partial void OnCreated();
+    partial void InsertLocalUser(LocalUser instance);
+    partial void UpdateLocalUser(LocalUser instance);
+    partial void DeleteLocalUser(LocalUser instance);
     partial void InsertUserLastList(UserLastList instance);
     partial void UpdateUserLastList(UserLastList instance);
     partial void DeleteUserLastList(UserLastList instance);
@@ -65,6 +68,14 @@ namespace vbotserver
 			OnCreated();
 		}
 		
+		public System.Data.Linq.Table<LocalUser> LocalUsers
+		{
+			get
+			{
+				return this.GetTable<LocalUser>();
+			}
+		}
+		
 		public System.Data.Linq.Table<UserLastList> UserLastLists
 		{
 			get
@@ -86,6 +97,164 @@ namespace vbotserver
 			get
 			{
 				return this.GetTable<UserPostIndex>();
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute()]
+	public partial class LocalUser : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _LocalUserID;
+		
+		private string _Service;
+		
+		private string _Screenname;
+		
+		private System.Nullable<int> _BoardUserID;
+		
+		private System.Nullable<System.DateTime> _LastUpdate;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnLocalUserIDChanging(int value);
+    partial void OnLocalUserIDChanged();
+    partial void OnServiceChanging(string value);
+    partial void OnServiceChanged();
+    partial void OnScreennameChanging(string value);
+    partial void OnScreennameChanged();
+    partial void OnBoardUserIDChanging(System.Nullable<int> value);
+    partial void OnBoardUserIDChanged();
+    partial void OnLastUpdateChanging(System.Nullable<System.DateTime> value);
+    partial void OnLastUpdateChanged();
+    #endregion
+		
+		public LocalUser()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LocalUserID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int LocalUserID
+		{
+			get
+			{
+				return this._LocalUserID;
+			}
+			set
+			{
+				if ((this._LocalUserID != value))
+				{
+					this.OnLocalUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._LocalUserID = value;
+					this.SendPropertyChanged("LocalUserID");
+					this.OnLocalUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Service", DbType="NVarChar(100)")]
+		public string Service
+		{
+			get
+			{
+				return this._Service;
+			}
+			set
+			{
+				if ((this._Service != value))
+				{
+					this.OnServiceChanging(value);
+					this.SendPropertyChanging();
+					this._Service = value;
+					this.SendPropertyChanged("Service");
+					this.OnServiceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Screenname", DbType="NVarChar(100)")]
+		public string Screenname
+		{
+			get
+			{
+				return this._Screenname;
+			}
+			set
+			{
+				if ((this._Screenname != value))
+				{
+					this.OnScreennameChanging(value);
+					this.SendPropertyChanging();
+					this._Screenname = value;
+					this.SendPropertyChanged("Screenname");
+					this.OnScreennameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BoardUserID", DbType="Int")]
+		public System.Nullable<int> BoardUserID
+		{
+			get
+			{
+				return this._BoardUserID;
+			}
+			set
+			{
+				if ((this._BoardUserID != value))
+				{
+					this.OnBoardUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._BoardUserID = value;
+					this.SendPropertyChanged("BoardUserID");
+					this.OnBoardUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastUpdate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> LastUpdate
+		{
+			get
+			{
+				return this._LastUpdate;
+			}
+			set
+			{
+				if ((this._LastUpdate != value))
+				{
+					this.OnLastUpdateChanging(value);
+					this.SendPropertyChanging();
+					this._LastUpdate = value;
+					this.SendPropertyChanged("LastUpdate");
+					this.OnLastUpdateChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
 	}
