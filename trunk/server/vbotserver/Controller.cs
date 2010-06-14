@@ -69,8 +69,14 @@ namespace vbotserver
 
         public bool Init()
         {
-            // load the bot config from the app config
             BotConfigSection botconfig = (BotConfigSection)ConfigurationManager.GetSection("botconfig");
+
+            if (!Database.Instance.DatabaseExists())
+            {
+                log.InfoFormat("Creating local database from datacontext...");
+                Database.Instance.CreateDatabase();
+            }
+            
             log.InfoFormat("ServiceURL: {0}", botconfig.WebServiceURL);
             log.InfoFormat("Total IM Services Loaded: {0}", botconfig.IMServices.Count);
 
@@ -217,24 +223,30 @@ namespace vbotserver
                 int iListChoice = 0;
 
                 if (int.TryParse(parser.ApplicationName, out iListChoice) && iListChoice > 0)
-                { // user entered a number, let's deal with the lastlists
+                { 
+                    // user entered a number, let's deal with the lastlists
+                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUserID);
 
-                    Dictionary<string, string> lastList = DB.Instance.QueryFirst("SELECT * FROM userlastlist WHERE (localuserid = " + user.LocalUserID.ToString() + ")");
-                    if (lastList.ContainsKey(@"name"))
+                    if (ll != null)
                     {
-                        switch (lastList[@"name"])
+
+                        switch (ll.Name)
                         {
                             case @"forum":
                                 retval = GotoForumIndex(iListChoice, user);
-                                break;
+                            break;
 
                             case @"thread":
                                 retval = GotoThreadIndex(iListChoice, user);
-                                break;
+                            break;
 
                             case @"post":
                                 retval = GotoPostIndex(iListChoice, user);
-                                break;
+                            break;
+
+                            default:
+                                log.ErrorFormat("Unknown lastlist {0}", ll.Name);
+                            break;
                         }
                     }
                     else
