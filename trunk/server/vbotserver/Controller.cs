@@ -208,7 +208,7 @@ namespace vbotserver
                 }
                 catch (Exception ex)
                 {
-                    log.Debug("Something bad",ex);
+                    log.Error("Something bad",ex);
                 }
             }
         }
@@ -476,24 +476,23 @@ namespace vbotserver
 
             if (curThreadLocation != null)
             {
-                Dictionary<string, string> postIndex = DB.Instance.QueryFirst("SELECT * FROM userpostindex WHERE (localuserid = " + user.LocalUserID.ToString() + ")");
+                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUserID);
 
-                if (postIndex.ContainsKey(@"postindex"))
+                if (upi != null)
                 {
-                    int iPostIndex = int.Parse(postIndex[@"postindex"]);
+                    int iPostIndex = (int)upi.PostIndex;
+
                     if (bGotoNext)
-                    {
                         iPostIndex++;
-                    }
                     else
-                    {
                         iPostIndex--;
-                    }
+
                     rs = GotoPostIndex(iPostIndex, user);
                 }
                 else
-                {// userpostindex table is fucked
-
+                {
+                    rs = new Result(ResultCode.Error, @"Invalid post index. Use `lp` to browse a thread.");
+                    log.WarnFormat("Invalid `UserPostIndex` for LocalUserID {0}", user.LocalUserID);
                 }
             }
             else

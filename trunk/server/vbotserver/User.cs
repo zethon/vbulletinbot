@@ -76,11 +76,8 @@ namespace vbotserver
             }
             else
             {
-                ll = new UserLastList();
-                ll.LocalUserID = LocalUserID;
-                ll.Name = strLastList.ToLower();
-
-                Database.Instance.UserLastLists.InsertOnSubmit(ll);
+                Database.Instance.UserLastLists.InsertOnSubmit(
+                    new UserLastList { LocalUserID = this.LocalUserID, Name = strLastList.ToLower() });
             }
 
             Database.Instance.SubmitChanges();
@@ -88,24 +85,19 @@ namespace vbotserver
 
         public void SaveLastPostIndex(int iPostIndex)
         {
-            string strQuery = string.Format(@"
-                        UPDATE userpostindex
-                        SET postindex = {0}
-                        WHERE (localuserid = {1})
-                    ",iPostIndex, LocalUserID);
+            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
 
-            int iRows = DB.Instance.QueryWrite(strQuery, true);
-            if (iRows <= 0)
+            if (upi != null)
             {
-                strQuery = string.Format(@"
-                                INSERT INTO userpostindex
-                                (postindex,localuserid)
-                                VALUES
-                                ({0},{1});
-                            ", iPostIndex, LocalUserID);
-
-                iRows = DB.Instance.QueryWrite(strQuery);
+                upi.PostIndex = iPostIndex;
             }
+            else
+            {
+                Database.Instance.UserPostIndexes.InsertOnSubmit(
+                    new UserPostIndex { LocalUserID = this.LocalUserID, PostIndex = iPostIndex });
+            }
+
+            Database.Instance.SubmitChanges();
         }
     }
 }
