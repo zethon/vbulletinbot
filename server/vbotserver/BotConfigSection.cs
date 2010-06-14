@@ -50,6 +50,15 @@ namespace vbotserver
                 return collection;
             }
         }
+
+        [ConfigurationProperty("localdatabase", IsRequired = true)]
+        public string LocalDatabase
+        {
+            get
+            {
+                return (base["localdatabase"] as string);
+            }
+        }
     }
 
     public class IMServiceElement : ConfigurationElement
