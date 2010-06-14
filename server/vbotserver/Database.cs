@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Configuration;
+using System.Data;
 
 namespace vbotserver
 {
@@ -19,7 +20,8 @@ namespace vbotserver
                 if (_instance == null)
                 {
                     BotConfigSection botconfig = (BotConfigSection)ConfigurationManager.GetSection("botconfig");
-                    _instance = new VBotDB(string.Format("Data Source={0}", botconfig.LocalDatabase));
+                    IDbConnection conn = new System.Data.SqlServerCe.SqlCeConnection(string.Format("Data Source={0}", botconfig.LocalDatabase));
+                    _instance = new VBotDB(conn);
                 }
                 
                 return _instance;
