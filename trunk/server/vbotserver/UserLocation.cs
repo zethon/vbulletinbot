@@ -330,8 +330,6 @@ namespace vbotserver
             return loc;
         }
 
-
-
         static public UserLocationT LoadLocation(UserLocationType locType, User user)
         {
             UserLocationT retVal = null;
@@ -385,7 +383,5 @@ namespace vbotserver
                 );
 
         }
-
-
     }
 }
