@@ -68,26 +68,22 @@ namespace vbotserver
 
         public void SaveLastList(string strLastList)
         {
-            strLastList = strLastList.ToLower();
+            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
 
-            string strQuery = string.Format(@"
-                                UPDATE userlastlist 
-                                SET name = '{0}'
-                                WHERE (localuserid = {1})
-                            ", strLastList, LocalUserID);
-
-            int iRows = DB.Instance.QueryWrite(strQuery,true);
-            if (iRows <= 0)
+            if (ll != null)
             {
-                strQuery = string.Format(@"
-                                INSERT INTO userlastlist 
-                                (name,localuserid)
-                                VALUES
-                                ('{0}',{1});
-                            ", strLastList, LocalUserID);
-
-                iRows = DB.Instance.QueryWrite(strQuery);
+                ll.Name = strLastList.ToLower();
             }
+            else
+            {
+                ll = new UserLastList();
+                ll.LocalUserID = LocalUserID;
+                ll.Name = strLastList.ToLower();
+
+                Database.Instance.UserLastLists.InsertOnSubmit(ll);
+            }
+
+            Database.Instance.SubmitChanges();
         }
 
         public void SaveLastPostIndex(int iPostIndex)

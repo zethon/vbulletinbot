@@ -64,6 +64,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SQLite, Version=1.0.65.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\modules\System.Data.SQLite.DLL</HintPath>
@@ -89,6 +90,7 @@
     <Compile Include="Connection.cs" />
     <Compile Include="ConnectionComposite.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="DB.cs" />
     <Compile Include="InstantMessage.cs" />
     <Compile Include="Program.cs" />
@@ -100,6 +102,11 @@
     </Compile>
     <Compile Include="Result.cs" />
     <Compile Include="IMUserInfo.cs" />
+    <Compile Include="vbotDB.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>vbotDB.dbml</DependentUpon>
+    </Compile>
     <Compile Include="VBPost.cs" />
     <Compile Include="VBThread.cs" />
     <Compile Include="User.cs" />
@@ -150,6 +157,19 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="vbotDB.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>vbotDB.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vbotDB.dbml.layout">
+      <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
