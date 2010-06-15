@@ -10,18 +10,17 @@ namespace vbotserver
     {
         static ILog log = LogManager.GetLogger(typeof(User));
 
+        // should be decoupled out of this class
+        public Connection Connection;
+
+        public LocalUser LocalUser;
+
+        // to be removed
         private string _strConnUsername = string.Empty;
         public string UserConnectionName
         {
             get { return _strConnUsername; }
             set { _strConnUsername = value; }
-        }
-
-        private Connection _conn = null;
-        public Connection UserConnection
-        {
-            get { return _conn; }
-            set { _conn = value; }
         }
 
         private int _iLocalUserID = 0;
