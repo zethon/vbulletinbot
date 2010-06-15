@@ -376,58 +376,6 @@ namespace vbotserver
             return new User { LocalUser = luser, VBUser = vbuserInfo, Connection = im.IMConnection };
         }
 
-        public User LoadUser(IMUserInfo imuserinfo)
-        {
-            User user = new User();
-
-            // load the userinfo from the local db
-            Dictionary<string, string> localuser = DB.Instance.QueryFirst(string.Format(@" SELECT * FROM localuser WHERE (service = '{0}') AND (screenname = '{1}')", imuserinfo.ServiceAlias, imuserinfo.ScreenName));
-
-            if (localuser == null || !localuser.ContainsKey(@"localuserid"))
-            { // user does not exist in the local db
-
-                Dictionary<string, string> vbuserInfo = new Dictionary<string, string>();
-                vbuserInfo = VB.Instance.WhoAMI(imuserinfo.ScreenName, imuserinfo.ServiceAlias);
-
-                if (vbuserInfo.ContainsKey(@"userid"))
-                { // user exists on vbulletin, create localdb row
-
-                    int iRows = DB.Instance.QueryWrite(string.Format(@"
-                                    INSERT INTO localuser
-                                    (lastupdate,service,screenname,boarduserid)
-                                    VALUES
-                                    ({0},'{1}','{2}',{3})
-                                    ", 0,
-                                     imuserinfo.ServiceAlias,
-                                     imuserinfo.ScreenName,
-                                     vbuserInfo[@"userid"].ToString()));
-
-                    if (iRows > 0)
-                    {
-                        int iLocalUserID = DB.Instance.LastInsertID();
-                        user.DBUser = DB.Instance.QueryFirst(string.Format("SELECT * FROM localuser WHERE (localuserid = {0})", iLocalUserID));
-                        user.VBUser = vbuserInfo;
-                    }
-                    else
-                    {
-                        log.Error("Could not insert new user into `localuser` table.");
-                    }
-                }
-                else
-                {
-                    log.Error("No `userid` defined from VB::WHoAMI()");
-                }
-            }
-            else
-            { // user exists in the local db
-                user.DBUser = localuser;                
-            }
-
-            user.Connection = imuserinfo.IMConnection;
-            user.UserConnectionName = imuserinfo.ScreenName;
-            return user;
-        }
-
         public string FetchPostBit(VBPost post, string strNewLine)
         {
             string strResponse = string.Empty;
