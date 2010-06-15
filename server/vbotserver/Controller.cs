@@ -160,6 +160,8 @@ namespace vbotserver
             log.InfoFormat("OUTMSG ({0}) {1}: {2}", conn.GetType().Name, im.User, im.Text);
         }
 
+        public Connection Connection = null;
+
         public void OnMessageCallback(Connection conn, InstantMessage im)
         {
             log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
@@ -168,11 +170,13 @@ namespace vbotserver
             {
                 try
                 {
+                    Connection = conn;
+
                     IMUserInfo creds = new IMUserInfo(im.User, conn.Alias, conn);
                     User user = GetUser(creds);
                     //UserT usert = LoadUser(creds);
 
-                    if (user != null && user.LocalUserID > 0)
+                    if (user != null && user.LocalUser.LocalUserID > 0)
                     {
 
                         if (_inputs.ContainsKey(user.LocalUserID) && _inputs[user.LocalUserID].State == InputStateEnum.Waiting)
@@ -339,16 +343,16 @@ namespace vbotserver
 
         public User GetUser(IMUserInfo im)
         {
-            Dictionary<string, string> vbuserInfo = new Dictionary<string, string>();
+            Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(im.ScreenName, im.ServiceAlias);
+
+            if (!vbuserInfo.ContainsKey("userid"))
+                return null;
 
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == im.ScreenName && u.Service == im.ServiceAlias);
 
             if (luser == null)
             {
-                
-                vbuserInfo = VB.Instance.WhoAMI(im.ScreenName, im.ServiceAlias);
-
                 if (vbuserInfo.ContainsKey(@"userid"))
                 {
                     luser = new LocalUser
