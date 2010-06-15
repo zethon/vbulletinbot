@@ -33,7 +33,7 @@ namespace vbotserver
             }
             catch (Exception ex)
             {
-                log.Debug("Exception", ex);
+                log.Fatal("Exception", ex);
             }
         }
     }
