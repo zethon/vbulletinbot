@@ -9,7 +9,7 @@ namespace vbotserver
 {
     class AIMConnection : Connection
     {
-        static ILog log = LogManager.GetLogger(typeof(User));
+        static ILog log = LogManager.GetLogger(typeof(AIMConnection));
 
         private TOC _toc = new TOC();
         private string _strUsername = string.Empty;
