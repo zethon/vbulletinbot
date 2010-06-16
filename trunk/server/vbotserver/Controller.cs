@@ -328,8 +328,9 @@ namespace vbotserver
                         break;
 
                         case "whoami":
-                            retval = WhoAmI(user.Connection, user.UserConnectionName, user);
-                            break;
+                            // TODO: the string in UserConnectionName should come from somewhere else?
+                            retval = WhoAmI(user.UserConnectionName, Connection.Alias);
+                        break;
 
                         default:
                             retval = new Result(ResultCode.Error, @"Unknown command. Please see http://code.google.com/p/vbulletinbot/ for help.");
@@ -373,7 +374,15 @@ namespace vbotserver
                 Database.Instance.SubmitChanges();
             }
 
-            return new User { LocalUser = luser, VBUser = vbuserInfo, Connection = im.IMConnection };
+            return new User 
+            { 
+                LocalUser = luser, 
+                VBUser = vbuserInfo, 
+                Connection = im.IMConnection,
+
+                // TODO: remove this
+                UserConnectionName = im.ScreenName
+            };
         }
 
         public string FetchPostBit(VBPost post, string strNewLine)
@@ -1000,9 +1009,14 @@ namespace vbotserver
             }
         }
 
+        /// <summary>
+        /// Returns the current Forum and Thread of the user
+        /// </summary>
+        /// <param name="user">The user</param>
+        /// <returns></returns>
         public Result WhereAmI(User user)
         {
-            string strNewLine = user.Connection.NewLine;
+            string strNewLine = Connection.NewLine;
             string strResponse = strNewLine;
 
             UserLocationT forumLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
@@ -1015,8 +1029,7 @@ namespace vbotserver
             {
                 strResponse += "None" + strNewLine;
             }
-
-
+            
             UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
             strResponse += "Current Thread: ";
             if (threadLoc != null)
@@ -1031,19 +1044,26 @@ namespace vbotserver
             return new Result(ResultCode.Success, strResponse);
         }
 
-        public Result WhoAmI(Connection conn, string strUsername, User user)
+        /// <summary>
+        /// Returns the vBulletin userid and username of the associated User
+        /// </summary>
+        /// <param name="strUsername">The connection screen name</param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public Result WhoAmI(string strUsername, string strConnectionName)
         {
             Result retval;
             string strResponse = string.Empty;
 
             try
             {
-                user.VBUser = VB.Instance.WhoAMI(strUsername, conn.Alias);
-                if (user.VBUser.ContainsKey(@"username"))
+                Dictionary<string, string> vbuser = VB.Instance.WhoAMI(strUsername, strConnectionName);
+
+                if (vbuser.ContainsKey(@"username"))
                 {
-                    strResponse = conn.NewLine
-                                      + "VBUserID: " + user.VBUserID.ToString() + conn.NewLine
-                                      + "VBUsername: " + user.VBUser[@"username"].ToString();
+                    strResponse = Connection.NewLine
+                                      + "VBUserID: " + vbuser[@"userid"].ToString() + Connection.NewLine
+                                      + "VBUsername: " + vbuser[@"username"].ToString();
                 }
                 else
                 {
