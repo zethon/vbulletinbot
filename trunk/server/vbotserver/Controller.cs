@@ -51,6 +51,8 @@ namespace vbotserver
 
         CommandClass _commands = null;
 
+        public ResponseChannel ResponseChannel = null;
+
         ConnectionComposite _conComp = null;
         public ConnectionComposite Connections
         {
@@ -160,25 +162,34 @@ namespace vbotserver
             log.InfoFormat("OUTMSG ({0}) {1}: {2}", conn.GetType().Name, im.User, im.Text);
         }
 
-        public Connection Connection = null;
-
         public void OnMessageCallback(Connection conn, InstantMessage im)
         {
             lock (this)
             {
                 log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
+
                 DateTime dtStart = DateTime.Now;
 
                 try
                 {
-                    Connection = conn;
+                    // class wide ResponseChannel
+                    ResponseChannel = new ResponseChannel
+                    {
+                        ToName = im.User,
+                        Connection = conn
+                    };
 
+                    // TODO: remove this, IMUserInfo is to be removed
                     IMUserInfo creds = new IMUserInfo(im.User, conn.Alias, conn);
-                    User user = GetUser(creds);
-                    //UserT usert = LoadUser(creds);
+                    
+                    User user = GetUser(im.User,conn.Alias);
+                    
+                    // TODO: redesign-in-progress-hack, to be removed
+                    user.Connection = conn;
 
                     if (user != null && user.LocalUser.LocalUserID > 0)
                     {
+                        #region if
 
                         if (_inputs.ContainsKey(user.LocalUser.LocalUserID) && _inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Waiting)
                         { // waiting for input?
@@ -208,6 +219,7 @@ namespace vbotserver
                                 conn.SendMessage(new InstantMessage(im.User, lastRes.Message));
                             }
                         }
+                        #endregion
                     }
                     else
                     {
@@ -215,6 +227,8 @@ namespace vbotserver
                         conn.SendMessage(new InstantMessage(im.User, strResponse));
                         log.Error(@"Could not load user.");
                     }
+
+                        
                 }
                 catch (Exception ex)
                 {
@@ -333,7 +347,7 @@ namespace vbotserver
 
                         case "whoami":
                             // TODO: the string in UserConnectionName should come from somewhere else?
-                            retval = WhoAmI(user.UserConnectionName, Connection.Alias);
+                            retval = WhoAmI(ResponseChannel.ToName, ResponseChannel.Connection.Alias);
                         break;
 
                         default:
@@ -346,15 +360,21 @@ namespace vbotserver
             return retval;
         }
 
-        public User GetUser(IMUserInfo im)
+        /// <summary>
+        /// Returns a User object associated with the screen name and service
+        /// </summary>
+        /// <param name="ScreenName">The screen name of the user</param>
+        /// <param name="ServiceAlias">The corresponding server (aim,gtalk,yahoo)</param>
+        /// <returns>User object or null</returns>
+        public User GetUser(string ScreenName, string ServiceAlias)
         {
-            Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(im.ScreenName, im.ServiceAlias);
+            Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(ScreenName, ServiceAlias);
 
             if (!vbuserInfo.ContainsKey("userid"))
                 return null;
 
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
-                u => u.Screenname == im.ScreenName && u.Service == im.ServiceAlias);
+                u => u.Screenname == ScreenName && u.Service == ServiceAlias);
 
             if (luser == null)
             {
@@ -362,8 +382,8 @@ namespace vbotserver
                 {
                     luser = new LocalUser
                     {
-                        Screenname = im.ScreenName,
-                        Service = im.ServiceAlias,
+                        Screenname = ScreenName,
+                        Service = ServiceAlias,
                         BoardUserID = int.Parse(vbuserInfo[@"userid"].ToString()),
                         LastUpdate = DateTime.Now
                     };
@@ -382,10 +402,9 @@ namespace vbotserver
             { 
                 LocalUser = luser, 
                 VBUser = vbuserInfo, 
-                Connection = im.IMConnection,
 
                 // TODO: remove this
-                UserConnectionName = im.ScreenName
+                UserConnectionName = ResponseChannel.ToName
             };
         }
 
@@ -884,7 +903,6 @@ namespace vbotserver
             {
                 ResultCode rc = ResultCode.Unknown;
 
-                //Connection conn = Connection;
                 string strResponse = string.Empty;
                 UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
 
@@ -917,7 +935,9 @@ namespace vbotserver
 
                     if (threads == null)
                     {
-                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, Connection);
+                        Connection connection = ResponseChannel.Connection;
+                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, connection.Alias, connection);
+                        
                         VBRequestResult r = VB.Instance.ListThreads(imuserinfo, loc.LocationRemoteID, iPageNumber, iPerPage);
 
                         if (r.ResultCode != VBRequestResultCode.Success)
@@ -938,7 +958,7 @@ namespace vbotserver
                         }
                     }
 
-                    strResponse += Connection.NewLine + "Threads in `" + loc.Title + "`" + Connection.NewLine;
+                    strResponse += ResponseChannel.Connection.NewLine + "Threads in `" + loc.Title + "`" + ResponseChannel.Connection.NewLine;
 
                     bool bForumsExist = false;
                     string strIsNew = string.Empty;
@@ -952,7 +972,7 @@ namespace vbotserver
 
                         if (iPageNumber <= iTotalPages)
                         {
-                            strResponse += string.Format("Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + Connection.NewLine;
+                            strResponse += string.Format("Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.Connection.NewLine;
                         }
 
                         int iCount = 1;
@@ -974,7 +994,7 @@ namespace vbotserver
 
                             bForumsExist = true;
 
-                            strResponse += string.Format("{0}. {1}{2}{3}{4} ({5}) - {6} by {7}" + Connection.NewLine,
+                            strResponse += string.Format("{0}. {1}{2}{3}{4} ({5}) - {6} by {7}" + ResponseChannel.Connection.NewLine,
                                                 iCount,
                                                 strIsSubscribed,
                                                 strIsNew,
@@ -1020,7 +1040,7 @@ namespace vbotserver
         /// <returns></returns>
         public Result WhereAmI(User user)
         {
-            string strNewLine = Connection.NewLine;
+            string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
 
             UserLocationT forumLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
@@ -1065,8 +1085,8 @@ namespace vbotserver
 
                 if (vbuser.ContainsKey(@"username"))
                 {
-                    strResponse = Connection.NewLine
-                                      + "VBUserID: " + vbuser[@"userid"].ToString() + Connection.NewLine
+                    strResponse = ResponseChannel.Connection.NewLine
+                                      + "VBUserID: " + vbuser[@"userid"].ToString() + ResponseChannel.Connection.NewLine
                                       + "VBUsername: " + vbuser[@"username"].ToString();
                 }
                 else
