@@ -15,17 +15,8 @@ namespace vbotserver
 
     public class Result
     {
-        private ResultCode _code = ResultCode.Unknown;
-        public ResultCode Code
-        {
-            get { return _code; }
-        }
-
-        private string _strMessage = string.Empty;
-        public string Message
-        {
-            get { return _strMessage; }
-        }
+        public ResultCode Code;
+        public string Message;
 
         public Result()
         {
@@ -33,13 +24,13 @@ namespace vbotserver
 
         public Result(ResultCode code)
         {
-            _code = code;
+            Code = code;
         }
 
         public Result(ResultCode code, string strMsg)
         {
-            _strMessage = strMsg;
-            _code = code;
+            Message = strMsg;
+            Code = code;
         }
     }
 }
