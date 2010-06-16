@@ -266,7 +266,7 @@ namespace vbotserver
                                  LocationRemoteID,
                                  string.Join(" ", IDList.ToArray()).Trim(),
                                  LocationType.ToString().ToLower(),
-                                 Owner.LocalUserID,
+                                 Owner.LocalUser.LocalUserID,
                                  PageNumber,
                                  PerPage
                                  );
@@ -292,7 +292,7 @@ namespace vbotserver
                 info.Add(@"locationremoteid", "-1");
                 info.Add(@"list", string.Empty);
                 info.Add(@"userlocationtype", @"forum");
-                info.Add(@"localuserid", owner.LocalUserID.ToString());
+                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
 
                 loc = new UserLocationT(info, owner);
             }
@@ -307,7 +307,7 @@ namespace vbotserver
                 info.Add(@"locationremoteid", "0");
                 info.Add(@"list", string.Empty);
                 info.Add(@"userlocationtype", @"thread");
-                info.Add(@"localuserid", owner.LocalUserID.ToString());
+                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
 
                 loc = new UserLocationT(info, owner);
             }
@@ -322,7 +322,7 @@ namespace vbotserver
                 info.Add(@"locationremoteid", "0");
                 info.Add(@"list", string.Empty);
                 info.Add(@"userlocationtype", @"post");
-                info.Add(@"localuserid", owner.LocalUserID.ToString());
+                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
 
                 loc = new UserLocationT(info, owner);
             }
@@ -342,7 +342,7 @@ namespace vbotserver
                                                     FROM userlocation
                                                     WHERE (localuserid = {0})
                                                     AND (userlocationtype = '{1}');
-                                                    ", user.LocalUserID, strLocType));
+                                                    ", user.LocalUser.LocalUserID, strLocType));
 
                 if (locInfo != null)
                 {
