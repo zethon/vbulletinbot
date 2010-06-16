@@ -164,10 +164,11 @@ namespace vbotserver
 
         public void OnMessageCallback(Connection conn, InstantMessage im)
         {
-            log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
-
             lock (this)
             {
+                log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
+                DateTime dtStart = DateTime.Now;
+
                 try
                 {
                     Connection = conn;
@@ -219,6 +220,9 @@ namespace vbotserver
                 {
                     log.Error("Something bad",ex);
                 }
+
+                TimeSpan elapsed = DateTime.Now - dtStart;
+                log.InfoFormat("INMSG RESPONSE TIME {0}.{1} seconds", elapsed.Seconds, elapsed.Milliseconds);
             }
         }
 
@@ -880,7 +884,7 @@ namespace vbotserver
             {
                 ResultCode rc = ResultCode.Unknown;
 
-                Connection conn = user.Connection;
+                //Connection conn = Connection;
                 string strResponse = string.Empty;
                 UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
 
@@ -913,7 +917,7 @@ namespace vbotserver
 
                     if (threads == null)
                     {
-                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, Connection);
                         VBRequestResult r = VB.Instance.ListThreads(imuserinfo, loc.LocationRemoteID, iPageNumber, iPerPage);
 
                         if (r.ResultCode != VBRequestResultCode.Success)
@@ -934,7 +938,7 @@ namespace vbotserver
                         }
                     }
 
-                    strResponse += conn.NewLine + "Threads in `" + loc.Title + "`" + conn.NewLine;
+                    strResponse += Connection.NewLine + "Threads in `" + loc.Title + "`" + Connection.NewLine;
 
                     bool bForumsExist = false;
                     string strIsNew = string.Empty;
@@ -948,7 +952,7 @@ namespace vbotserver
 
                         if (iPageNumber <= iTotalPages)
                         {
-                            strResponse += string.Format("Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + conn.NewLine;
+                            strResponse += string.Format("Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + Connection.NewLine;
                         }
 
                         int iCount = 1;
@@ -970,7 +974,7 @@ namespace vbotserver
 
                             bForumsExist = true;
 
-                            strResponse += string.Format("{0}. {1}{2}{3}{4} ({5}) - {6} by {7}" + conn.NewLine,
+                            strResponse += string.Format("{0}. {1}{2}{3}{4} ({5}) - {6} by {7}" + Connection.NewLine,
                                                 iCount,
                                                 strIsSubscribed,
                                                 strIsNew,
@@ -1080,171 +1084,6 @@ namespace vbotserver
             }
 
             return retval;
-        }
-
-        public Result UnsubscribeThread(User user, string[] options)
-        {
-            Result ret = null;
-            object[] objs = { user, options };
-
-            if (options.Count() > 0 && options[0].ToLower() == @"all")
-            {
-                object[] param = { user, true, null };
-                Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-                t.Start(param);                
-                ret = new Result(ResultCode.Halt, string.Empty);
-            }
-            else if (options.Count() == 0)
-            {
-                UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
-                if (threadLoc != null)
-                {
-                    object[] param = { user, false, threadLoc.LocationRemoteID };
-                    Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-                    t.Start(param);
-
-                    ret = new Result(ResultCode.Halt, string.Empty);
-                }
-                else
-                {
-                    ret = new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
-                }
-            }
-            else
-            {
-                ret = new Result(ResultCode.Error,@"Invalid parameter to `usub` command");
-            }
-
-            return ret;
-        }
-
-        public void DoUnsubscribeThread(object o)
-        {
-            object[] objs = o as object[];
-
-            if (objs == null)
-            {
-                throw new Exception(@"Could not cast object to object[] in DoUnsubscribeThread");
-            }
-
-            if (objs.Count() != 3)
-            {
-                throw new Exception(@"Something weird passed into DoUnsubscribeThread");
-            }
-
-            User user = objs[0] as User;
-            bool bAll = (bool)objs[1];
-
-            Connection c = user.Connection;
-            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
-
-            int iThreadID = -1;
-            string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
-
-            if (!bAll)
-            {
-                iThreadID = (int)objs[2];
-                strConfMsg = @"Are you sure you want to unsubscribe from thread " + iThreadID.ToString() + "?";
-            }
-
-            if (GetConfirmation(user,strConfMsg))
-            {
-                VBRequestResult r = VB.Instance.UnSubscribeThread(i, iThreadID);
-                if (r.ResultCode == VBRequestResultCode.Success)
-                {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Subscription(s) removed."));
-                }
-                else
-                {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not remove subscription(s)."));
-                    log.Error(r.Message);
-                }
-            }
-            else
-            {
-                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
-                log.DebugFormat("User '{0}' cancelled action DoUnsubscribeThread()", user.UserConnectionName);
-            }
-        }
-
-        public Result TurnOnOffAutoIMS(User user, string[] options)
-        {
-            Result ret = null;
-
-            if (options.Count() != 1)
-            {
-                ret = new Result(ResultCode.Error, @"Use `im on` or `im off` to turn on/off IM Notification");
-            }
-            else if (options[0].ToLower() == @"on")
-            {
-                object[] objs = { user, true };
-                Thread t = new Thread(new ParameterizedThreadStart(DoTurnOnOffAutoIMS));
-                t.Start(objs);   
-
-                ret = new Result(ResultCode.Halt, string.Empty);
-            }
-            else if (options[0].ToLower() == @"off")
-            {
-                object[] objs = { user, false };
-                Thread t = new Thread(new ParameterizedThreadStart(DoTurnOnOffAutoIMS));
-                t.Start(objs);   
-
-                ret = new Result(ResultCode.Halt, string.Empty);
-            }
-            else
-            {
-                ret = new Result(ResultCode.Error, @"Use `im on` or `im off` to turn on/off IM Notification");
-            }
-            
-            
-
-            
-            return ret;
-        }
-
-        public void DoTurnOnOffAutoIMS(object o)
-        {
-            object[] objs = o as object[];
-
-            if (objs == null)
-            {
-                throw new Exception(@"Could not cast object to object[] in DoTurnOnOffAutoIMS");
-            }
-
-            if (objs.Count() != 2)
-            {
-                throw new Exception(@"Something weird passed into DoUnsubscribeThread");
-            }
-
-            User user = objs[0] as User;
-            bool bOn = (bool)objs[1];
-            Connection c = user.Connection;
-            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
-
-            string strOnOff = "off";
-            if (bOn)
-            {
-                strOnOff = "on";
-            }
-
-            if (GetConfirmation(user, "Are you sure you want to turn IM Notification " + strOnOff + "?"))
-            {
-                VBRequestResult r = VB.Instance.TurnOnOffIMNotification(i, bOn);
-
-                if (r.ResultCode == VBRequestResultCode.Success)
-                {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"IM Notification turned " + strOnOff + "."));
-                }
-                else
-                {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not set IM Notification"));
-                    log.Error(r.Message);
-                }
-            }
-            else
-            {
-                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
-            }
         }
 
         #region Threaded Functions
@@ -1540,6 +1379,167 @@ namespace vbotserver
             }
         }
 
+        public Result UnsubscribeThread(User user, string[] options)
+        {
+            Result ret = null;
+            object[] objs = { user, options };
+
+            if (options.Count() > 0 && options[0].ToLower() == @"all")
+            {
+                object[] param = { user, true, null };
+                Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
+                t.Start(param);
+                ret = new Result(ResultCode.Halt, string.Empty);
+            }
+            else if (options.Count() == 0)
+            {
+                UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                if (threadLoc != null)
+                {
+                    object[] param = { user, false, threadLoc.LocationRemoteID };
+                    Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
+                    t.Start(param);
+
+                    ret = new Result(ResultCode.Halt, string.Empty);
+                }
+                else
+                {
+                    ret = new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
+                }
+            }
+            else
+            {
+                ret = new Result(ResultCode.Error, @"Invalid parameter to `usub` command");
+            }
+
+            return ret;
+        }
+
+        public void DoUnsubscribeThread(object o)
+        {
+            object[] objs = o as object[];
+
+            if (objs == null)
+            {
+                throw new Exception(@"Could not cast object to object[] in DoUnsubscribeThread");
+            }
+
+            if (objs.Count() != 3)
+            {
+                throw new Exception(@"Something weird passed into DoUnsubscribeThread");
+            }
+
+            User user = objs[0] as User;
+            bool bAll = (bool)objs[1];
+
+            Connection c = user.Connection;
+            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+
+            int iThreadID = -1;
+            string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
+
+            if (!bAll)
+            {
+                iThreadID = (int)objs[2];
+                strConfMsg = @"Are you sure you want to unsubscribe from thread " + iThreadID.ToString() + "?";
+            }
+
+            if (GetConfirmation(user, strConfMsg))
+            {
+                VBRequestResult r = VB.Instance.UnSubscribeThread(i, iThreadID);
+                if (r.ResultCode == VBRequestResultCode.Success)
+                {
+                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Subscription(s) removed."));
+                }
+                else
+                {
+                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not remove subscription(s)."));
+                    log.Error(r.Message);
+                }
+            }
+            else
+            {
+                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
+                log.DebugFormat("User '{0}' cancelled action DoUnsubscribeThread()", user.UserConnectionName);
+            }
+        }
+
+        public Result TurnOnOffAutoIMS(User user, string[] options)
+        {
+            Result ret = null;
+
+            if (options.Count() != 1)
+            {
+                ret = new Result(ResultCode.Error, @"Use `im on` or `im off` to turn on/off IM Notification");
+            }
+            else if (options[0].ToLower() == @"on")
+            {
+                object[] objs = { user, true };
+                Thread t = new Thread(new ParameterizedThreadStart(DoTurnOnOffAutoIMS));
+                t.Start(objs);
+
+                ret = new Result(ResultCode.Halt, string.Empty);
+            }
+            else if (options[0].ToLower() == @"off")
+            {
+                object[] objs = { user, false };
+                Thread t = new Thread(new ParameterizedThreadStart(DoTurnOnOffAutoIMS));
+                t.Start(objs);
+
+                ret = new Result(ResultCode.Halt, string.Empty);
+            }
+            else
+            {
+                ret = new Result(ResultCode.Error, @"Use `im on` or `im off` to turn on/off IM Notification");
+            }
+
+            return ret;
+        }
+
+        public void DoTurnOnOffAutoIMS(object o)
+        {
+            object[] objs = o as object[];
+
+            if (objs == null)
+            {
+                throw new Exception(@"Could not cast object to object[] in DoTurnOnOffAutoIMS");
+            }
+
+            if (objs.Count() != 2)
+            {
+                throw new Exception(@"Something weird passed into DoUnsubscribeThread");
+            }
+
+            User user = objs[0] as User;
+            bool bOn = (bool)objs[1];
+            Connection c = user.Connection;
+            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+
+            string strOnOff = "off";
+            if (bOn)
+            {
+                strOnOff = "on";
+            }
+
+            if (GetConfirmation(user, "Are you sure you want to turn IM Notification " + strOnOff + "?"))
+            {
+                VBRequestResult r = VB.Instance.TurnOnOffIMNotification(i, bOn);
+
+                if (r.ResultCode == VBRequestResultCode.Success)
+                {
+                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"IM Notification turned " + strOnOff + "."));
+                }
+                else
+                {
+                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not set IM Notification"));
+                    log.Error(r.Message);
+                }
+            }
+            else
+            {
+                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
+            }
+        }
         #endregion
 
         public void MainLoop()
