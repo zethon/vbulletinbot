@@ -179,12 +179,12 @@ namespace vbotserver
                     if (user != null && user.LocalUser.LocalUserID > 0)
                     {
 
-                        if (_inputs.ContainsKey(user.LocalUserID) && _inputs[user.LocalUserID].State == InputStateEnum.Waiting)
+                        if (_inputs.ContainsKey(user.LocalUser.LocalUserID) && _inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Waiting)
                         { // waiting for input?
 
                             InputState ist = new InputState(InputStateEnum.Responded);
                             ist.PageText = im.Text;
-                            _inputs[user.LocalUserID] = ist;
+                            _inputs[user.LocalUser.LocalUserID] = ist;
                         }
                         else
                         { // the user is at the 'main menu'
@@ -234,7 +234,7 @@ namespace vbotserver
                 if (int.TryParse(parser.ApplicationName, out iListChoice) && iListChoice > 0)
                 { 
                     // user entered a number, let's deal with the lastlists
-                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUserID);
+                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUser.LocalUserID);
 
                     if (ll != null)
                     {
@@ -477,7 +477,7 @@ namespace vbotserver
 
             if (curThreadLocation != null)
             {
-                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUserID);
+                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUser.LocalUserID);
 
                 if (upi != null)
                 {
@@ -493,7 +493,7 @@ namespace vbotserver
                 else
                 {
                     rs = new Result(ResultCode.Error, @"Invalid post index. Use `lp` to browse a thread.");
-                    log.WarnFormat("Invalid `UserPostIndex` for LocalUserID {0}", user.LocalUserID);
+                    log.WarnFormat("Invalid `UserPostIndex` for LocalUserID {0}", user.LocalUser.LocalUserID);
                 }
             }
             else
@@ -1163,6 +1163,7 @@ namespace vbotserver
             else
             {
                 c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
+                log.DebugFormat("User '{0}' cancelled action DoUnsubscribeThread()", user.UserConnectionName);
             }
         }
 
@@ -1252,9 +1253,9 @@ namespace vbotserver
             string strRet = string.Empty;
             DateTime start = DateTime.Now;
 
-            _inputs[user.LocalUserID] = new InputState(InputStateEnum.Waiting);
+            _inputs[user.LocalUser.LocalUserID] = new InputState(InputStateEnum.Waiting);
 
-            while (_inputs[user.LocalUserID].State == InputStateEnum.Waiting)
+            while (_inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Waiting)
             {
                 TimeSpan span = DateTime.Now - start;
                 if (span.TotalMinutes > 9) // ten minute wait for input
@@ -1268,12 +1269,12 @@ namespace vbotserver
             };
 
             // state is set to 'Responded' in the callback....
-            if (_inputs[user.LocalUserID].State == InputStateEnum.Responded)
+            if (_inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Responded)
             {
-                strRet = _inputs[user.LocalUserID].PageText;
+                strRet = _inputs[user.LocalUser.LocalUserID].PageText;
             }
 
-            _inputs.Remove(user.LocalUserID);
+            _inputs.Remove(user.LocalUser.LocalUserID);
             return strRet;
         }
 
