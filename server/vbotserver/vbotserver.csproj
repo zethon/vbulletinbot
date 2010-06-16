@@ -100,6 +100,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ResponseChannel.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="IMUserInfo.cs" />
     <Compile Include="vbotDB.designer.cs">
