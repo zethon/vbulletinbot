@@ -10,12 +10,12 @@ namespace vbotserver
     {
         static ILog log = LogManager.GetLogger(typeof(User));
 
-        // should be decoupled out of this class
+        // TODO: remove this
         public Connection Connection;
 
         public LocalUser LocalUser;
 
-        // to be removed
+        // TODO: remove this
         private string _strConnUsername = string.Empty;
         public string UserConnectionName
         {
@@ -23,31 +23,10 @@ namespace vbotserver
             set { _strConnUsername = value; }
         }
 
-        private int _iLocalUserID = 0;
-        public int LocalUserID
-        {
-            get { return _iLocalUserID; }
-        }
-
         private int _iVBUserID = 0;
         public int VBUserID
         {
             get { return _iVBUserID; }
-        }
-
-        private Dictionary<string, string> _dbUser;
-        public Dictionary<string, string> DBUser
-        {
-            get { return _dbUser; }
-            set 
-            { 
-                Dictionary<string,string> temp = value as Dictionary<string,string>;
-
-                if (!temp.ContainsKey(@"localuserid") || !int.TryParse(temp[@"localuserid"].ToString(),out _iLocalUserID))
-                    throw new Exception("Cannot set DBUser, dictionary does not contain `localuserid` column.");
-
-                _dbUser = value; 
-            }
         }
 
         private Dictionary<string, string> _vbUser;
@@ -67,7 +46,7 @@ namespace vbotserver
 
         public void SaveLastList(string strLastList)
         {
-            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
+            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUser.LocalUserID);
 
             if (ll != null)
             {
@@ -76,7 +55,7 @@ namespace vbotserver
             else
             {
                 Database.Instance.UserLastLists.InsertOnSubmit(
-                    new UserLastList { LocalUserID = this.LocalUserID, Name = strLastList.ToLower() });
+                    new UserLastList { LocalUserID = this.LocalUser.LocalUserID, Name = strLastList.ToLower() });
             }
 
             Database.Instance.SubmitChanges();
@@ -84,7 +63,7 @@ namespace vbotserver
 
         public void SaveLastPostIndex(int iPostIndex)
         {
-            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
+            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUser.LocalUserID);
 
             if (upi != null)
             {
@@ -93,7 +72,7 @@ namespace vbotserver
             else
             {
                 Database.Instance.UserPostIndexes.InsertOnSubmit(
-                    new UserPostIndex { LocalUserID = this.LocalUserID, PostIndex = iPostIndex });
+                    new UserPostIndex { LocalUserID = this.LocalUser.LocalUserID, PostIndex = iPostIndex });
             }
 
             Database.Instance.SubmitChanges();
