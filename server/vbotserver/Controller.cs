@@ -174,11 +174,8 @@ namespace vbotserver
                 try
                 {
                     ResponseChannel = new ResponseChannel(im.User, conn);
-                    
-                    User user = GetUser(im.User,conn.Alias);
-                    
-                    // TODO: redesign-in-progress-hack, to be removed
-                    user.Connection = conn;
+
+                    LocalUserAdapter user = GetUser(im.User,conn.Alias);
 
                     if (user != null && user.LocalUser.LocalUserID > 0)
                     {
@@ -236,7 +233,7 @@ namespace vbotserver
             }
         }
 
-        public Result DoCommand(string strCommand,User user)
+        public Result DoCommand(string strCommand,LocalUserAdapter user)
         {
             Result retval = new Result();
             CommandParser parser = new CommandParser(strCommand);
@@ -362,7 +359,7 @@ namespace vbotserver
         /// <param name="ScreenName">The screen name of the user</param>
         /// <param name="ServiceAlias">The corresponding server (aim,gtalk,yahoo)</param>
         /// <returns>User object or null</returns>
-        public User GetUser(string ScreenName, string ServiceAlias)
+        public LocalUserAdapter GetUser(string ScreenName, string ServiceAlias)
         {
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == ScreenName && u.Service == ServiceAlias);
@@ -391,12 +388,10 @@ namespace vbotserver
                 Database.Instance.SubmitChanges();
             }
 
-            return new User 
+            return new LocalUserAdapter 
             { 
                 LocalUser = luser, 
-
-                // TODO: remove this
-                UserConnectionName = ResponseChannel.ToName
+                ResponseChannel = ResponseChannel
             };
         }
 
@@ -412,12 +407,12 @@ namespace vbotserver
             return strResponse;
         }
 
-        public Result GotoForumIndex(int iIndex, User user)
+        public Result GotoForumIndex(int iIndex, LocalUserAdapter user)
         {
             return GotoForumIndex(iIndex, user, false);
         }
 
-        public Result GotoForumIndex(int iIndex, User user, bool bGotoRoot)
+        public Result GotoForumIndex(int iIndex, LocalUserAdapter user, bool bGotoRoot)
         {
             Result retval = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -434,7 +429,6 @@ namespace vbotserver
 
                     curLoc.ParseForumsList(forums);
                     curLoc.SaveLocation();
-                    //curLoc.UserLocationID = curLoc.UserLocationID; //DB.Instance.LastInsertID();
                 }
             }
 
@@ -482,7 +476,7 @@ namespace vbotserver
             return retval;
         }
 
-        public Result GotoNextPost(User user, bool bGotoNext)
+        public Result GotoNextPost(LocalUserAdapter user, bool bGotoNext)
         {
             Result rs = null;
 
@@ -517,7 +511,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoParentForum(User user)
+        public Result GotoParentForum(LocalUserAdapter user)
         {
             Result ret = null;
             UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -558,7 +552,7 @@ namespace vbotserver
             return ret;
         }
 
-        public Result GotoPostIndex(int iChoice, User user)
+        public Result GotoPostIndex(int iChoice, LocalUserAdapter user)
         {
             Result rs = null;
             UserLocationAdapter curPostLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
@@ -573,7 +567,7 @@ namespace vbotserver
                     VBPost post = r.Data as VBPost;
                     if (post != null)
                     {
-                        string strText = FetchPostBit(post, user.Connection.NewLine);
+                        string strText = FetchPostBit(post, ResponseChannel.Connection.NewLine);
                         user.SaveLastPostIndex(iChoice);
                         rs = new Result(ResultCode.Success, strText);
                     }
@@ -595,7 +589,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoThread(User user, string[] options)
+        public Result GotoThread(LocalUserAdapter user, string[] options)
         {
             Result rs = null;
 
@@ -650,7 +644,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoThreadIndex(int iChoice, User user)
+        public Result GotoThreadIndex(int iChoice, LocalUserAdapter user)
         {
             Result rs = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
@@ -709,12 +703,12 @@ namespace vbotserver
             return rs;
         }
 
-        public Result ListForum(User user)
+        public Result ListForum(LocalUserAdapter user)
         {
             return ListForum(user, null);
         }
 
-        public Result ListForum(User user, List<Dictionary<string, string>> forums)
+        public Result ListForum(LocalUserAdapter user, List<Dictionary<string, string>> forums)
         {
             lock (this)
             {
@@ -738,8 +732,7 @@ namespace vbotserver
                     forums = res.Data as List<Dictionary<string, string>>;
                 }
 
-                Connection conn = user.Connection;
-                string strResponse = conn.NewLine + "Subforums in `" + loc.Title + "`" + conn.NewLine;
+                string strResponse = ResponseChannel.Connection.NewLine + "Subforums in `" + loc.Title + "`" + ResponseChannel.Connection.NewLine;
                 bool bForumsExist = false;
                 string strIsNew = string.Empty;
 
@@ -762,7 +755,7 @@ namespace vbotserver
                         }
 
                         bForumsExist = true;
-                        strResponse += iCount.ToString() + ". " + strIsNew + foruminfo[@"title"] + conn.NewLine;
+                        strResponse += iCount.ToString() + ". " + strIsNew + foruminfo[@"title"] + ResponseChannel.NewLine;
                         iCount++;
                     }
 
@@ -783,12 +776,12 @@ namespace vbotserver
             }
         }
 
-        public Result ListPosts(User user, string[] options)
+        public Result ListPosts(LocalUserAdapter user, string[] options)
         {
             return ListPosts(user, options, null, null);
         }
 
-        public Result ListPosts(User user, string[] options, List<VBPost> posts, VBThread thread)
+        public Result ListPosts(LocalUserAdapter user, string[] options, List<VBPost> posts, VBThread thread)
         {
             lock (this)
             {
@@ -830,15 +823,14 @@ namespace vbotserver
                     }
                 }
 
-                Connection conn = user.Connection;
-                string strResponse = conn.NewLine + "Thread: " + loc.Title + conn.NewLine;
+                string strResponse = ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
 
                 double dTotalPosts = (double)(thread.ReplyCount + 1);
                 int iTotalPages = (int)Math.Ceiling(dTotalPosts / (double)iPerPage);
 
                 if (iPageNumber <= iTotalPages)
                 {
-                    strResponse += string.Format("Posts: Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + conn.NewLine;
+                    strResponse += string.Format("Posts: Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.NewLine;
                 }
 
                 string strIsNew = string.Empty;
@@ -853,7 +845,7 @@ namespace vbotserver
                             strIsNew = "*";
                         }
 
-                        strResponse += string.Format("{0}. {1}\"{2}\" - {3} by {4}" + conn.NewLine,
+                        strResponse += string.Format("{0}. {1}\"{2}\" - {3} by {4}" + ResponseChannel.NewLine,
                                             iCount,
                                             strIsNew,
                                             postInfo.GetShortPostText(),
@@ -878,12 +870,12 @@ namespace vbotserver
             }
         }
 
-        public Result ListThreads(User user, string[] options)
+        public Result ListThreads(LocalUserAdapter user, string[] options)
         {
             return ListThreads(user, options, null);
         }
 
-        public Result ListThreads(User user, string[] options, List<VBThread> threads)
+        public Result ListThreads(LocalUserAdapter user, string[] options, List<VBThread> threads)
         {
             lock (this)
             {
@@ -1022,7 +1014,7 @@ namespace vbotserver
         /// </summary>
         /// <param name="user">The user</param>
         /// <returns></returns>
-        public Result WhereAmI(User user)
+        public Result WhereAmI(LocalUserAdapter user)
         {
             string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
@@ -1091,7 +1083,7 @@ namespace vbotserver
         }
 
         #region Threaded Functions
-        public string GetString(User user)
+        public string GetString(LocalUserAdapter user)
         {
             string strRet = string.Empty;
             DateTime start = DateTime.Now;
@@ -1121,16 +1113,17 @@ namespace vbotserver
             return strRet;
         }
 
-        public bool GetConfirmation(User user)
+        public bool GetConfirmation(LocalUserAdapter user)
         {
             return GetConfirmation(user, @"Are you sure? (y or n)");
         }
 
-        public bool GetConfirmation(User user, string strMessage)
+        public bool GetConfirmation(LocalUserAdapter user, string strMessage)
         {
             bool bRetval = false;
-            Connection c = user.Connection;
-            c.SendMessage(new InstantMessage(user.UserConnectionName, strMessage));
+            //Connection c = user.Connection;
+            //c.SendMessage(new InstantMessage(user.UserConnectionName, strMessage));
+            user.ResponseChannel.SendMessage(strMessage);
 
             string strResponse = GetString(user);
 
@@ -1142,7 +1135,7 @@ namespace vbotserver
             return bRetval;
         }
 
-        public Result MarkRead(User user, string strField)
+        public Result MarkRead(LocalUserAdapter user, string strField)
         {
             object[] objs = { user, strField };
             Thread t = new Thread(new ParameterizedThreadStart(DoMarkRead));
@@ -1157,9 +1150,9 @@ namespace vbotserver
 
             if (objs != null && objs.Count() == 2)
             {
-                User user = objs[0] as User;
+                LocalUserAdapter user = objs[0] as LocalUserAdapter;
+
                 string strField = objs[1] as string;
-                Connection c = user.Connection;
                 string strUpper = char.ToUpper(strField[0]) + strField.Substring(1);
 
                 UserLocationAdapter loc = null;
@@ -1174,7 +1167,7 @@ namespace vbotserver
                 else
                 {
                     // TODO: this should throw an exception
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not make " + strField + " as read."));
+                    user.ResponseChannel.SendMessage(@"Could not make " + strField + " as read.");
                     log.Error("Unknown `strField` in MarkRead()");
                 }
 
@@ -1186,22 +1179,22 @@ namespace vbotserver
 
                         if (r.ResultCode == VBRequestResultCode.Success)
                         {
-                            c.SendMessage(new InstantMessage(user.UserConnectionName, strUpper + @" marked as read."));
+                            user.ResponseChannel.SendMessage(strUpper + @" marked as read.");
                         }
                         else
                         {
-                            c.SendMessage(new InstantMessage(user.UserConnectionName, strUpper + @" could not be marked as read."));
+                            user.ResponseChannel.SendMessage(strUpper + @" could not be marked as read.");
                             log.Error(r.Message);
                         }
                     }
                     else
                     {
-                        c.SendMessage(new InstantMessage(user.UserConnectionName, "Mark " + strField + " read cancelled."));
+                        user.ResponseChannel.SendMessage("Mark " + strField + " read cancelled.");
                     }
                 }
                 else
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, string.Format("No current {0}.", strField)));
+                    user.ResponseChannel.SendMessage(string.Format("No current {0}.", strField));
                 }
             }
             else
@@ -1210,7 +1203,7 @@ namespace vbotserver
             }
         }
 
-        public Result SubscribeThread(User user, string[] options)
+        public Result SubscribeThread(LocalUserAdapter user, string[] options)
         {
             int iThreadID = 0;
 
@@ -1235,10 +1228,9 @@ namespace vbotserver
 
             if (objs != null && objs.Count() == 2)
             {
-                User user = objs[0] as User;
-                int iThreadId = (int)objs[1];
+                LocalUserAdapter user = objs[0] as LocalUserAdapter;
 
-                Connection c = user.Connection;
+                int iThreadId = (int)objs[1];
                 string strMessage = string.Empty;
 
                 if (iThreadId == 0)
@@ -1262,7 +1254,7 @@ namespace vbotserver
                         VBThread thread = new VBThread(threadInfo);
 
                         string strConf = string.Format("{1}Thread: {0}{1}Are you sure you wish to subscribe to this thread?",
-                                                thread.GetTitle(), user.Connection.NewLine);
+                                                thread.GetTitle(), user.ResponseChannel.NewLine);
 
                         if (GetConfirmation(user, strConf))
                         {
@@ -1294,11 +1286,11 @@ namespace vbotserver
                     strMessage = @"No thread to subscribe to. Use `lt` to browse threads or use `sub XYZ` where XYZ is the thread id.";
                 }
 
-                c.SendMessage(new InstantMessage(user.UserConnectionName, strMessage));
+                user.ResponseChannel.SendMessage(strMessage);
             }
         }
 
-        public Result ThreadReply(User user)
+        public Result ThreadReply(LocalUserAdapter user)
         {
             Thread replyThread = new Thread(new ParameterizedThreadStart(DoThreadReply));
             replyThread.Start(user);
@@ -1308,16 +1300,15 @@ namespace vbotserver
 
         public void DoThreadReply(object userObj)
         {
-            User user = userObj as User;
-            Connection c = user.Connection;
+            LocalUserAdapter user = userObj as LocalUserAdapter;
             UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
 
             if (postLoc != null)
             {
-                string strResponse = string.Format("New Thread Reply:{0}Current Thread: {1}{0}", user.Connection.NewLine, postLoc.Title);
+                string strResponse = string.Format("New Thread Reply:{0}Current Thread: {1}{0}", user.ResponseChannel.NewLine, postLoc.Title);
                 strResponse += @"Enter your post text:";
 
-                c.SendMessage(new InstantMessage(user.UserConnectionName, strResponse));
+                user.ResponseChannel.SendMessage(strResponse);
 
                 string strPostText = GetString(user);
 
@@ -1329,30 +1320,30 @@ namespace vbotserver
 
                         if (r.ResultCode == VBRequestResultCode.Success && r.Data != null && (int)r.Data > 0)
                         {
-                            c.SendMessage(new InstantMessage(user.UserConnectionName, @"Post submitted successfully."));
+                            user.ResponseChannel.SendMessage(@"Post submitted successfully.");
                         }
                         else
                         {
-                            c.SendMessage(new InstantMessage(user.UserConnectionName, @"There was an error submitting the post."));
+                            user.ResponseChannel.SendMessage(@"There was an error submitting the post.");
                         }
                     }
                     else
                     {
-                        c.SendMessage(new InstantMessage(user.UserConnectionName, @"Post cancelled"));
+                        user.ResponseChannel.SendMessage(@"Post cancelled");
                     }
                 }
                 else
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"No post entered"));
+                    user.ResponseChannel.SendMessage(@"No post entered");
                 }
             }
             else
             {
-                c.SendMessage(new InstantMessage(user.UserConnectionName, @"No current thread. Use `lt` to browse to a thread."));
+                user.ResponseChannel.SendMessage(@"No current thread. Use `lt` to browse to a thread.");
             }
         }
 
-        public Result UnsubscribeThread(User user, string[] options)
+        public Result UnsubscribeThread(LocalUserAdapter user, string[] options)
         {
             Result ret = null;
             object[] objs = { user, options };
@@ -1402,13 +1393,8 @@ namespace vbotserver
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            User user = objs[0] as User;
+            LocalUserAdapter user = objs[0] as LocalUserAdapter;
             bool bAll = (bool)objs[1];
-
-            Connection c = user.Connection;
-
-            ResponseChannel i = new ResponseChannel(user.UserConnectionName, user.Connection);
-
             int iThreadID = -1;
             string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
 
@@ -1420,25 +1406,26 @@ namespace vbotserver
 
             if (GetConfirmation(user, strConfMsg))
             {
-                VBRequestResult r = VB.Instance.UnSubscribeThread(i, iThreadID);
+                VBRequestResult r = VB.Instance.UnSubscribeThread(user.ResponseChannel, iThreadID);
                 if (r.ResultCode == VBRequestResultCode.Success)
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Subscription(s) removed."));
+                    user.ResponseChannel.SendMessage(@"Subscription(s) removed.");
+
                 }
                 else
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not remove subscription(s)."));
+                    user.ResponseChannel.SendMessage(@"Could not remove subscription(s).");
                     log.Error(r.Message);
                 }
             }
             else
             {
-                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
-                log.DebugFormat("User '{0}' cancelled action DoUnsubscribeThread()", user.UserConnectionName);
+                user.ResponseChannel.SendMessage(@"Action cancelled.");
+                log.DebugFormat("User '{0}' cancelled action DoUnsubscribeThread()", user.ResponseChannel.ToName);
             }
         }
 
-        public Result TurnOnOffAutoIMS(User user, string[] options)
+        public Result TurnOnOffAutoIMS(LocalUserAdapter user, string[] options)
         {
             Result ret = null;
 
@@ -1484,11 +1471,8 @@ namespace vbotserver
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            User user = objs[0] as User;
+            LocalUserAdapter user = objs[0] as LocalUserAdapter;
             bool bOn = (bool)objs[1];
-            Connection c = user.Connection;
-
-            ResponseChannel i = new ResponseChannel(user.UserConnectionName, user.Connection);
 
             string strOnOff = "off";
             if (bOn)
@@ -1498,21 +1482,21 @@ namespace vbotserver
 
             if (GetConfirmation(user, "Are you sure you want to turn IM Notification " + strOnOff + "?"))
             {
-                VBRequestResult r = VB.Instance.TurnOnOffIMNotification(i, bOn);
+                VBRequestResult r = VB.Instance.TurnOnOffIMNotification(user.ResponseChannel, bOn);
 
                 if (r.ResultCode == VBRequestResultCode.Success)
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"IM Notification turned " + strOnOff + "."));
+                    user.ResponseChannel.SendMessage(@"IM Notification turned " + strOnOff + ".");
                 }
                 else
                 {
-                    c.SendMessage(new InstantMessage(user.UserConnectionName, @"Could not set IM Notification"));
+                    user.ResponseChannel.SendMessage(@"Could not set IM Notification");
                     log.Error(r.Message);
                 }
             }
             else
             {
-                c.SendMessage(new InstantMessage(user.UserConnectionName, @"Action cancelled."));
+                user.ResponseChannel.SendMessage(@"Action cancelled.");
             }
         }
         #endregion

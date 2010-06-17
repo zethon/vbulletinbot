@@ -6,22 +6,12 @@ using log4net;
 
 namespace vbotserver
 {
-    public class User
+    public class LocalUserAdapter
     {
-        static ILog log = LogManager.GetLogger(typeof(User));
+        static ILog log = LogManager.GetLogger(typeof(LocalUserAdapter));
 
         public LocalUser LocalUser;
-
-        // TODO: remove this
-        public Connection Connection;
-
-        // TODO: remove this
-        private string _strConnUsername = string.Empty;
-        public string UserConnectionName
-        {
-            get { return _strConnUsername; }
-            set { _strConnUsername = value; }
-        }
+        public ResponseChannel ResponseChannel;
 
         public void SaveLastList(string strLastList)
         {
