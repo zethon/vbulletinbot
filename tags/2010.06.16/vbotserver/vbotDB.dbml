@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="vbot" Class="VBotDB" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Table Name="LocalUser" Member="LocalUsers">
+    <Type Name="LocalUser">
+      <Column Name="LocalUserID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Service" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Screenname" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="BoardUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="LastUpdate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="UserLastList" Member="UserLastLists">
+    <Type Name="UserLastList">
+      <Column Name="UserLastListID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LocalUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="UserLocation" Member="UserLocations">
+    <Type Name="UserLocation">
+      <Column Name="UserLocationID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LocalUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="UserLocationType" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="List" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="LocationRemoteID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="PageNumber" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PerPage" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="UserPostIndex" Member="UserPostIndexes">
+    <Type Name="UserPostIndex">
+      <Column Name="UserPostIndexID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LocalUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="PostIndex" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>
