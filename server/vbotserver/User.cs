@@ -10,10 +10,10 @@ namespace vbotserver
     {
         static ILog log = LogManager.GetLogger(typeof(User));
 
+        public LocalUser LocalUser;
+
         // TODO: remove this
         public Connection Connection;
-
-        public LocalUser LocalUser;
 
         // TODO: remove this
         private string _strConnUsername = string.Empty;

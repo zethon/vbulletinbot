@@ -49,9 +49,9 @@ namespace vbotserver
         
         static ILog log = LogManager.GetLogger(typeof(Controller));
 
-        CommandClass _commands = null;
-
         public ResponseChannel ResponseChannel = null;
+
+        CommandClass _commands = null;
 
         ConnectionComposite _conComp = null;
         public ConnectionComposite Connections
@@ -173,15 +173,8 @@ namespace vbotserver
 
                 try
                 {
-                    // class wide ResponseChannel
-                    ResponseChannel = new ResponseChannel
-                    {
-                        ToName = im.User,
-                        Connection = conn
-                    };
-
                     // TODO: remove this, IMUserInfo is to be removed
-                    IMUserInfo creds = new IMUserInfo(im.User, conn.Alias, conn);
+                    ResponseChannel creds = ResponseChannel = new ResponseChannel(im.User, conn.Alias, conn);
                     
                     User user = GetUser(im.User,conn.Alias);
                     
@@ -434,7 +427,7 @@ namespace vbotserver
             { // this location does not exist
 
                 curLoc = UserLocationT.GetDefaultLocation(UserLocationType.FORUM, user);
-                IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                 VBRequestResult res = VB.Instance.ListForums(iminfo, curLoc.LocationRemoteID);
 
                 if (res.ResultCode == VBRequestResultCode.Success)
@@ -466,7 +459,7 @@ namespace vbotserver
                 }
 
                 // set the FORUMS location
-                IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                 VBRequestResult res = VB.Instance.ListForums(iminfo, iNewForumID);
 
                 // TODO: error checking of the above call
@@ -530,7 +523,7 @@ namespace vbotserver
         public Result GotoParentForum(User user)
         {
             Result ret = null;
-            IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+            ResponseChannel imuserinfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
             UserLocationT forumLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
 
             if (forumLoc != null)
@@ -576,7 +569,7 @@ namespace vbotserver
 
             if (curPostLoc != null)
             {
-                IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                 VBRequestResult r = VB.Instance.GetPostByIndex(iminfo, curPostLoc.LocationRemoteID, iChoice);
                 if (r.ResultCode == VBRequestResultCode.Success)
                 {
@@ -622,7 +615,7 @@ namespace vbotserver
                     }
 
                     VBThread thread = null;
-                    IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                    ResponseChannel imuserinfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                     VBRequestResult r = VB.Instance.ListPosts(imuserinfo, iNewThreadID, postLoc.PageNumber, postLoc.PerPage, out thread);
 
                     if (r.ResultCode == VBRequestResultCode.Success)
@@ -687,7 +680,7 @@ namespace vbotserver
                     if (int.TryParse(strNewThreadID, out iNewThreadID))
                     {
                         VBThread thread = null;
-                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                        ResponseChannel imuserinfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                         VBRequestResult r = VB.Instance.ListPosts(imuserinfo, iNewThreadID, postLoc.PageNumber, postLoc.PerPage, out thread);
 
                         if (r.ResultCode == VBRequestResultCode.Success)
@@ -731,7 +724,7 @@ namespace vbotserver
             lock (this)
             {
                 Result resval = null;
-                IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                 UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
 
                 if (loc == null)
@@ -835,7 +828,7 @@ namespace vbotserver
 
                 if (posts == null || thread == null)
                 {
-                    IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                    ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                     VBRequestResult r = VB.Instance.ListPosts(iminfo, loc.LocationRemoteID, iPageNumber, iPerPage, out thread);
 
                     if (r.ResultCode == VBRequestResultCode.Success)
@@ -936,7 +929,7 @@ namespace vbotserver
                     if (threads == null)
                     {
                         Connection connection = ResponseChannel.Connection;
-                        IMUserInfo imuserinfo = new IMUserInfo(user.UserConnectionName, connection.Alias, connection);
+                        ResponseChannel imuserinfo = new ResponseChannel(user.UserConnectionName, connection.Alias, connection);
                         
                         VBRequestResult r = VB.Instance.ListThreads(imuserinfo, loc.LocationRemoteID, iPageNumber, iPerPage);
 
@@ -1198,7 +1191,7 @@ namespace vbotserver
                 {
                     if (GetConfirmation(user, @"Mark this " + strField + "as read?"))
                     {
-                        IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                        ResponseChannel i = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                         VBRequestResult r = VB.Instance.MarkRead(i, loc.LocationRemoteID, strField);
 
                         if (r.ResultCode == VBRequestResultCode.Success)
@@ -1271,7 +1264,7 @@ namespace vbotserver
                 // check to see if iThreadId was set above
                 if (iThreadId > 0)
                 {
-                    IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                    ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                     VBRequestResult r = VB.Instance.GetThread(iminfo, iThreadId);
 
                     if (r != null && r.ResultCode == VBRequestResultCode.Success)
@@ -1343,7 +1336,7 @@ namespace vbotserver
                 {
                     if (GetConfirmation(user))
                     {
-                        IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+                        ResponseChannel iminfo = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
                         VBRequestResult r = VB.Instance.PostReply(iminfo, postLoc.LocationRemoteID, strPostText);
 
                         if (r.ResultCode == VBRequestResultCode.Success && r.Data != null && (int)r.Data > 0)
@@ -1425,7 +1418,7 @@ namespace vbotserver
             bool bAll = (bool)objs[1];
 
             Connection c = user.Connection;
-            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+            ResponseChannel i = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
 
             int iThreadID = -1;
             string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
@@ -1505,7 +1498,7 @@ namespace vbotserver
             User user = objs[0] as User;
             bool bOn = (bool)objs[1];
             Connection c = user.Connection;
-            IMUserInfo i = new IMUserInfo(user.UserConnectionName, user.Connection.Alias, user.Connection);
+            ResponseChannel i = new ResponseChannel(user.UserConnectionName, user.Connection.Alias, user.Connection);
 
             string strOnOff = "off";
             if (bOn)
