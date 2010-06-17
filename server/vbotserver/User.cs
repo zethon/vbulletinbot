@@ -23,27 +23,6 @@ namespace vbotserver
             set { _strConnUsername = value; }
         }
 
-        private int _iVBUserID = 0;
-        public int VBUserID
-        {
-            get { return _iVBUserID; }
-        }
-
-        private Dictionary<string, string> _vbUser;
-        public Dictionary<string, string> VBUser
-        {
-            get { return _vbUser; }
-            set
-            {
-                Dictionary<string, string> temp = value as Dictionary<string, string>;
-
-                if (!temp.ContainsKey(@"userid") || !int.TryParse(temp[@"userid"].ToString(), out _iVBUserID))
-                    throw new Exception("Cannot set VBUser, dictionary does not contain `userid`.");
-
-                _vbUser = value;
-            }
-        }
-
         public void SaveLastList(string strLastList)
         {
             UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUser.LocalUserID);
