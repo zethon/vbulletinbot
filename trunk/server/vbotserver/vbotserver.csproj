@@ -108,7 +108,7 @@
     </Compile>
     <Compile Include="VBPost.cs" />
     <Compile Include="VBThread.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="LocalUserAdapter.cs" />
     <Compile Include="UserLocationAdapter.cs" />
     <Compile Include="VB.cs" />
   </ItemGroup>

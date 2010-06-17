@@ -19,7 +19,7 @@ namespace vbotserver
         static ILog log = LogManager.GetLogger(typeof(UserLocationAdapter));
 
         public UserLocation UserLocation;
-        public User User;
+        public LocalUserAdapter User;
         public UserLocationTypeEnum UserLocationType;
 
         public int UserLocationID
@@ -168,7 +168,7 @@ namespace vbotserver
             return;
         }
 
-        static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,User owner)
+        static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,LocalUserAdapter owner)
         {
             UserLocationAdapter loc = null;
 
@@ -212,7 +212,7 @@ namespace vbotserver
             return loc;
         }
 
-        static public UserLocationAdapter LoadLocation(UserLocationTypeEnum locType, User user)
+        static public UserLocationAdapter LoadLocation(UserLocationTypeEnum locType, LocalUserAdapter user)
         {
             UserLocationAdapter retval = null;
 
