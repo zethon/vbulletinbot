@@ -7,6 +7,9 @@ This page contains a list of todo items for the project. This includes code chan
 
 = Items =
 
+  * deprecate custom webservice and use NuSOAP
+
+= Completed =
+
   * move `localuser` and `userlocation` tables from sqlite to ssce
   * get rid of references to User.Connection and User.UserConnectionName
-  * deprecate custom webservice and use NuSOAP
