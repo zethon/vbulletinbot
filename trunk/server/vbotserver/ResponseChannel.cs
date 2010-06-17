@@ -13,6 +13,11 @@ namespace vbotserver
         public Connection Connection = null;
         public string ToName = string.Empty;
 
+        public string NewLine
+        {
+            get { return Connection.NewLine; }
+        }
+
         public ResponseChannel()
         {
         }
