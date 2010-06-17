@@ -108,7 +108,7 @@ namespace vbotserver
             _iRequestCount = 0;
         }
 
-        public VBRequestResult GetPostByIndex(ResponseChannel imuserinfo, int iThreadID, int iIndex)
+        public VBRequestResult GetPostByIndex(string Username, string Service, int iThreadID, int iIndex)
         {
             VBRequestResult vbrr = new VBRequestResult();
 
@@ -119,8 +119,8 @@ namespace vbotserver
     <index>" + iIndex.ToString() + @"</index>
 <usercredentials>
     <type>service</type>
-    <screenname>" + imuserinfo.ScreenName + @"</screenname>
-    <service>" + imuserinfo.ServiceAlias + @"</service>
+    <screenname>" + Username + @"</screenname>
+    <service>" + Service + @"</service>
 </usercredentials>
 </request>
 ";
@@ -291,8 +291,8 @@ namespace vbotserver
 
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", iminfo.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", iminfo.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
@@ -350,7 +350,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListForums(ResponseChannel imuserinfo, int iForumID)
+        public VBRequestResult ListForums(ResponseChannel info, int iForumID)
         {
             VBRequestResult vbrr = new VBRequestResult();
             Dictionary<string, string> userdict = new Dictionary<string, string>();
@@ -361,8 +361,8 @@ namespace vbotserver
                 <forumid>" + iForumID.ToString() + @"</forumid>
             	<usercredentials>
             		<type>service</type>
-            		<screenname>" + imuserinfo.ScreenName + @"</screenname>
-                    <service>" + imuserinfo.ServiceAlias + @"</service>
+            		<screenname>" + info.ToName + @"</screenname>
+                    <service>" + info.Connection.Alias + @"</service>
             	</usercredentials>
             </request>
             ";
@@ -449,7 +449,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListParentForums(ResponseChannel imuserinfo, int iForumID)
+        public VBRequestResult ListParentForums(ResponseChannel rc, int iForumID)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<Dictionary<string, string>> retdict = new List<Dictionary<string, string>>();
@@ -460,8 +460,8 @@ namespace vbotserver
 <forumid>" + iForumID.ToString() + @"</forumid>
 <usercredentials>
 	<type>service</type>
-	<screenname>" + imuserinfo.ScreenName + @"</screenname>
-    <service>" + imuserinfo.ServiceAlias + @"</service>
+	<screenname>" + rc.ToName + @"</screenname>
+    <service>" + rc.Connection.Alias + @"</service>
 </usercredentials>
 </request>
 ";
@@ -539,13 +539,13 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListPosts(ResponseChannel imuserinfo, int iThreadId, int iPageNumber, int iPerPage)
+        public VBRequestResult ListPosts(ResponseChannel rc, int iThreadId, int iPageNumber, int iPerPage)
         {
             VBThread t = null;
-            return ListPosts(imuserinfo, iThreadId, iPageNumber, iPerPage, out t);
+            return ListPosts(rc, iThreadId, iPageNumber, iPerPage, out t);
         }
 
-        public VBRequestResult ListPosts(ResponseChannel imuserinfo, int iThreadId, int iPageNumber, int iPerPage, out VBThread thread)
+        public VBRequestResult ListPosts(ResponseChannel rc, int iThreadId, int iPageNumber, int iPerPage, out VBThread thread)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<VBPost> retdict = new List<VBPost>();
@@ -559,8 +559,8 @@ namespace vbotserver
     <perpage>" + iPerPage.ToString() + @"</perpage>
 <usercredentials>
     <type>service</type>
-    <screenname>" + imuserinfo.ScreenName + @"</screenname>
-    <service>" + imuserinfo.ServiceAlias + @"</service>
+    <screenname>" + rc.ToName + @"</screenname>
+    <service>" + rc.Connection.Alias + @"</service>
 </usercredentials>
 </request>
 ";
@@ -639,7 +639,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListThreads(ResponseChannel imuserinfo, int iForumID, int iPageNumber, int iPerPage)
+        public VBRequestResult ListThreads(ResponseChannel rc, int iForumID, int iPageNumber, int iPerPage)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<VBThread> retdict = new List<VBThread>();
@@ -653,8 +653,8 @@ namespace vbotserver
     <perpage>" + iPerPage.ToString() + @"</perpage>
 <usercredentials>
         		<type>service</type>
-        		<screenname>" + imuserinfo.ScreenName + @"</screenname>
-                <service>" + imuserinfo.ServiceAlias + @"</service>
+        		<screenname>" + rc.ToName + @"</screenname>
+                <service>" + rc.Connection.Alias + @"</service>
 </usercredentials>
 </request>
 ";
@@ -715,7 +715,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult MarkRead(ResponseChannel iminfo, int iID, string strField)
+        public VBRequestResult MarkRead(ResponseChannel rc, int iID, string strField)
         {
             VBRequestResult vbrr = null;
             StringWriter stringWriter = new StringWriter();
@@ -739,8 +739,8 @@ namespace vbotserver
             // write user credentials
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", rc.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", rc.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
@@ -792,7 +792,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult PostReply(ResponseChannel iminfo, int iThreadID, string strPageText)
+        public VBRequestResult PostReply(ResponseChannel rc, int iThreadID, string strPageText)
         {
             VBRequestResult vbrr = new VBRequestResult();
             int iPostID = 0;
@@ -813,8 +813,8 @@ namespace vbotserver
 
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", rc.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", rc.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
@@ -873,7 +873,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult SubscribeThread(ResponseChannel iminfo, int iThreadID)
+        public VBRequestResult SubscribeThread(ResponseChannel rc, int iThreadID)
         {
             VBRequestResult vbrr = null;
 
@@ -889,8 +889,8 @@ namespace vbotserver
 
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", rc.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", rc.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
@@ -961,7 +961,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult TurnOnOffIMNotification(ResponseChannel iminfo, bool bOn)
+        public VBRequestResult TurnOnOffIMNotification(ResponseChannel rc, bool bOn)
         {
             VBRequestResult vbrr = null;
 
@@ -977,8 +977,8 @@ namespace vbotserver
 
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", rc.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", rc.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
@@ -1026,7 +1026,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult UnSubscribeThread(ResponseChannel iminfo, int iThreadID)
+        public VBRequestResult UnSubscribeThread(ResponseChannel rc, int iThreadID)
         {
             VBRequestResult vbrr = null;
 
@@ -1049,8 +1049,8 @@ namespace vbotserver
 
             xmlWriter.WriteStartElement(@"usercredentials");
             xmlWriter.WriteElementString(@"type", @"service");
-            xmlWriter.WriteElementString(@"service", iminfo.ServiceAlias);
-            xmlWriter.WriteElementString(@"screenname", iminfo.ScreenName);
+            xmlWriter.WriteElementString(@"service", rc.Connection.Alias);
+            xmlWriter.WriteElementString(@"screenname", rc.ToName);
             xmlWriter.WriteEndElement();
 
             // <request> tag
