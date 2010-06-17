@@ -168,6 +168,7 @@ namespace vbotserver
             {
                 log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
 
+                int iReqCount = VB.Instance.RequestCount;
                 DateTime dtStart = DateTime.Now;
 
                 try
@@ -236,7 +237,10 @@ namespace vbotserver
                 }
 
                 TimeSpan elapsed = DateTime.Now - dtStart;
-                log.InfoFormat("INMSG RESPONSE TIME {0}.{1} seconds", elapsed.Seconds, elapsed.Milliseconds);
+                
+                log.InfoFormat("Response Time: {0}.{1} seconds, Requests: {2}", 
+                    elapsed.Seconds, elapsed.Milliseconds, VB.Instance.RequestCount - iReqCount);
+
             }
         }
 
@@ -368,29 +372,26 @@ namespace vbotserver
         /// <returns>User object or null</returns>
         public User GetUser(string ScreenName, string ServiceAlias)
         {
-            Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(ScreenName, ServiceAlias);
-
-            if (!vbuserInfo.ContainsKey("userid"))
-                return null;
-
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == ScreenName && u.Service == ServiceAlias);
 
             if (luser == null)
             {
-                if (vbuserInfo.ContainsKey(@"userid"))
-                {
-                    luser = new LocalUser
-                    {
-                        Screenname = ScreenName,
-                        Service = ServiceAlias,
-                        BoardUserID = int.Parse(vbuserInfo[@"userid"].ToString()),
-                        LastUpdate = DateTime.Now
-                    };
+                Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(ScreenName, ServiceAlias);
 
-                    Database.Instance.LocalUsers.InsertOnSubmit(luser);
-                    Database.Instance.SubmitChanges();
-                }
+                if (!vbuserInfo.ContainsKey("userid"))
+                    return null;
+
+                luser = new LocalUser
+                {
+                    Screenname = ScreenName,
+                    Service = ServiceAlias,
+                    BoardUserID = int.Parse(vbuserInfo[@"userid"].ToString()),
+                    LastUpdate = DateTime.Now
+                };
+
+                Database.Instance.LocalUsers.InsertOnSubmit(luser);
+                Database.Instance.SubmitChanges();
             }
             else
             {
@@ -401,7 +402,6 @@ namespace vbotserver
             return new User 
             { 
                 LocalUser = luser, 
-                VBUser = vbuserInfo, 
 
                 // TODO: remove this
                 UserConnectionName = ResponseChannel.ToName
@@ -439,7 +439,7 @@ namespace vbotserver
 
                 if (res.ResultCode == VBRequestResultCode.Success)
                 {
-                    List<Dictionary<string, string>> forums = res.Data as List<Dictionary<string, string>>;
+                   List<Dictionary<string, string>> forums = res.Data as List<Dictionary<string, string>>;
 
                     curLoc.ParseForumsList(forums);
                     curLoc.SaveLocation();
@@ -1293,7 +1293,7 @@ namespace vbotserver
                             }
                             else
                             {
-                                strMessage = string.Format("Could not subscribe user to thread id {2}.", user.VBUser, user.VBUserID, iThreadId);
+                                strMessage = string.Format("Could not subscribe user to thread id {0}.", iThreadId);
                             }
                         }
                         else
@@ -1314,34 +1314,6 @@ namespace vbotserver
 
                 c.SendMessage(new InstantMessage(user.UserConnectionName, strMessage));
             }
-
-            
-            
-
-
-            //else
-            //{
-            //    string strConf = string.Format("{1}Current Thread: {0}{1}Are you sure you wish to subscribe to this thread?", loc.Title, user.UserConnection.NewLine);
-            //    if (GetConfirmation(user, strConf))
-            //    {
-
-            //        IMUserInfo iminfo = new IMUserInfo(user.UserConnectionName, user.UserConnection.Alias, user.UserConnection);
-            //        VBRequestResult r = VB.Instance.SubscribeThread(iminfo, loc.LocationRemoteID);
-
-            //        // TODO: test what happens when r is null
-            //        if (r.ResultCode == VBRequestResultCode.Success)
-            //        {
-            //            strMessage = string.Format("Subscribed to thread {0}", loc.LocationRemoteID);
-            //        }
-            //        else
-            //        {
-            //            strMessage = string.Format("Could not subscribe user to thread id {2}.", user.VBUser, user.VBUserID, loc.LocationRemoteID);
-            //        }
-            //    }
-
-            //}
-
-            //c.SendMessage(new InstantMessage(user.UserConnectionName, strMessage));
         }
 
         public Result ThreadReply(User user)
