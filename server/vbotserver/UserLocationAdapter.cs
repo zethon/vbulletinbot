@@ -48,13 +48,6 @@ namespace vbotserver
             set { UserLocation.LocationRemoteID = value; }
         }
 
-        //private UserLocationTypeEnum _locType;
-        //public UserLocationTypeEnum LocationType
-        //{
-        //    get { return _locType; }
-        //    set { _locType = value; }
-        //}
-
         public int PageNumber
         {
             get { return (int)UserLocation.PageNumber; }

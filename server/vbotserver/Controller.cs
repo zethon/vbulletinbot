@@ -13,36 +13,6 @@ using log4net;
 
 namespace vbotserver
 {
-    enum InputStateEnum
-    {
-        None,
-        Waiting,
-        Responded,
-        TimeOut
-    }
-
-    class InputState
-    {
-        public InputStateEnum State = InputStateEnum.None;
-
-        public string _strPageText = string.Empty;
-        public string PageText
-        {
-            get { return _strPageText; }
-            set { _strPageText = value; }
-        }
-
-        public InputState()
-        {
-            State = InputStateEnum.None;
-        }
-
-        public InputState(InputStateEnum en)
-        {
-            State = en;
-        }
-    }
-
     class Controller
     {
         Dictionary<int, InputState> _inputs = new Dictionary<int, InputState>();
