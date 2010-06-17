@@ -91,7 +91,6 @@
     <Compile Include="ConnectionComposite.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="DB.cs" />
     <Compile Include="InstantMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
