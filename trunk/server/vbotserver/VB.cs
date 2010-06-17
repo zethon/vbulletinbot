@@ -108,7 +108,7 @@ namespace vbotserver
             _iRequestCount = 0;
         }
 
-        public VBRequestResult GetPostByIndex(IMUserInfo imuserinfo, int iThreadID, int iIndex)
+        public VBRequestResult GetPostByIndex(ResponseChannel imuserinfo, int iThreadID, int iIndex)
         {
             VBRequestResult vbrr = new VBRequestResult();
 
@@ -275,7 +275,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult GetThread(IMUserInfo iminfo, int iThreadID)
+        public VBRequestResult GetThread(ResponseChannel iminfo, int iThreadID)
         {
             VBRequestResult vbrr = null;
 
@@ -350,7 +350,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListForums(IMUserInfo imuserinfo, int iForumID)
+        public VBRequestResult ListForums(ResponseChannel imuserinfo, int iForumID)
         {
             VBRequestResult vbrr = new VBRequestResult();
             Dictionary<string, string> userdict = new Dictionary<string, string>();
@@ -449,7 +449,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListParentForums(IMUserInfo imuserinfo, int iForumID)
+        public VBRequestResult ListParentForums(ResponseChannel imuserinfo, int iForumID)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<Dictionary<string, string>> retdict = new List<Dictionary<string, string>>();
@@ -539,13 +539,13 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListPosts(IMUserInfo imuserinfo, int iThreadId, int iPageNumber, int iPerPage)
+        public VBRequestResult ListPosts(ResponseChannel imuserinfo, int iThreadId, int iPageNumber, int iPerPage)
         {
             VBThread t = null;
             return ListPosts(imuserinfo, iThreadId, iPageNumber, iPerPage, out t);
         }
 
-        public VBRequestResult ListPosts(IMUserInfo imuserinfo, int iThreadId, int iPageNumber, int iPerPage, out VBThread thread)
+        public VBRequestResult ListPosts(ResponseChannel imuserinfo, int iThreadId, int iPageNumber, int iPerPage, out VBThread thread)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<VBPost> retdict = new List<VBPost>();
@@ -639,7 +639,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult ListThreads(IMUserInfo imuserinfo, int iForumID, int iPageNumber, int iPerPage)
+        public VBRequestResult ListThreads(ResponseChannel imuserinfo, int iForumID, int iPageNumber, int iPerPage)
         {
             VBRequestResult vbrr = new VBRequestResult();
             List<VBThread> retdict = new List<VBThread>();
@@ -715,7 +715,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult MarkRead(IMUserInfo iminfo, int iID, string strField)
+        public VBRequestResult MarkRead(ResponseChannel iminfo, int iID, string strField)
         {
             VBRequestResult vbrr = null;
             StringWriter stringWriter = new StringWriter();
@@ -792,7 +792,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult PostReply(IMUserInfo iminfo, int iThreadID, string strPageText)
+        public VBRequestResult PostReply(ResponseChannel iminfo, int iThreadID, string strPageText)
         {
             VBRequestResult vbrr = new VBRequestResult();
             int iPostID = 0;
@@ -873,7 +873,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult SubscribeThread(IMUserInfo iminfo, int iThreadID)
+        public VBRequestResult SubscribeThread(ResponseChannel iminfo, int iThreadID)
         {
             VBRequestResult vbrr = null;
 
@@ -961,7 +961,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult TurnOnOffIMNotification(IMUserInfo iminfo, bool bOn)
+        public VBRequestResult TurnOnOffIMNotification(ResponseChannel iminfo, bool bOn)
         {
             VBRequestResult vbrr = null;
 
@@ -1026,7 +1026,7 @@ namespace vbotserver
             return vbrr;
         }
 
-        public VBRequestResult UnSubscribeThread(IMUserInfo iminfo, int iThreadID)
+        public VBRequestResult UnSubscribeThread(ResponseChannel iminfo, int iThreadID)
         {
             VBRequestResult vbrr = null;
 
