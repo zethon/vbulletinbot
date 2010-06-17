@@ -10,31 +10,16 @@ namespace vbotserver
     {
         static ILog log = LogManager.GetLogger(typeof(ResponseChannel));
 
-        private string _strServiceAlias = string.Empty;
-        public string ServiceAlias
-        {
-            get { return _strServiceAlias; }
-        }
-
-        private string _strScreenName = string.Empty;
-        public string ScreenName
-        {
-            get { return _strScreenName; }
-        }
-
-        //private Connection _connection = null;
-        //public Connection IMConnection
-        //{
-        //    get { return _connection; }
-        //}
-
         public Connection Connection = null;
         public string ToName = string.Empty;
 
-        public ResponseChannel(string strName, string strService, Connection conn)
+        public ResponseChannel()
         {
-            _strScreenName = strName;
-            _strServiceAlias = strService;
+        }
+
+        public ResponseChannel(string strName, Connection conn)
+        {
+            ToName = strName;
             Connection = conn;
         }
 
@@ -50,7 +35,7 @@ namespace vbotserver
             }
             else if (ToName == string.Empty)
             {
-                log.Warn("SendMessage() failed because ToName is empty");
+                log.Info("SendMessage() failed because ToName is empty");
             }
         }
     }
