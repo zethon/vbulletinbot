@@ -7,153 +7,76 @@ using log4net;
 
 namespace vbotserver
 {
-    public enum UserLocationType
+    public enum UserLocationTypeEnum
     {
         FORUM,
         THREAD,
         POST
     }
 
-
     public class UserLocationAdapter
     {
         static ILog log = LogManager.GetLogger(typeof(UserLocationAdapter));
 
-        private int _iUserLocationID = 0;
+        public UserLocation UserLocation;
+        public User User;
+        public UserLocationTypeEnum UserLocationType;
+
         public int UserLocationID
         {
-            get { return _iUserLocationID; }
-            set { _iUserLocationID = value; }
+            get { return (int)UserLocation.UserLocationID; }
         }
 
-        private User _owner = null;
-        public User Owner
-        {
-            get { return _owner; }
-        }
-
-        private string _strTitle = string.Empty;
         public string Title
         {
-            get { return _strTitle; }
-            set { _strTitle = value; }
+            get { return UserLocation.Title; }
+            set { UserLocation.Title = value; }
         }
 
         private List<string> _IDList = new List<string>();
         public List<string> IDList
         {
-            get { return _IDList; }
+            get 
+            { 
+                return _IDList; 
+            }
         }
 
-        private int _iLocationRemoteID = 0;
         public int LocationRemoteID
         {
-            get { return _iLocationRemoteID; }
-            set { _iLocationRemoteID = value; }
+            get { return (int)UserLocation.LocationRemoteID; }
+            set { UserLocation.LocationRemoteID = value; }
         }
 
-        private UserLocationType _locType;
-        public UserLocationType LocationType
-        {
-            get { return _locType; }
-            set { _locType = value; }
-        }
+        //private UserLocationTypeEnum _locType;
+        //public UserLocationTypeEnum LocationType
+        //{
+        //    get { return _locType; }
+        //    set { _locType = value; }
+        //}
 
-        private int _iPageNumber = 0;
         public int PageNumber
         {
-            get { return _iPageNumber; }
-            set { _iPageNumber = value; }
+            get { return (int)UserLocation.PageNumber; }
+            set { UserLocation.PageNumber = value; }
         }
 
-        private int _iPerPage = 0;
         public int PerPage
         {
-            get { return _iPerPage; }
-            set { _iPerPage = value; }
+            get { return (int)UserLocation.PerPage; }
+            set { UserLocation.PerPage = value; }
         }
 
-        public UserLocationAdapter(Dictionary<string, string> info,User owner)
+        public UserLocationAdapter()
         {
-            if (owner == null)
-            {
-                throw new Exception("Userlocation owner is empty");
-            }
-            
-            _owner = owner;
+        }
 
-            if (info.ContainsKey(@"userlocationtype"))
-            {
-                _locType = (UserLocationType) Enum.Parse(typeof(UserLocationType), info[@"userlocationtype"].ToString(), true);
-            }
-            else
-            {
-                throw new Exception("Key `userlocationtype` not found in constructor for UserLocation");
-            }
+        public UserLocationAdapter(UserLocation ul)
+        {
+            UserLocation = ul;
 
-            if (info.ContainsKey(@"userlocationid"))
-            {
-                if (!int.TryParse(info[@"userlocationid"].ToString(), out _iUserLocationID))
-                {
-                    throw new Exception("Could not parse `userlocationid` for UserLocation constructor");
-                }
-            }
-
-            if (info.ContainsKey(@"locationremoteid"))
-            {
-                if (!int.TryParse(info[@"locationremoteid"].ToString(), out _iLocationRemoteID))
-                {
-                    throw new Exception("Could not parse `locationremoteid` for UserLocation constructor");
-                }
-            }
-            else
-            {
-                throw new Exception("Key `locationremoteid` not found in hash for UserLocation constructor");
-            }
-
-            if (info.ContainsKey(@"pagenumber"))
-            {
-                if (!int.TryParse(info[@"pagenumber"].ToString(), out _iPageNumber))
-                {
-                    throw new Exception("Could not parse `pagenumber` for UserLocation constructor");
-                }
-            }
-            else
-            {
-                _iPageNumber = 1;
-            }
-
-            if (info.ContainsKey(@"perpage"))
-            {
-                if (!int.TryParse(info[@"perpage"].ToString(), out _iPerPage))
-                {
-                    throw new Exception("Could not parse `perpage` for UserLocation constructor");
-                }
-            }
-            else
-            {
-                _iPerPage = 5; // HARDCODED DEFAULT! ACK!
-            }
-
-            if (info.ContainsKey(@"title"))
-            {
-                _strTitle = info[@"title"].ToString();
-            }
-            else
-            {
-                throw new Exception("Key `title` not found in hash for UserLocation constructor");
-            }
-
-
-            if (info.ContainsKey(@"list"))
-            {
-                ParseList(info[@"list"].ToString());
-            }
-            else
-            {
-                throw new Exception("Key `list` not found in hash for UserLocation constructor");
-            }
-
+            UserLocationType = (UserLocationTypeEnum)Enum.Parse(typeof(UserLocationTypeEnum), ul.UserLocationType, true);
+            ParseList(ul.List);
         }
 
         public void ParseList(string strList)
@@ -207,13 +130,14 @@ namespace vbotserver
                 }
                         
                 if (forumInfo.ContainsKey(@"iscurrent") && forumInfo[@"iscurrent"] == "1")
-                { 
-                    if (!int.TryParse(forumInfo[@"forumid"],out _iLocationRemoteID))
+                {
+                    int iLocationRemoteID;
+                    if (!int.TryParse(forumInfo[@"forumid"], out iLocationRemoteID))
                     {
                         throw new Exception(@"Could not parse parent `forumid`");
                     }
 
-                    _strTitle = forumInfo[@"title"];
+                    Title = forumInfo[@"title"];
                 }
                 else
                 {
@@ -230,159 +154,78 @@ namespace vbotserver
 
         public void SaveLocation()
         {
-            string strTempTitle = Title.Replace(@"'", @"''");
-
-            if (UserLocationID > 0)
+            if (UserLocation.UserLocationID > 0)
             {
-                string strQuery = string.Format(@"
-                                    UPDATE userlocation
-                                    SET
-                                        title = '{0}',
-                                        locationremoteid = {1},
-                                        list = '{2}',
-                                        userlocationtype = '{3}',
-                                        pagenumber = {4},
-                                        perpage = {5}
-                                    WHERE
-                                        (userlocationid = {6});
-                                ", strTempTitle,
-                                 LocationRemoteID,
-                                 string.Join(" ", IDList.ToArray()),
-                                 LocationType.ToString().ToLower(),
-                                 PageNumber,
-                                 PerPage,
-                                 UserLocationID
-                                 );
-
-                int iRows = DB.Instance.QueryWrite(strQuery);
+                UserLocation.List = string.Join(" ", IDList.ToArray());
+                Database.Instance.SubmitChanges();
             }
             else
             {
-                string strQuery = string.Format(@"
-                                    INSERT INTO userlocation
-                                    (title,locationremoteid,list,userlocationtype,localuserid,pagenumber,perpage)
-                                    VALUES
-                                    ('{0}',{1},'{2}','{3}',{4},{5},{6})
-                                ", strTempTitle,
-                                 LocationRemoteID,
-                                 string.Join(" ", IDList.ToArray()).Trim(),
-                                 LocationType.ToString().ToLower(),
-                                 Owner.LocalUser.LocalUserID,
-                                 PageNumber,
-                                 PerPage
-                                 );
-
-                int iRows = DB.Instance.QueryWrite(strQuery);
-
-            }            
-
+                UserLocation.List = string.Join(" ", IDList.ToArray());
+                Database.Instance.UserLocations.InsertOnSubmit(UserLocation);
+            }
+            Database.Instance.SubmitChanges();
+            return;
         }
 
-        static public UserLocationAdapter GetDefaultLocation(UserLocationType locType,User owner)
+        static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,User owner)
         {
             UserLocationAdapter loc = null;
 
-            if (locType == UserLocationType.FORUM)
+            if (locType == UserLocationTypeEnum.FORUM)
             {
-                Dictionary<string, string> info = new Dictionary<string, string>();
-
-                info.Add(@"totalpages", "0");
-                info.Add(@"perpage", "5");
-                info.Add(@"pagenumber", "1");
-                info.Add(@"title", "INDEX");                
-                info.Add(@"locationremoteid", "-1");
-                info.Add(@"list", string.Empty);
-                info.Add(@"userlocationtype", @"forum");
-                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
-
-                loc = new UserLocationAdapter(info, owner);
+                UserLocation ul = new UserLocation();
+                ul.PerPage = 5;
+                ul.PageNumber = 1;
+                ul.Title = @"INDEX";
+                ul.LocationRemoteID = -1;
+                ul.List = string.Empty;
+                ul.UserLocationType = @"forum";
+                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                loc = new UserLocationAdapter(ul);
             }
-            else if (locType == UserLocationType.THREAD)
+            else if (locType == UserLocationTypeEnum.THREAD)
             {
-                Dictionary<string, string> info = new Dictionary<string, string>();
-
-                info.Add(@"totalpages", "0");
-                info.Add(@"perpage", "5");
-                info.Add(@"pagenumber", "1");
-                info.Add(@"title", string.Empty);
-                info.Add(@"locationremoteid", "0");
-                info.Add(@"list", string.Empty);
-                info.Add(@"userlocationtype", @"thread");
-                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
-
-                loc = new UserLocationAdapter(info, owner);
+                UserLocation ul = new UserLocation();
+                ul.PerPage = 5;
+                ul.PageNumber = 1;
+                ul.Title = string.Empty;
+                ul.LocationRemoteID = 0;
+                ul.List = string.Empty;
+                ul.UserLocationType = @"thread";
+                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                loc = new UserLocationAdapter(ul);
             }
-            else if (locType == UserLocationType.POST)
+            else if (locType == UserLocationTypeEnum.POST)
             {
-                Dictionary<string, string> info = new Dictionary<string, string>();
-
-                info.Add(@"totalpages", "0");
-                info.Add(@"perpage", "5");
-                info.Add(@"pagenumber", "1");
-                info.Add(@"title", string.Empty);
-                info.Add(@"locationremoteid", "0");
-                info.Add(@"list", string.Empty);
-                info.Add(@"userlocationtype", @"post");
-                info.Add(@"localuserid", owner.LocalUser.LocalUserID.ToString());
-
-                loc = new UserLocationAdapter(info, owner);
+                UserLocation ul = new UserLocation();
+                ul.PerPage = 5;
+                ul.PageNumber = 1;
+                ul.Title = string.Empty;
+                ul.LocationRemoteID = 0;
+                ul.List = string.Empty;
+                ul.UserLocationType = @"post";
+                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                loc = new UserLocationAdapter(ul);
             }
 
             return loc;
         }
 
-        static public UserLocationAdapter LoadLocation(UserLocationType locType, User user)
+        static public UserLocationAdapter LoadLocation(UserLocationTypeEnum locType, User user)
         {
-            UserLocationAdapter retVal = null;
-            string strLocType = locType.ToString().ToLower();
+            UserLocationAdapter retval = null;
 
-            try
-            {
-                Dictionary<string, string> locInfo = DB.Instance.QueryFirst(string.Format(@"
-                                                    SELECT *
-                                                    FROM userlocation
-                                                    WHERE (localuserid = {0})
-                                                    AND (userlocationtype = '{1}');
-                                                    ", user.LocalUser.LocalUserID, strLocType));
+            UserLocation ul = Database.Instance.UserLocations.FirstOrDefault(
+                l => l.LocalUserID == user.LocalUser.LocalUserID
+                    && l.UserLocationType == locType.ToString().ToLower());
 
-                if (locInfo != null)
-                {
-                    retVal = new UserLocationAdapter(locInfo, user);
-                }
-            }
-            catch (System.Data.SQLite.SQLiteException ex)
+            if (ul != null)
             {
-                log.Debug("Could not load userlocation", ex);
+                retval = new UserLocationAdapter(ul);
             }
 
-            return retVal;
-        }
-
-        public void BuildParentThreadInfo(Dictionary<string, string> threadInfo)
-        {
-            long lEpoch = long.Parse(threadInfo[@"dateline"].ToString());
-
-            DateTime dateline = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
-            dateline.AddSeconds(lEpoch);
-
-            string strDate = dateline.ToShortDateString();
-            string strTime = dateline.ToShortTimeString();
-
-            if (dateline.Date == DateTime.Now.Date)
-            {
-                strDate = "Today";
-            }
-            else if (dateline.Date == DateTime.Now.Date.AddDays(-1))
-            {
-                strDate = "Yesterday";
-            }
-
-            _strTitle = string.Format("{0} - {1} created by {2}",
-                    threadInfo[@"title"].ToString(),
-                    strDate + " " + strTime,
-                    threadInfo[@"postusername"].ToString()
-                );
-
+            return retval;
         }
     }
 }
