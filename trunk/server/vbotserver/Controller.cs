@@ -420,12 +420,12 @@ namespace vbotserver
         public Result GotoForumIndex(int iIndex, User user, bool bGotoRoot)
         {
             Result retval = null;
-            UserLocationT curLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
+            UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationType.FORUM, user);
 
             if (curLoc == null)
             { // this location does not exist
 
-                curLoc = UserLocationT.GetDefaultLocation(UserLocationType.FORUM, user);
+                curLoc = UserLocationAdapter.GetDefaultLocation(UserLocationType.FORUM, user);
                 VBRequestResult res = VB.Instance.ListForums(ResponseChannel, curLoc.LocationRemoteID);
 
                 if (res.ResultCode == VBRequestResultCode.Success)
@@ -465,11 +465,11 @@ namespace vbotserver
                 curLoc.SaveLocation();
 
                 // reset the THREAD location
-                UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
+                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationType.THREAD, user);
 
                 if (threadLoc == null)
                 {
-                    threadLoc = UserLocationT.GetDefaultLocation(UserLocationType.THREAD, user);
+                    threadLoc = UserLocationAdapter.GetDefaultLocation(UserLocationType.THREAD, user);
                 }
 
                 threadLoc.Title = curLoc.Title;
@@ -486,7 +486,7 @@ namespace vbotserver
         {
             Result rs = null;
 
-            UserLocationT curThreadLocation = UserLocationT.LoadLocation(UserLocationType.POST, user);
+            UserLocationAdapter curThreadLocation = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
 
             if (curThreadLocation != null)
             {
@@ -520,7 +520,7 @@ namespace vbotserver
         public Result GotoParentForum(User user)
         {
             Result ret = null;
-            UserLocationT forumLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
+            UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationType.FORUM, user);
 
             if (forumLoc != null)
             {
@@ -533,7 +533,7 @@ namespace vbotserver
                     forumLoc.SaveLocation();
 
                     // reset the THREAD location
-                    UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
+                    UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationType.THREAD, user);
 
                     if (threadLoc != null)
                     {
@@ -561,7 +561,7 @@ namespace vbotserver
         public Result GotoPostIndex(int iChoice, User user)
         {
             Result rs = null;
-            UserLocationT curPostLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+            UserLocationAdapter curPostLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
 
             if (curPostLoc != null)
             {
@@ -605,10 +605,10 @@ namespace vbotserver
 
                 if (int.TryParse(options[0], out iNewThreadID))
                 {
-                    UserLocationT postLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                    UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
                     if (postLoc == null)
                     {
-                        postLoc = UserLocationT.GetDefaultLocation(UserLocationType.POST, user);
+                        postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationType.POST, user);
                     }
 
                     VBThread thread = null;
@@ -653,7 +653,7 @@ namespace vbotserver
         public Result GotoThreadIndex(int iChoice, User user)
         {
             Result rs = null;
-            UserLocationT curLoc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
+            UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationType.THREAD, user);
 
             if (curLoc != null)
             {
@@ -667,10 +667,10 @@ namespace vbotserver
                     int iNewThreadID = 0;
                     string strNewThreadID = curLoc.IDList[iChoice - 1];
 
-                    UserLocationT postLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                    UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
                     if (postLoc == null)
                     {
-                        postLoc = UserLocationT.GetDefaultLocation(UserLocationType.POST, user);
+                        postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationType.POST, user);
                     }
 
                     if (int.TryParse(strNewThreadID, out iNewThreadID))
@@ -719,12 +719,12 @@ namespace vbotserver
             lock (this)
             {
                 Result resval = null;
-                UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
+                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationType.FORUM, user);
 
                 if (loc == null)
                 { // this location does not exist
 
-                    loc = UserLocationT.GetDefaultLocation(UserLocationType.FORUM, user);
+                    loc = UserLocationAdapter.GetDefaultLocation(UserLocationType.FORUM, user);
                     VBRequestResult res = VB.Instance.ListForums(ResponseChannel, loc.LocationRemoteID);
                     forums = res.Data as List<Dictionary<string, string>>;
 
@@ -793,7 +793,7 @@ namespace vbotserver
             lock (this)
             {
                 ResultCode rc = ResultCode.Unknown;
-                UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
 
                 if (loc == null)
                 {
@@ -890,7 +890,7 @@ namespace vbotserver
                 ResultCode rc = ResultCode.Unknown;
 
                 string strResponse = string.Empty;
-                UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.THREAD, user);
+                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationType.THREAD, user);
 
                 if (loc == null)
                 {
@@ -1027,7 +1027,7 @@ namespace vbotserver
             string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
 
-            UserLocationT forumLoc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
+            UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationType.FORUM, user);
             strResponse += "Current Forum: ";
             if (forumLoc != null)
             {
@@ -1038,7 +1038,7 @@ namespace vbotserver
                 strResponse += "None" + strNewLine;
             }
             
-            UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+            UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
             strResponse += "Current Thread: ";
             if (threadLoc != null)
             {
@@ -1162,14 +1162,14 @@ namespace vbotserver
                 Connection c = user.Connection;
                 string strUpper = char.ToUpper(strField[0]) + strField.Substring(1);
 
-                UserLocationT loc = null;
+                UserLocationAdapter loc = null;
                 if (strField == @"thread")
                 {
-                    loc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                    loc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
                 }
                 else if (strField == @"forum")
                 {
-                    loc = UserLocationT.LoadLocation(UserLocationType.FORUM, user);
+                    loc = UserLocationAdapter.LoadLocation(UserLocationType.FORUM, user);
                 }
                 else
                 {
@@ -1243,7 +1243,7 @@ namespace vbotserver
 
                 if (iThreadId == 0)
                 {
-                    UserLocationT loc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                    UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
 
                     if (loc != null)
                     {
@@ -1310,7 +1310,7 @@ namespace vbotserver
         {
             User user = userObj as User;
             Connection c = user.Connection;
-            UserLocationT postLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+            UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
 
             if (postLoc != null)
             {
@@ -1366,7 +1366,7 @@ namespace vbotserver
             }
             else if (options.Count() == 0)
             {
-                UserLocationT threadLoc = UserLocationT.LoadLocation(UserLocationType.POST, user);
+                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationType.POST, user);
                 if (threadLoc != null)
                 {
                     object[] param = { user, false, threadLoc.LocationRemoteID };
