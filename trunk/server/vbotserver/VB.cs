@@ -1098,8 +1098,6 @@ namespace vbotserver
             return vbrr;
         }
 
-
-
         public XDocument SendRawRequest(string strXml)
         {
             try
@@ -1137,6 +1135,7 @@ namespace vbotserver
                 return null;
             }
         }
+
         public VBPost GetPost(int iVBUserId, int iPostID)
         {
             VBPost post = null;
