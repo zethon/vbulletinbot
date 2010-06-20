@@ -259,83 +259,86 @@ function fetch_threadsxml($forumid,$pagenumber = PAGE_NUMBER_DEFAULT,$perpage = 
 	$xml = new XMLexporter($vbulletin);
 	$xml->add_group('response');	
 	
-	$forumperms = fetch_permissions($forumid);
-	if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']))
-	{
-		print_xml_error('no_permission_fetch_threadsxml');
-	}			
-	
-	$userid = $vbulletin->userinfo['userid'];
-	$limitlower = ($pagenumber - 1) * $perpage;
-	
-	$getthreadidssql = ("
-		SELECT 
-			thread.threadid, 
-			thread.lastpost, 
-			thread.lastposter, 
-			thread.lastpostid, 
-			thread.replycount, 
-			IF(thread.views<=thread.replycount, thread.replycount+1, thread.views) AS views
-		FROM " . TABLE_PREFIX . "thread AS thread
-		WHERE forumid = $forumid
-			AND sticky = 0
-			AND visible = 1
-		ORDER BY 
-			lastpost DESC 		
-		LIMIT $limitlower, $perpage
-	");	
-
 	// get the total threads count	
 	$threadcount = $db->query_first("SELECT threadcount FROM " . TABLE_PREFIX . "forum WHERE (forumid = $forumid);");
-
-	$getthreadids = $db->query_read_slave($getthreadidssql);
 	
-	$ids = '';
-	while ($thread = $db->fetch_array($getthreadids))
+	if ($threadcount > 0)
 	{
-		$ids .= ',' . $thread['threadid'];
-	}
-
-		$threadssql = "
+		$forumperms = fetch_permissions($forumid);
+		if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']))
+		{
+			print_error_xml('no_permission_fetch_threadsxml');
+		}			
+		
+		$userid = $vbulletin->userinfo['userid'];
+		$limitlower = ($pagenumber - 1) * $perpage;
+		
+		$getthreadidssql = ("
 			SELECT 
 				thread.threadid, 
-				thread.title AS threadtitle, 
-				thread.forumid, 
 				thread.lastpost, 
 				thread.lastposter, 
 				thread.lastpostid, 
-				thread.replycount,
-				threadread.readtime AS threadread,
-				forumread.readtime as forumread,
-				subscribethread.subscribethreadid AS subscribethreadid
-			FROM " . TABLE_PREFIX . "thread AS thread	
-			LEFT JOIN " . TABLE_PREFIX . "threadread AS threadread ON (threadread.threadid = thread.threadid AND threadread.userid = $userid) 		
-			LEFT JOIN " . TABLE_PREFIX . "forumread AS forumread ON (thread.forumid = forumread.forumid AND forumread.userid = $userid) 		
-			LEFT JOIN " . TABLE_PREFIX . "subscribethread AS subscribethread ON (thread.threadid = subscribethread.threadid AND subscribethread.userid = $userid)		
-			WHERE thread.threadid IN (0$ids)
-			ORDER BY lastpost DESC
-		";
+				thread.replycount, 
+				IF(thread.views<=thread.replycount, thread.replycount+1, thread.views) AS views
+			FROM " . TABLE_PREFIX . "thread AS thread
+			WHERE forumid = $forumid
+				AND sticky = 0
+				AND visible = 1
+			ORDER BY 
+				lastpost DESC 		
+			LIMIT $limitlower, $perpage
+		");	
+	
+		$getthreadids = $db->query_read_slave($getthreadidssql);
 		
-	$threads = $db->query_read_slave($threadssql);		
-
-	while ($thread = $db->fetch_array($threads))
-	{	
-		$thread['isnew'] = 'true';		
-		if ($thread['forumread'] >= $thread['lastpost'] || $thread['threadread'] >= $thread['lastpost'] || (TIMENOW - ($vbulletin->options['markinglimit'] * 86400)) > $thread['lastpost'] )
+		$ids = '';
+		while ($thread = $db->fetch_array($getthreadids))
 		{
-			$thread['isnew'] = 'false';
+			$ids .= ',' . $thread['threadid'];
 		}
-
-		$xml->add_group('thread');
-		foreach($thread as $key => $val)
-		{
-			$xml->add_tag($key,$val);
-		}
-		// add the thread count to each element
-		$xml->add_tag('totalthreads',$threadcount['threadcount']);
-		
-		$xml->close_group();
-	}		
+	
+			$threadssql = "
+				SELECT 
+					thread.threadid, 
+					thread.title AS threadtitle, 
+					thread.forumid, 
+					thread.lastpost, 
+					thread.lastposter, 
+					thread.lastpostid, 
+					thread.replycount,
+					threadread.readtime AS threadread,
+					forumread.readtime as forumread,
+					subscribethread.subscribethreadid AS subscribethreadid
+				FROM " . TABLE_PREFIX . "thread AS thread	
+				LEFT JOIN " . TABLE_PREFIX . "threadread AS threadread ON (threadread.threadid = thread.threadid AND threadread.userid = $userid) 		
+				LEFT JOIN " . TABLE_PREFIX . "forumread AS forumread ON (thread.forumid = forumread.forumid AND forumread.userid = $userid) 		
+				LEFT JOIN " . TABLE_PREFIX . "subscribethread AS subscribethread ON (thread.threadid = subscribethread.threadid AND subscribethread.userid = $userid)		
+				WHERE thread.threadid IN (0$ids)
+				ORDER BY lastpost DESC
+			";
+			
+		$threads = $db->query_read_slave($threadssql);		
+	
+		while ($thread = $db->fetch_array($threads))
+		{	
+			$thread['isnew'] = 'true';		
+			if ($thread['forumread'] >= $thread['lastpost'] || $thread['threadread'] >= $thread['lastpost'] || (TIMENOW - ($vbulletin->options['markinglimit'] * 86400)) > $thread['lastpost'] )
+			{
+				$thread['isnew'] = 'false';
+			}
+	
+			$xml->add_group('thread');
+			foreach($thread as $key => $val)
+			{
+				$xml->add_tag($key,$val);
+			}
+			// add the thread count to each element
+			$xml->add_tag('totalthreads',$threadcount['threadcount']);
+			
+			$xml->close_group();
+		}		
+	}
 	
 	$xml->add_tag('success','true');
 	$xml->close_group();
