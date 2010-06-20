@@ -46,7 +46,7 @@ namespace vbotserver
             doOnConnectEvent();
         }
 
-        override public void Connect()
+        public override void Connect()
         {
             _toc.Connect(_strUsername,_strPassword);
         }
