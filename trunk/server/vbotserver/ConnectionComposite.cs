@@ -103,7 +103,7 @@ namespace vbotserver
                     }
                     else
                     {
-                        log.DebugFormat("Could not create connection `{0}`", strType);
+                        log.ErrorFormat("Could not create connection `{0}`", strType);
                     }
                 }
                 catch (Exception e)
@@ -114,65 +114,5 @@ namespace vbotserver
 
             return retval;
         }
-
-        //public static ConnectionComposite MakeConnectionComposite(XDocument doc)
-        //{
-        //    string strNameSpace = Assembly.GetExecutingAssembly().GetName().Name;
-        //    ConnectionComposite retval = new ConnectionComposite();
-
-        //    var xConns = from xElem in doc.Descendants(@"imservice")
-        //                 select xElem;
-
-        //    foreach (XElement conn in xConns)
-        //    {
-        //        try
-        //        {
-        //            string strType = string.Format("{0}.{1}", strNameSpace, conn.Attribute(@"type").Value);
-
-        //            string strUsername = string.Empty;
-        //            if (conn.Element(@"screenname") != null)
-        //            {
-        //                strUsername = conn.Element(@"screenname").Value;
-        //            }
-
-        //            string strPassword = string.Empty;
-        //            if (conn.Element(@"password") != null)
-        //            {
-        //                strPassword = conn.Element(@"password").Value;
-        //            }
-
-        //            Type conType = Type.GetType(strType, false, true);
-        //            object[] args = new object[] { strUsername, strPassword };
-
-        //            if (conType != null)
-        //            {
-        //                Connection newCon = (Connection)System.Activator.CreateInstance(conType, args);
-        //                newCon.Alias = conn.Attribute(@"vbalias").Value;
-        //                switch (conn.Attribute(@"vbalias").Value)
-        //                {
-        //                    case "HTML":
-        //                        newCon.NewLine = "<br>";
-        //                    break;
-
-        //                    case "CRLF":
-        //                        newCon.NewLine = "\r\n";
-        //                    break;
-
-        //                    default:
-        //                    break;
-        //                }
-
-        //                retval.Connections.Add(newCon);
-        //                log.InfoFormat("Connection added ({0})", strType);
-        //            }
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            log.Debug("Unable to create connection", e);
-        //        }
-        //    }
-
-        //    return retval;
-        //}
     }
 }
