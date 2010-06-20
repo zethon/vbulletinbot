@@ -130,6 +130,7 @@ namespace vbotserver
                         throw new Exception(@"Could not parse parent `forumid`");
                     }
 
+                    LocationRemoteID = iLocationRemoteID;
                     Title = forumInfo[@"title"];
                 }
                 else
@@ -157,8 +158,10 @@ namespace vbotserver
                 UserLocation.List = string.Join(" ", IDList.ToArray());
                 Database.Instance.UserLocations.InsertOnSubmit(UserLocation);
             }
+
             Database.Instance.SubmitChanges();
-            return;
+            log.DebugFormat("Saved Location LocalUserID '{0}', UserLocationType '{1}', LocationRemoteID '{2}'",
+                    UserLocation.LocalUserID, UserLocation.UserLocationType, UserLocation.LocationRemoteID);
         }
 
         static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,LocalUserAdapter owner)
