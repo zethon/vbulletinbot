@@ -100,8 +100,9 @@ namespace vbotserver
                             string strResponse = c.NewLine + "Forum: '" + infoDict["title"] + "'" + c.NewLine + "Thread: '" + infoDict["threadtitle"] + "'" + c.NewLine;
                             strResponse += FetchPostBit(post, c.NewLine) + c.NewLine;
                             strResponse += "(Type 'gt " + infoDict["threadid"] + "' to go to the thread. Type 'im off' to turn off IM Notification)";
-                            
-                            c.SendMessage(new InstantMessage(strScreenName, strResponse));
+
+                            ResponseChannel rc = new vbotserver.ResponseChannel(strScreenName, c);
+                            rc.SendMessage(strResponse);
                             Thread.Sleep(2000);
                         }
                     }
@@ -185,10 +186,8 @@ namespace vbotserver
                     {
                         string strResponse = @"Unknown screen name. Please add this screen name to your user profile.";
                         conn.SendMessage(new InstantMessage(im.User, strResponse));
-                        log.Error(@"Could not load user.");
+                        log.DebugFormat(@"Unknown user: '{0}' ({1})",im.User,conn.Alias);
                     }
-
-                        
                 }
                 catch (Exception ex)
                 {
@@ -199,7 +198,6 @@ namespace vbotserver
                 
                 log.InfoFormat("Response Time: {0}.{1} seconds, Requests: {2}", 
                     elapsed.Seconds, elapsed.Milliseconds, VB.Instance.RequestCount - iReqCount);
-
             }
         }
 
@@ -248,6 +246,7 @@ namespace vbotserver
                 { // assume a command was entered
                     switch (parser.ApplicationName.ToLower())
                     {
+                        case @"\":
                         case "/":
                             retval = GotoForumIndex(-1, user, true);
                             break;
