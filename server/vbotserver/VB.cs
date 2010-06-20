@@ -1102,30 +1102,39 @@ namespace vbotserver
 
         public XDocument SendRawRequest(string strXml)
         {
-            lock (this)
+            try
             {
-                // add the bot credentials to the xml
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(strXml);
-                XmlElement botCreds = doc.CreateElement(@"botcredentials");
-                XmlElement pwElement = doc.CreateElement(@"servicepw");
-                pwElement.InnerText = ServicePassword;
-                botCreds.AppendChild(pwElement);
-                doc.DocumentElement.AppendChild(botCreds);
+                lock (this)
+                {
+                    // add the bot credentials to the xml
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(strXml);
+                    XmlElement botCreds = doc.CreateElement(@"botcredentials");
+                    XmlElement pwElement = doc.CreateElement(@"servicepw");
+                    pwElement.InnerText = ServicePassword;
+                    botCreds.AppendChild(pwElement);
+                    doc.DocumentElement.AppendChild(botCreds);
 
-                WebClient client = new WebClient();
+                    WebClient client = new WebClient();
 
-                               _strLastRequest = doc.InnerXml;
-                _strLastResponse = string.Empty;
-                byte[] postArray = Encoding.ASCII.GetBytes(doc.InnerXml);
+                    _strLastRequest = doc.InnerXml;
+                    _strLastResponse = string.Empty;
+                    byte[] postArray = Encoding.ASCII.GetBytes(doc.InnerXml);
 
-                client.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                byte[] responseArray = client.UploadData(_strServiceUrl, postArray);
-                _iRequestCount++;
+                    client.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+                    byte[] responseArray = client.UploadData(_strServiceUrl, postArray);
+                    _iRequestCount++;
 
-                _strLastResponse = Encoding.ASCII.GetString(responseArray);
-                XDocument retdoc = XDocument.Parse(LastResponse);
-                return retdoc;
+                    _strLastResponse = Encoding.ASCII.GetString(responseArray);
+                    XDocument retdoc = XDocument.Parse(LastResponse);
+                    return retdoc;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("VB::SendRawRequest(): LastRequest = {0} LastResponse = {1}", LastRequest, LastResponse);
+                log.Error(ex);
+                return null;
             }
         }
         public VBPost GetPost(int iVBUserId, int iPostID)
