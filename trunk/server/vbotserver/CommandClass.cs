@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Data;
+using System.Net;
 using log4net;
 
 namespace vbotserver
@@ -60,6 +61,12 @@ namespace vbotserver
         public void Break()
         {
             System.Diagnostics.Debugger.Break();
+        }
+
+        [CommandMethod("cls", "clear the console")]
+        public void Cls()
+        {
+            Console.Clear();
         }
 
         [CommandMethod("connect", "connect all services")]
