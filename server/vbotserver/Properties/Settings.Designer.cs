@@ -32,5 +32,15 @@ namespace vbotserver.Properties {
                 return ((string)(this["Database1ConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.anothermessageboard.com/vbulletinbot.php")]
+        public string vbotserver_VBotService_VBotService {
+            get {
+                return ((string)(this["vbotserver_VBotService_VBotService"]));
+            }
+        }
     }
 }

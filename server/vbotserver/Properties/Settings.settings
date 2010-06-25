@@ -10,5 +10,8 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data Source=|DataDirectory|\Database1.sdf</Value>
     </Setting>
+    <Setting Name="vbotserver_VBotService_VBotService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://www.anothermessageboard.com/vbulletinbot.php</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
