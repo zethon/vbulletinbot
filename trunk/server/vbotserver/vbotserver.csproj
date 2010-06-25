@@ -115,9 +115,14 @@
     </Compile>
     <Compile Include="VBPost.cs" />
     <Compile Include="VBThread.cs" />
-    <Compile Include="LocalUserAdapter.cs" />
+    <Compile Include="UserAdapter.cs" />
     <Compile Include="UserLocationAdapter.cs" />
     <Compile Include="VB.cs" />
+    <Compile Include="Web References\VBotService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -172,6 +177,17 @@
     <None Include="vbotDB.dbml.layout">
       <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
+    <None Include="Web References\VBotService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\VBotService\RemoteUser.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\RequestResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\vbulletinbot.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
@@ -181,6 +197,19 @@
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://www.anothermessageboard.com/vbulletinbot.php%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\VBotService\</RelPath>
+      <UpdateFromURL>http://www.anothermessageboard.com/vbulletinbot.php%3fwsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>vbotserver_VBotService_VBotService</CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

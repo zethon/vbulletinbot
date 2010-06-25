@@ -71,9 +71,9 @@ namespace vbotserver
             VB.Instance.ServicePassword = botconfig.WebServicePassword;
 
             // start the notification timer
-            _notTimer = new System.Timers.Timer(1000 * 60);
-            _notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
-            _notTimer.Enabled = true;
+            //_notTimer = new System.Timers.Timer(1000 * 60);
+            //_notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
+            //_notTimer.Enabled = true;
 
             return true;
         }
@@ -146,7 +146,7 @@ namespace vbotserver
                 {
                     ResponseChannel = new ResponseChannel(im.User, conn);
 
-                    LocalUserAdapter user = GetUser(im.User,conn.Alias);
+                    UserAdapter user = GetUser(im.User,conn.Alias);
 
                     if (user != null && user.LocalUser.LocalUserID > 0)
                     {
@@ -194,14 +194,17 @@ namespace vbotserver
                     log.Error("Something bad",ex);
                 }
 
-                TimeSpan elapsed = DateTime.Now - dtStart;
-                
-                log.InfoFormat("Response Time: {0}.{1} seconds, Requests: {2}", 
-                    elapsed.Seconds, elapsed.Milliseconds, VB.Instance.RequestCount - iReqCount);
+                if (log.IsDebugEnabled)
+                {
+                    TimeSpan elapsed = DateTime.Now - dtStart;
+
+                    log.InfoFormat("Response Time: {0}.{1} seconds, Requests: {2}",
+                        elapsed.Seconds, elapsed.Milliseconds, VB.Instance.RequestCount - iReqCount);
+                }
             }
         }
 
-        public Result DoCommand(string strCommand,LocalUserAdapter user)
+        public Result DoCommand(string strCommand,UserAdapter user)
         {
             Result retval = new Result();
             CommandParser parser = new CommandParser(strCommand);
@@ -328,7 +331,7 @@ namespace vbotserver
         /// <param name="ScreenName">The screen name of the user</param>
         /// <param name="ServiceAlias">The corresponding server (aim,gtalk,yahoo)</param>
         /// <returns>User object or null</returns>
-        public LocalUserAdapter GetUser(string ScreenName, string ServiceAlias)
+        public UserAdapter GetUser(string ScreenName, string ServiceAlias)
         {
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == ScreenName && u.Service == ServiceAlias);
@@ -357,7 +360,7 @@ namespace vbotserver
                 Database.Instance.SubmitChanges();
             }
 
-            return new LocalUserAdapter 
+            return new UserAdapter 
             { 
                 LocalUser = luser, 
                 ResponseChannel = ResponseChannel
@@ -376,12 +379,12 @@ namespace vbotserver
             return strResponse;
         }
 
-        public Result GotoForumIndex(int iIndex, LocalUserAdapter user)
+        public Result GotoForumIndex(int iIndex, UserAdapter user)
         {
             return GotoForumIndex(iIndex, user, false);
         }
 
-        public Result GotoForumIndex(int iIndex, LocalUserAdapter user, bool bGotoRoot)
+        public Result GotoForumIndex(int iIndex, UserAdapter user, bool bGotoRoot)
         {
             Result retval = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -445,7 +448,7 @@ namespace vbotserver
             return retval;
         }
 
-        public Result GotoNextPost(LocalUserAdapter user, bool bGotoNext)
+        public Result GotoNextPost(UserAdapter user, bool bGotoNext)
         {
             Result rs = null;
 
@@ -480,7 +483,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoParentForum(LocalUserAdapter user)
+        public Result GotoParentForum(UserAdapter user)
         {
             Result ret = null;
             UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -521,7 +524,7 @@ namespace vbotserver
             return ret;
         }
 
-        public Result GotoPostIndex(int iChoice, LocalUserAdapter user)
+        public Result GotoPostIndex(int iChoice, UserAdapter user)
         {
             Result rs = null;
             UserLocationAdapter curPostLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
@@ -558,7 +561,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoThread(LocalUserAdapter user, string[] options)
+        public Result GotoThread(UserAdapter user, string[] options)
         {
             Result rs = null;
 
@@ -613,7 +616,7 @@ namespace vbotserver
             return rs;
         }
 
-        public Result GotoThreadIndex(int iChoice, LocalUserAdapter user)
+        public Result GotoThreadIndex(int iChoice, UserAdapter user)
         {
             Result rs = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
@@ -672,12 +675,12 @@ namespace vbotserver
             return rs;
         }
 
-        public Result ListForum(LocalUserAdapter user)
+        public Result ListForum(UserAdapter user)
         {
             return ListForum(user, null);
         }
 
-        public Result ListForum(LocalUserAdapter user, List<Dictionary<string, string>> forums)
+        public Result ListForum(UserAdapter user, List<Dictionary<string, string>> forums)
         {
             lock (this)
             {
@@ -745,12 +748,12 @@ namespace vbotserver
             }
         }
 
-        public Result ListPosts(LocalUserAdapter user, string[] options)
+        public Result ListPosts(UserAdapter user, string[] options)
         {
             return ListPosts(user, options, null, null);
         }
 
-        public Result ListPosts(LocalUserAdapter user, string[] options, List<VBPost> posts, VBThread thread)
+        public Result ListPosts(UserAdapter user, string[] options, List<VBPost> posts, VBThread thread)
         {
             lock (this)
             {
@@ -839,12 +842,12 @@ namespace vbotserver
             }
         }
 
-        public Result ListThreads(LocalUserAdapter user, string[] options)
+        public Result ListThreads(UserAdapter user, string[] options)
         {
             return ListThreads(user, options, null);
         }
 
-        public Result ListThreads(LocalUserAdapter user, string[] options, List<VBThread> threads)
+        public Result ListThreads(UserAdapter user, string[] options, List<VBThread> threads)
         {
             lock (this)
             {
@@ -983,7 +986,7 @@ namespace vbotserver
         /// </summary>
         /// <param name="user">The user</param>
         /// <returns></returns>
-        public Result WhereAmI(LocalUserAdapter user)
+        public Result WhereAmI(UserAdapter user)
         {
             string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
@@ -1052,7 +1055,7 @@ namespace vbotserver
         }
 
         #region Threaded Functions
-        public string GetString(LocalUserAdapter user)
+        public string GetString(UserAdapter user)
         {
             string strRet = string.Empty;
             DateTime start = DateTime.Now;
@@ -1082,12 +1085,12 @@ namespace vbotserver
             return strRet;
         }
 
-        public bool GetConfirmation(LocalUserAdapter user)
+        public bool GetConfirmation(UserAdapter user)
         {
             return GetConfirmation(user, @"Are you sure? (y or n)");
         }
 
-        public bool GetConfirmation(LocalUserAdapter user, string strMessage)
+        public bool GetConfirmation(UserAdapter user, string strMessage)
         {
             bool bRetval = false;
             //Connection c = user.Connection;
@@ -1104,7 +1107,7 @@ namespace vbotserver
             return bRetval;
         }
 
-        public Result MarkRead(LocalUserAdapter user, string strField)
+        public Result MarkRead(UserAdapter user, string strField)
         {
             object[] objs = { user, strField };
             Thread t = new Thread(new ParameterizedThreadStart(DoMarkRead));
@@ -1119,7 +1122,7 @@ namespace vbotserver
 
             if (objs != null && objs.Count() == 2)
             {
-                LocalUserAdapter user = objs[0] as LocalUserAdapter;
+                UserAdapter user = objs[0] as UserAdapter;
 
                 string strField = objs[1] as string;
                 string strUpper = char.ToUpper(strField[0]) + strField.Substring(1);
@@ -1172,7 +1175,7 @@ namespace vbotserver
             }
         }
 
-        public Result SubscribeThread(LocalUserAdapter user, string[] options)
+        public Result SubscribeThread(UserAdapter user, string[] options)
         {
             int iThreadID = 0;
 
@@ -1197,7 +1200,7 @@ namespace vbotserver
 
             if (objs != null && objs.Count() == 2)
             {
-                LocalUserAdapter user = objs[0] as LocalUserAdapter;
+                UserAdapter user = objs[0] as UserAdapter;
 
                 int iThreadId = (int)objs[1];
                 string strMessage = string.Empty;
@@ -1259,7 +1262,7 @@ namespace vbotserver
             }
         }
 
-        public Result ThreadReply(LocalUserAdapter user)
+        public Result ThreadReply(UserAdapter user)
         {
             Thread replyThread = new Thread(new ParameterizedThreadStart(DoThreadReply));
             replyThread.Start(user);
@@ -1269,7 +1272,7 @@ namespace vbotserver
 
         public void DoThreadReply(object userObj)
         {
-            LocalUserAdapter user = userObj as LocalUserAdapter;
+            UserAdapter user = userObj as UserAdapter;
             UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
 
             if (postLoc != null)
@@ -1312,7 +1315,7 @@ namespace vbotserver
             }
         }
 
-        public Result UnsubscribeThread(LocalUserAdapter user, string[] options)
+        public Result UnsubscribeThread(UserAdapter user, string[] options)
         {
             Result ret = null;
             object[] objs = { user, options };
@@ -1362,7 +1365,7 @@ namespace vbotserver
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            LocalUserAdapter user = objs[0] as LocalUserAdapter;
+            UserAdapter user = objs[0] as UserAdapter;
             bool bAll = (bool)objs[1];
             int iThreadID = -1;
             string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
@@ -1394,7 +1397,7 @@ namespace vbotserver
             }
         }
 
-        public Result TurnOnOffAutoIMS(LocalUserAdapter user, string[] options)
+        public Result TurnOnOffAutoIMS(UserAdapter user, string[] options)
         {
             Result ret = null;
 
@@ -1440,7 +1443,7 @@ namespace vbotserver
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            LocalUserAdapter user = objs[0] as LocalUserAdapter;
+            UserAdapter user = objs[0] as UserAdapter;
             bool bOn = (bool)objs[1];
 
             string strOnOff = "off";
