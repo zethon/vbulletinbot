@@ -180,12 +180,12 @@
     <None Include="vbotDB.dbml.layout">
       <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
+    <None Include="Web References\VBotService\ForumListResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
     <None Include="Web References\VBotService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Web References\VBotService\RemoteUser.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\RequestResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>

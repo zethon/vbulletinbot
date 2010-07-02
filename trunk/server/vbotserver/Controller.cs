@@ -338,16 +338,14 @@ namespace vbotserver
 
             if (luser == null)
             {
-                Dictionary<string, string> vbuserInfo = VB.Instance.WhoAMI(ScreenName, ServiceAlias);
-
-                if (!vbuserInfo.ContainsKey("userid"))
-                    return null;
+                //VBotService.RemoteUser user = new VBotService.RemoteUser();
+                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(ScreenName,ServiceAlias));
 
                 luser = new LocalUser
                 {
                     Screenname = ScreenName,
                     Service = ServiceAlias,
-                    BoardUserID = int.Parse(vbuserInfo[@"userid"].ToString()),
+                    BoardUserID = result.RemoteUser.UserID,
                     LastUpdate = DateTime.Now
                 };
 
@@ -393,13 +391,12 @@ namespace vbotserver
             { // this location does not exist
 
                 curLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                VBRequestResult res = VB.Instance.ListForums(ResponseChannel, curLoc.LocationRemoteID);
+                VBotService.ForumListResult result = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), curLoc.LocationRemoteID);
 
-                if (res.ResultCode == VBRequestResultCode.Success)
+                if (result.Result.Code == 0)
                 {
-                   List<Dictionary<string, string>> forums = res.Data as List<Dictionary<string, string>>;
-
-                    curLoc.ParseForumsList(forums);
+                    curLoc.SetCurrentForum(result.CurrentForum);
+                    curLoc.ParseForumsList(result.ForumList);
                     curLoc.SaveLocation();
                 }
             }
@@ -423,11 +420,11 @@ namespace vbotserver
                 }
 
                 // set the FORUMS location
-                VBRequestResult res = VB.Instance.ListForums(ResponseChannel, iNewForumID);
+                VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), iNewForumID);
 
                 // TODO: error checking of the above call
-                List<Dictionary<string, string>> forums = res.Data as List<Dictionary<string, string>>;
-                curLoc.ParseForumsList(forums);
+                curLoc.SetCurrentForum(res.CurrentForum);
+                curLoc.ParseForumsList(res.ForumList);
                 curLoc.SaveLocation();
 
                 // reset the THREAD location
@@ -442,7 +439,7 @@ namespace vbotserver
                 threadLoc.LocationRemoteID = iNewForumID;
                 threadLoc.SaveLocation();
 
-                retval = ListForum(user, forums);
+                retval = ListForum(user,res.ForumList);
             }
 
             return retval;
@@ -490,12 +487,12 @@ namespace vbotserver
 
             if (forumLoc != null)
             {
-                VBRequestResult res = VB.Instance.ListParentForums(ResponseChannel, forumLoc.LocationRemoteID);
+                VBotService.ForumListResult result = BotService.Instance.ListParentForums(BotService.Credentialize(ResponseChannel), forumLoc.LocationRemoteID);
 
-                if (res.ResultCode == VBRequestResultCode.Success && res.Data != null)
+                if (result.Result.Code == 0)
                 {
-                    List<Dictionary<string, string>> forums = res.Data as List<Dictionary<string, string>>;
-                    forumLoc.ParseForumsList(forums);
+                    forumLoc.SetCurrentForum(result.CurrentForum);
+                    forumLoc.ParseForumsList(result.ForumList);
                     forumLoc.SaveLocation();
 
                     // reset the THREAD location
@@ -508,7 +505,7 @@ namespace vbotserver
                         threadLoc.SaveLocation();
                     }
 
-                    ret = ListForum(user, forums);
+                    ret = ListForum(user, result.ForumList);
                 }
                 else
                 {
@@ -680,7 +677,7 @@ namespace vbotserver
             return ListForum(user, null);
         }
 
-        public Result ListForum(UserAdapter user, List<Dictionary<string, string>> forums)
+        public Result ListForum(UserAdapter user, VBotService.Forum[] forums)
         {
             lock (this)
             {
@@ -691,43 +688,37 @@ namespace vbotserver
                 { // this location does not exist
 
                     loc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                    VBRequestResult res = VB.Instance.ListForums(ResponseChannel, loc.LocationRemoteID);
-                    forums = res.Data as List<Dictionary<string, string>>;
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
 
-                    loc.ParseForumsList(forums);
+                    // TODO: error checking of the above call
+                    loc.SetCurrentForum(res.CurrentForum);
+                    loc.ParseForumsList(res.ForumList);
                     loc.SaveLocation();
                 }
 
                 if (forums == null)
                 {
-                    VBRequestResult res = VB.Instance.ListForums(ResponseChannel, loc.LocationRemoteID);
-                    forums = res.Data as List<Dictionary<string, string>>;
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
+                    forums = res.ForumList;
                 }
 
                 string strResponse = ResponseChannel.Connection.NewLine + "Subforums in `" + loc.Title + "`" + ResponseChannel.Connection.NewLine;
                 bool bForumsExist = false;
                 string strIsNew = string.Empty;
 
-                if (forums.Count > 0)
+                if (forums.Count() > 0)
                 {
                     int iCount = 1;
-                    foreach (Dictionary<string, string> foruminfo in forums)
+                    foreach (VBotService.Forum foruminfo in forums)
                     {
-                        if (foruminfo.ContainsKey(@"iscurrent") && foruminfo[@"iscurrent"] == "1")
-                        {
-                            continue;
-                        }
-
-
                         strIsNew = string.Empty;
-                        if (foruminfo.ContainsKey(@"isnew") && foruminfo[@"isnew"].ToLower() == "new")
+                        if (foruminfo.IsNew)
                         {
                             strIsNew = "*";
-
                         }
 
                         bForumsExist = true;
-                        strResponse += iCount.ToString() + ". " + strIsNew + foruminfo[@"title"] + ResponseChannel.NewLine;
+                        strResponse += iCount.ToString() + ". " + strIsNew + foruminfo.Title+ ResponseChannel.NewLine;
                         iCount++;
                     }
 
@@ -1029,17 +1020,25 @@ namespace vbotserver
 
             try
             {
-                Dictionary<string, string> vbuser = VB.Instance.WhoAMI(strUsername, strConnectionName);
+                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(strUsername,strConnectionName));
 
-                if (vbuser.ContainsKey(@"username"))
+                if (result.Code == 0)
                 {
-                    strResponse = ResponseChannel.Connection.NewLine
-                                      + "VBUserID: " + vbuser[@"userid"].ToString() + ResponseChannel.Connection.NewLine
-                                      + "VBUsername: " + vbuser[@"username"].ToString();
+                    if (result.RemoteUser.UserID > 0)
+                    {
+                        strResponse = ResponseChannel.Connection.NewLine
+                                          + "VBUserID: " + result.RemoteUser.UserID.ToString() + ResponseChannel.Connection.NewLine
+                                          + "VBUsername: " + result.RemoteUser.Username;
+                    }
+                    else
+                    {
+                        strResponse = @"Unknown user. Please update your profile.";
+                    }
                 }
                 else
                 {
-                    strResponse = @"Uknown user. Please update your profile.";
+                    strResponse = @"There was an error. Please try again later.";
+                    log.WarnFormat(@"Could not process WhoAmI(), result.Text: '{0}'", result.Text);
                 }
 
                 retval = new Result(ResultCode.Success, strResponse);
@@ -1047,7 +1046,7 @@ namespace vbotserver
             catch (Exception e)
             {
                 retval = new Result(ResultCode.Error, e.Message);
-                log.Debug(@"WhoAMI failed", e);
+                log.Error(@"WhoAMI failed", e);
                 return retval;
             }
 

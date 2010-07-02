@@ -106,44 +106,20 @@ namespace vbotserver
             }
         }
 
-        public void ParseForumsList(List<Dictionary<string, string>> list)
+        public void ParseForumsList(VBotService.Forum[] forums)
         {
             IDList.Clear();
 
-            foreach (Dictionary<string, string> forumInfo in list)
+            foreach (VBotService.Forum forum in forums)
             {
-                if (!forumInfo.ContainsKey(@"forumid"))
-                {
-                    throw new Exception(@"Dictionary does not contain `forumid`");
-                }
-
-                if (!forumInfo.ContainsKey(@"title"))
-                {
-                    throw new Exception(@"Dictionary does not contain `title`");
-                }
-                        
-                if (forumInfo.ContainsKey(@"iscurrent") && forumInfo[@"iscurrent"] == "1")
-                {
-                    int iLocationRemoteID;
-                    if (!int.TryParse(forumInfo[@"forumid"], out iLocationRemoteID))
-                    {
-                        throw new Exception(@"Could not parse parent `forumid`");
-                    }
-
-                    LocationRemoteID = iLocationRemoteID;
-                    Title = forumInfo[@"title"];
-                }
-                else
-                {
-                    int iTemp = 0;
-                    if (!int.TryParse(forumInfo[@"forumid"],out iTemp) || iTemp <= 0)
-                    {
-                        throw new Exception(@"Could not parse child `forumid` ");
-                    }
-
-                    _IDList.Add(forumInfo[@"forumid"]);
-                }
+                IDList.Add(forum.ForumID.ToString());
             }
+        }
+
+        public void SetCurrentForum(VBotService.Forum forum)
+        {
+            LocationRemoteID = forum.ForumID;
+            Title = forum.Title;
         }
 
         public void SaveLocation()
