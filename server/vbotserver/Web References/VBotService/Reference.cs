@@ -31,6 +31,10 @@ namespace vbotserver.VBotService {
         
         private System.Threading.SendOrPostCallback WhoAmIOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ListForumsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback ListParentForumsOperationCompleted;
+        
         private bool useDefaultCredentialsSetExplicitly;
         
         /// <remarks/>
@@ -73,12 +77,17 @@ namespace vbotserver.VBotService {
         public event WhoAmICompletedEventHandler WhoAmICompleted;
         
         /// <remarks/>
+        public event ListForumsCompletedEventHandler ListForumsCompleted;
+        
+        /// <remarks/>
+        public event ListParentForumsCompletedEventHandler ListParentForumsCompleted;
+        
+        /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/WhoAmI", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
         [return: System.Xml.Serialization.SoapElementAttribute("return")]
-        public RequestResult WhoAmI(UserCredentials UserCredentials, out RemoteUser RemoteUser) {
+        public RequestResult WhoAmI(UserCredentials UserCredentials) {
             object[] results = this.Invoke("WhoAmI", new object[] {
                         UserCredentials});
-            RemoteUser = ((RemoteUser)(results[1]));
             return ((RequestResult)(results[0]));
         }
         
@@ -100,6 +109,70 @@ namespace vbotserver.VBotService {
             if ((this.WhoAmICompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.WhoAmICompleted(this, new WhoAmICompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/ListForums", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public ForumListResult ListForums(UserCredentials UserCredentials, int ForumID) {
+            object[] results = this.Invoke("ListForums", new object[] {
+                        UserCredentials,
+                        ForumID});
+            return ((ForumListResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ListForumsAsync(UserCredentials UserCredentials, int ForumID) {
+            this.ListForumsAsync(UserCredentials, ForumID, null);
+        }
+        
+        /// <remarks/>
+        public void ListForumsAsync(UserCredentials UserCredentials, int ForumID, object userState) {
+            if ((this.ListForumsOperationCompleted == null)) {
+                this.ListForumsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnListForumsOperationCompleted);
+            }
+            this.InvokeAsync("ListForums", new object[] {
+                        UserCredentials,
+                        ForumID}, this.ListForumsOperationCompleted, userState);
+        }
+        
+        private void OnListForumsOperationCompleted(object arg) {
+            if ((this.ListForumsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ListForumsCompleted(this, new ListForumsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/ListParentForums", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public ForumListResult ListParentForums(UserCredentials UserCredentials, int ForumID) {
+            object[] results = this.Invoke("ListParentForums", new object[] {
+                        UserCredentials,
+                        ForumID});
+            return ((ForumListResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ListParentForumsAsync(UserCredentials UserCredentials, int ForumID) {
+            this.ListParentForumsAsync(UserCredentials, ForumID, null);
+        }
+        
+        /// <remarks/>
+        public void ListParentForumsAsync(UserCredentials UserCredentials, int ForumID, object userState) {
+            if ((this.ListParentForumsOperationCompleted == null)) {
+                this.ListParentForumsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnListParentForumsOperationCompleted);
+            }
+            this.InvokeAsync("ListParentForums", new object[] {
+                        UserCredentials,
+                        ForumID}, this.ListParentForumsOperationCompleted, userState);
+        }
+        
+        private void OnListParentForumsOperationCompleted(object arg) {
+            if ((this.ListParentForumsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ListParentForumsCompleted(this, new ListParentForumsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -161,29 +234,98 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
-    public partial class RemoteUser {
+    public partial class Forum {
         
-        private int useridField;
+        private int forumIDField;
         
-        private string usernameField;
+        private string titleField;
+        
+        private bool isNewField;
+        
+        private bool isCurrentField;
         
         /// <remarks/>
-        public int userid {
+        public int ForumID {
             get {
-                return this.useridField;
+                return this.forumIDField;
             }
             set {
-                this.useridField = value;
+                this.forumIDField = value;
             }
         }
         
         /// <remarks/>
-        public string username {
+        public string Title {
             get {
-                return this.usernameField;
+                return this.titleField;
             }
             set {
-                this.usernameField = value;
+                this.titleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsNew {
+            get {
+                return this.isNewField;
+            }
+            set {
+                this.isNewField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsCurrent {
+            get {
+                return this.isCurrentField;
+            }
+            set {
+                this.isCurrentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class ForumListResult {
+        
+        private RequestResult resultField;
+        
+        private Forum currentForumField;
+        
+        private Forum[] forumListField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Forum CurrentForum {
+            get {
+                return this.currentForumField;
+            }
+            set {
+                this.currentForumField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Forum[] ForumList {
+            get {
+                return this.forumListField;
+            }
+            set {
+                this.forumListField = value;
             }
         }
     }
@@ -199,6 +341,8 @@ namespace vbotserver.VBotService {
         private int codeField;
         
         private string textField;
+        
+        private RemoteUser remoteUserField;
         
         /// <remarks/>
         public int Code {
@@ -217,6 +361,49 @@ namespace vbotserver.VBotService {
             }
             set {
                 this.textField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public RemoteUser RemoteUser {
+            get {
+                return this.remoteUserField;
+            }
+            set {
+                this.remoteUserField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class RemoteUser {
+        
+        private int userIDField;
+        
+        private string usernameField;
+        
+        /// <remarks/>
+        public int UserID {
+            get {
+                return this.userIDField;
+            }
+            set {
+                this.userIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Username {
+            get {
+                return this.usernameField;
+            }
+            set {
+                this.usernameField = value;
             }
         }
     }
@@ -245,12 +432,56 @@ namespace vbotserver.VBotService {
                 return ((RequestResult)(this.results[0]));
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ListForumsCompletedEventHandler(object sender, ListForumsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ListForumsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ListForumsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
         
         /// <remarks/>
-        public RemoteUser RemoteUser {
+        public ForumListResult Result {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((RemoteUser)(this.results[1]));
+                return ((ForumListResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ListParentForumsCompletedEventHandler(object sender, ListParentForumsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ListParentForumsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ListParentForumsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ForumListResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ForumListResult)(this.results[0]));
             }
         }
     }

@@ -35,5 +35,24 @@ namespace vbotserver
             }
         }
 
+        public static VBotService.UserCredentials Credentialize(string strUser, string strServ)
+        {
+            VBotService.UserCredentials creds = new VBotService.UserCredentials();
+
+            creds.Username = strUser;
+            creds.ServiceName = strServ;
+
+            return creds;
+        }
+
+        public static VBotService.UserCredentials Credentialize(ResponseChannel channel)
+        {
+            VBotService.UserCredentials creds = new VBotService.UserCredentials();
+
+            creds.Username = channel.ToName;
+            creds.ServiceName = channel.Connection.Alias;
+
+            return creds;
+        }
     }
 }
