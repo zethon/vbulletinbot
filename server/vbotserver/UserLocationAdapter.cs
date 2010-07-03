@@ -96,11 +96,11 @@ namespace vbotserver
             }
         }
 
-        public void ParseThreadList(List<VBThread> list)
+        public void ParseThreadList(VBotService.Thread[] list)
         {
             IDList.Clear();
 
-            foreach (VBThread thread in list)
+            foreach (VBotService.Thread thread in list)
             {
                 _IDList.Add(thread.ThreadID.ToString());
             }

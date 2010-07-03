@@ -116,6 +116,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Include="Thread.cs" />
     <Compile Include="VBPost.cs" />
     <Compile Include="VBThread.cs" />
     <Compile Include="UserAdapter.cs" />
@@ -188,6 +189,9 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\VBotService\RequestResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\ThreadListResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\vbulletinbot.wsdl" />

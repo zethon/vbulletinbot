@@ -835,11 +835,6 @@ namespace vbotserver
 
         public Result ListThreads(UserAdapter user, string[] options)
         {
-            return ListThreads(user, options, null);
-        }
-
-        public Result ListThreads(UserAdapter user, string[] options, List<VBThread> threads)
-        {
             lock (this)
             {
                 ResultCode rc = ResultCode.Unknown;
@@ -874,18 +869,15 @@ namespace vbotserver
                     }
 
 
-                    if (threads == null)
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.ThreadListResult r = BotService.Instance.ListThreads(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
+
+                    if (r.Result.Code != 0)
                     {
-                        Connection connection = ResponseChannel.Connection;
-                        VBRequestResult r = VB.Instance.ListThreads(ResponseChannel, loc.LocationRemoteID, iPageNumber, iPerPage);
-
-                        if (r.ResultCode != VBRequestResultCode.Success)
-                        {
-                            return new Result(ResultCode.Error, "Could not view threads. Please try again.");
-                        }
-
-                        threads = r.Data as List<VBThread>;
+                        log.ErrorFormat("Could not list threads: {0}", r.Result.Text);
+                        return new Result(ResultCode.Error, "Could not view threads. Please try again.");
                     }
+
 
                     bool bShowIDs = false;
                     foreach (string strOption in options)
@@ -903,10 +895,9 @@ namespace vbotserver
                     string strIsNew = string.Empty;
                     string strIsSubscribed = string.Empty;
 
-                    if (threads.Count > 0)
+                    if (r.ThreadList.Count() > 0)
                     {
-                        VBThread firstThread = threads[0];
-                        int iTotalPages = (int)Math.Ceiling((double)firstThread.TotalThreads / (double)iPerPage);
+                        int iTotalPages = (int)Math.Ceiling((double)r.ThreadCount / (double)iPerPage);
                         iTotalPages += 1;
 
                         if (iPageNumber <= iTotalPages)
@@ -915,7 +906,7 @@ namespace vbotserver
                         }
 
                         int iCount = 1;
-                        foreach (VBThread thread in threads)
+                        foreach (VBotService.Thread thread in r.ThreadList)
                         {
                             string strID = string.Empty;
                             if (bShowIDs)
@@ -929,7 +920,7 @@ namespace vbotserver
                                 strIsNew = "*";
                             }
 
-                            strIsSubscribed = thread.SubscribeThreadID > 0 ? "#" : string.Empty;
+                            strIsSubscribed = thread.IsSubscribed ? "#" : string.Empty;
 
                             bForumsExist = true;
 
@@ -956,8 +947,9 @@ namespace vbotserver
                     {
                         loc.PageNumber = iPageNumber;
                         loc.PerPage = iPerPage;
-                        loc.ParseThreadList(threads);
+                        loc.ParseThreadList(r.ThreadList);                        
                         loc.SaveLocation();
+
                         rc = ResultCode.Success;
                     }
                 }
@@ -971,6 +963,7 @@ namespace vbotserver
                 return new Result(rc, strResponse);
             }
         }
+        
 
         /// <summary>
         /// Returns the current Forum and Thread of the user
