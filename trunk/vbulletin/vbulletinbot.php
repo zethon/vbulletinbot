@@ -43,6 +43,17 @@ function ProcessSimpleType($who)
 	return "Hello $who";
 }
 
+function ErrorResult($text)
+{
+    global $vbulletin,$structtypes;
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']);  
+    $result['Code'] = 1;
+    $result['Text'] = $text;
+
+    return $result;    
+}
+
 function RegisterService($who)
 {
 	global $db,$vbulletin,$server;
@@ -79,6 +90,99 @@ function RegisterService($who)
 	}
 	
 	return $result;
+}
+
+function GetPostByIndex($who,$threadid,$index)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }    
+    
+    if ($index > 0)
+    {
+        $index -= 1;
+        $postinfo = $db->query_first("SELECT * FROM ". TABLE_PREFIX ."post as post WHERE (threadid = $threadid) ORDER BY dateline ASC LIMIT $index,1");
+        
+        if (is_array($postinfo))
+        {
+            $postinfo['pagetext'] = strip_bbcode($postinfo['pagetext'],true,false,false);  
+            $retval['Post'] = ConsumeArray($postinfo,$structtypes['Post']);    
+        }
+    
+        if ($postinfo['postid'] > 0)
+        {
+            $threadinfo = fetch_threadinfo($postinfo['threadid']);
+            $foruminfo = fetch_foruminfo($threadinfo['forumid'],false);
+            mark_thread_read($threadinfo, $foruminfo, $vbulletin->userinfo['userid'], $postinfo['dateline']);
+        }
+    }    
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;    
+    
+}
+
+function GetThread($who,$threadid)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }   
+    
+    $threadinfo = $thread = fetch_threadinfo($threadid);    
+    $forum = fetch_foruminfo($thread['forumid']);
+    $foruminfo =& $forum;    
+    
+    // check forum permissions
+    $forumperms = fetch_permissions($thread['forumid']);
+    if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']) OR !($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewthreads']))
+    {
+        print_error_xml('no_permission_fetch_threadxml');
+    }
+    if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewothers']) AND ($thread['postuserid'] != $vbulletin->userinfo['userid'] OR $vbulletin->userinfo['userid'] == 0))
+    {
+        print_error_xml('no_permission_fetch_threadxml');
+    }    
+    
+    // *********************************************************************************
+    // check if there is a forum password and if so, ensure the user has it set
+    verify_forum_password($foruminfo['forumid'], $foruminfo['password']);        
+    
+    $userid = $vbulletin->userinfo['userid'];
+    $threadssql = "
+        SELECT 
+            thread.*,
+            threadread.readtime AS threadread,
+            forumread.readtime as forumread,
+            subscribethread.subscribethreadid AS subscribethreadid
+        FROM " . TABLE_PREFIX . "thread AS thread    
+        LEFT JOIN " . TABLE_PREFIX . "threadread AS threadread ON (threadread.threadid = thread.threadid AND threadread.userid = $userid)         
+        LEFT JOIN " . TABLE_PREFIX . "forumread AS forumread ON (thread.forumid = forumread.forumid AND forumread.userid = $userid)         
+        LEFT JOIN " . TABLE_PREFIX . "subscribethread AS subscribethread ON (thread.threadid = subscribethread.threadid AND subscribethread.userid = $userid)        
+        WHERE thread.threadid IN (0$threadid)
+        ORDER BY lastpost DESC
+    ";
+        
+    $thread = $db->query_first($threadssql);     
+    
+    // TODO: Remove this HACK!
+    $thread['threadtitle'] = $thread['title'];
+    
+    $retval['Thread'] = ConsumeArray($thread,$structtypes['Thread']);                 
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;     
 }
 
 function ListForums($who,$forumid)
@@ -391,6 +495,155 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
     $retval['ThreadCount'] = $threadcount['threadcount'];
     
     return $retval;
+}
+
+function MarkForumRead($who,$forumid)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }   
+
+    $foruminfo = fetch_foruminfo($forumid);
+    mark_forum_read($foruminfo,$vbulletin->userinfo['userid'],TIMENOW);
+
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;      
+}
+
+function MarkThreadRead($who,$threadid)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }   
+
+    $threadinfo = fetch_threadinfo($threadid);
+    $foruminfo = fetch_foruminfo($threadinfo['forumid']);
+
+    mark_thread_read($threadinfo,$foruminfo,$vbulletin->userinfo['userid'],TIMENOW);    
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;      
+}
+
+function SubscribeThread($who,$threadid)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }   
+    
+    $threadinfo = fetch_threadinfo($threadid);
+    $foruminfo = fetch_foruminfo($threadinfo['forumid'],false);
+    
+    if (!$foruminfo['forumid'])
+    {
+        return ErrorResult("invalid_forumid_subscribe_thread");
+    }
+    
+    $forumperms = fetch_permissions($foruminfo['forumid']);
+    if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']))
+    {
+        return ErrorResult("no_forum_permission_subscribe_thread");
+    }    
+    
+    if (!$foruminfo['allowposting'] OR $foruminfo['link'] OR !$foruminfo['cancontainthreads'])
+    {
+        return ErrorResult("forum_closed_subscribe_thread");
+    }    
+    
+    if (!verify_forum_password($foruminfo['forumid'], $foruminfo['password'], false))
+    {
+        return ErrorResult("invalid_forum_password_subscribe_thread");
+    }
+    
+    if ($threadinfo['threadid'] > 0)
+    {
+        if ((!$threadinfo['visible'] AND !can_moderate($threadinfo['forumid'], 'canmoderateposts')) OR ($threadinfo['isdeleted'] AND !can_moderate($threadinfo['forumid'], 'candeleteposts')))
+        {
+            return ErrorResult('cannot_view_thread_subscribe_thread');    
+        }        
+        
+        if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewthreads']) OR (($vbulletin->userinfo['userid'] != $threadinfo['postuserid'] OR !$vbulletin->userinfo['userid']) AND !($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewothers'])))
+        {
+            return ErrorResult("no_thread_permission_subscribe_thread");
+        }        
+        
+        $emailupdate = 1; // Instant notification by email
+        $folderid = 0; // Delfault folder
+        
+        /*insert query*/
+        $db->query_write("
+            REPLACE INTO " . TABLE_PREFIX . "subscribethread (userid, threadid, emailupdate, folderid, canview)
+            VALUES (" . $vbulletin->userinfo['userid'] . ", $threadinfo[threadid], $emailupdate, $folderid, 1)
+        ");        
+
+        // TODO: remove this HACK!
+        $threadinfo['threadtitle'] = $threadinfo['title'];
+        $retval['Thread'] = ConsumeArray($threadinfo,$structtypes['Thread']);
+    }
+    else
+    {
+        return ErrorResult("invalid_threadid_subscribe_thread");        
+    } 
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;  
+}
+
+function UnSubscribeThread($who,$threadid) 
+{
+     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }    
+    
+    if (is_numeric($threadid))
+    { // delete this specific thread subscription
+    
+        $userid = $vbulletin->userinfo['userid'];
+        if ($threadid > 0)
+        {
+            $db->query_write("
+                DELETE FROM " . TABLE_PREFIX . "subscribethread 
+                WHERE (threadid = $threadid AND userid = $userid);
+            ");            
+        }
+        else if ($threadid == -1)
+        {
+            $db->query_write("
+                DELETE FROM " . TABLE_PREFIX . "subscribethread 
+                WHERE (userid = $userid);
+            ");            
+        }
+    }
+    else
+    {
+        return ErrorResult('invalid_threadid_unsubscribe_thread');        
+    }    
+    
+    $retval['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+   
+    return $retval;       
 }
 
 function WhoAmI($who)

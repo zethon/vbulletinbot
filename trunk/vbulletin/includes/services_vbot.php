@@ -61,5 +61,71 @@ $server->register(
     'encoded',
     'Returns a list of posts of the associated threadid'
 );
-               
+
+$server->register(
+    'GetPostByIndex',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int','Index'=>'xsd:int'),
+    array('return'=>'tns:GetPostResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Resturns post information by index in the thread'
+);
+
+$server->register(
+    'GetThread',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int'),
+    array('return'=>'tns:GetThreadResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Resturns thread information of the given threadid'
+);
+
+$server->register(
+    'SubscribeThread',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int'),
+    array('return'=>'tns:GetThreadResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Subscribes user to threadid and returns the thread info'
+);
+
+$server->register(
+    'UnSubscribeThread',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int'),
+    array('return'=>'tns:RequestResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Subscribes user to threadid and returns the thread info'
+);
+   
+$server->register(
+    'MarkForumRead',
+    array('UserCredentials'=>'tns:UserCredentials','ForumID'=>'xsd:int'),
+    array('return'=>'tns:RequestResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Subscribes user to threadid and returns the thread info'
+); 
+
+$server->register(
+    'MarkThreadRead',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int'),
+    array('return'=>'tns:RequestResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Subscribes user to threadid and returns the thread info'
+);  
+            
 ?>
