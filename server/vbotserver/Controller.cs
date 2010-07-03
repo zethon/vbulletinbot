@@ -574,24 +574,23 @@ namespace vbotserver
                         postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.POST, user);
                     }
 
-                    VBThread thread = null;
-                    VBRequestResult r = VB.Instance.ListPosts(ResponseChannel, iNewThreadID, postLoc.PageNumber, postLoc.PerPage, out thread);
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
 
-                    if (r.ResultCode == VBRequestResultCode.Success)
+                    if (r.Result.Code == 0)
                     {
-                        List<VBPost> posts = r.Data as List<VBPost>;
-
                         // TODO: build the postLoc location title here
                         postLoc.Title = string.Format("{0} - {1} created by {2}",
-                                        Regex.Replace(thread.ThreadTitle, @"[\']", string.Empty),
-                                        thread.GetFriendlyDate(thread.DateLine),
-                                        thread.PostUsername);
+                                        Regex.Replace(r.Thread.ThreadTitle, @"[\']", string.Empty),
+                                        r.Thread.GetFriendlyDate(r.Thread.DateLine),
+                                        r.Thread.PostUsername);
 
                         postLoc.LocationRemoteID = iNewThreadID;
-                        postLoc.ParsePostList(posts);
+                        
+                        postLoc.ParsePostList(r.PostList);
                         postLoc.SaveLocation();
 
-                        rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, posts, thread);
+                        rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, r);
                     }
                     else
                     {
@@ -638,24 +637,22 @@ namespace vbotserver
 
                     if (int.TryParse(strNewThreadID, out iNewThreadID))
                     {
-                        VBThread thread = null;
-                        VBRequestResult r = VB.Instance.ListPosts(ResponseChannel, iNewThreadID, postLoc.PageNumber, postLoc.PerPage, out thread);
+                        VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                        VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
 
-                        if (r.ResultCode == VBRequestResultCode.Success)
+                        if (r.Result.Code == 0)
                         {
-                            List<VBPost> posts = r.Data as List<VBPost>;
-
                             // TODO: build the postLoc location title here
                             postLoc.Title = string.Format("{0} - {1} created by {2}",
-                                            Regex.Replace(thread.ThreadTitle, @"[\']", string.Empty),
-                                            thread.GetFriendlyDate(thread.DateLine),
-                                            thread.PostUsername);
+                                            Regex.Replace(r.Thread.ThreadTitle, @"[\']", string.Empty),
+                                            r.Thread.GetFriendlyDate(r.Thread.DateLine),
+                                            r.Thread.PostUsername);
 
                             postLoc.LocationRemoteID = iNewThreadID;
-                            postLoc.ParsePostList(posts);
+                            postLoc.ParsePostList(r.PostList);
                             postLoc.SaveLocation();
 
-                            rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, posts, thread);
+                            rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, r);
                         }
                     }
                     else
@@ -741,10 +738,10 @@ namespace vbotserver
 
         public Result ListPosts(UserAdapter user, string[] options)
         {
-            return ListPosts(user, options, null, null);
+            return ListPosts(user, options, null);
         }
 
-        public Result ListPosts(UserAdapter user, string[] options, List<VBPost> posts, VBThread thread)
+        public Result ListPosts(UserAdapter user, string[] options, VBotService.PostListResult result)
         {
             lock (this)
             {
@@ -776,19 +773,15 @@ namespace vbotserver
                 }
 
 
-                if (posts == null || thread == null)
+                if (result == null)
                 {
-                    VBRequestResult r = VB.Instance.ListPosts(ResponseChannel, loc.LocationRemoteID, iPageNumber, iPerPage, out thread);
-
-                    if (r.ResultCode == VBRequestResultCode.Success)
-                    {
-                        posts = r.Data as List<VBPost>;
-                    }
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    result = BotService.Instance.ListPosts(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
                 }
 
                 string strResponse = ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
 
-                double dTotalPosts = (double)(thread.ReplyCount + 1);
+                double dTotalPosts = (double)(result.Thread.ReplyCount + 1);
                 int iTotalPages = (int)Math.Ceiling(dTotalPosts / (double)iPerPage);
 
                 if (iPageNumber <= iTotalPages)
@@ -797,10 +790,10 @@ namespace vbotserver
                 }
 
                 string strIsNew = string.Empty;
-                if (posts.Count > 0)
+                if (result.PostList.Count() > 0)
                 {
                     int iCount = ((iPageNumber - 1) * iPerPage) + 1;
-                    foreach (VBPost postInfo in posts)
+                    foreach (VBotService.Post postInfo in result.PostList)
                     {
                         strIsNew = string.Empty;
                         if (postInfo.IsNew)
@@ -831,7 +824,7 @@ namespace vbotserver
                 user.SaveLastPostIndex(1);
                 return new Result(rc, strResponse);
             }
-        }
+        }        
 
         public Result ListThreads(UserAdapter user, string[] options)
         {
@@ -963,8 +956,7 @@ namespace vbotserver
                 return new Result(rc, strResponse);
             }
         }
-        
-
+ 
         /// <summary>
         /// Returns the current Forum and Thread of the user
         /// </summary>
