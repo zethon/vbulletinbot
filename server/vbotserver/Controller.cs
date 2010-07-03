@@ -1142,7 +1142,7 @@ namespace vbotserver
                 {
                     if (GetConfirmation(user, @"Mark this " + strField + " read?"))
                     {
-                        VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
                         
                         VBotService.RequestResult r = null; 
                         
@@ -1226,7 +1226,7 @@ namespace vbotserver
                 // check to see if iThreadId was set above
                 if (iThreadId > 0)
                 {
-                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
                     VBotService.GetThreadResult r = BotService.Instance.GetThread(uc, iThreadId);
 
                     if (r.Result.Code == 0)
@@ -1364,38 +1364,6 @@ namespace vbotserver
                 ret = new Result(ResultCode.Error, @"Invalid parameter to `unsub` command");
             }
 
-            //if (options.Count() > 0 && options[0].ToLower() == @"all")
-            //{
-            //    object[] param = { user, true, null };
-            //    Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-            //    t.Start(param);
-            //    ret = new Result(ResultCode.Halt, string.Empty);
-            //}
-            ////else if (options.Count > 0)
-            ////{
-
-            ////}
-            //else if (options.Count() == 0)
-            //{
-            //    UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
-            //    if (threadLoc != null)
-            //    {
-            //        object[] param = { user, false, threadLoc.LocationRemoteID };
-            //        Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-            //        t.Start(param);
-
-            //        ret = new Result(ResultCode.Halt, string.Empty);
-            //    }
-            //    else
-            //    {
-            //        ret = new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
-            //    }
-            //}
-            //else
-            //{
-            //    ret = new Result(ResultCode.Error, @"Invalid parameter to `usub` command");
-            //}
-
             return ret;
         }
 
@@ -1424,7 +1392,7 @@ namespace vbotserver
 
             if (GetConfirmation(user, strConfMsg))
             {
-                VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
                 VBotService.RequestResult r = BotService.Instance.UnSubscribeThread(uc, iThreadID);
 
                 if (r.Code == 0)
@@ -1502,16 +1470,17 @@ namespace vbotserver
 
             if (GetConfirmation(user, "Are you sure you want to turn IM Notification " + strOnOff + "?"))
             {
-                VBRequestResult r = VB.Instance.TurnOnOffIMNotification(user.ResponseChannel, bOn);
+                VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                VBotService.RequestResult r = BotService.Instance.SetIMNotification(uc, bOn);
 
-                if (r.ResultCode == VBRequestResultCode.Success)
+                if (r.Code == 0)
                 {
                     user.ResponseChannel.SendMessage(@"IM Notification turned " + strOnOff + ".");
                 }
                 else
                 {
                     user.ResponseChannel.SendMessage(@"Could not set IM Notification");
-                    log.Error(r.Message);
+                    log.Error(r.Text);
                 }
             }
             else
