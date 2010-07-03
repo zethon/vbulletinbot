@@ -86,11 +86,11 @@ namespace vbotserver
             }
         }
 
-        public void ParsePostList(List<VBPost> list)
+        public void ParsePostList(VBotService.Post[] list)
         {
             IDList.Clear();
 
-            foreach (VBPost post in list)
+            foreach (VBotService.Post post in list)
             {
                 IDList.Add(post.PostID.ToString());
             }
