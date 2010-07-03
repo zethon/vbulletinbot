@@ -44,7 +44,7 @@ namespace vbotserver.VBotService
             return strRet;
         }
 
-        public string GetTitleString()
+        public string GetTitle()
         {
             return string.Format("{0} - {1} created by {2}",
                              Regex.Replace(ThreadTitle, @"[\']", string.Empty),
