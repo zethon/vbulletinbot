@@ -377,6 +377,18 @@ namespace vbotserver
             return strResponse;
         }
 
+        public string FetchPostBit(VBotService.Post post, string strNewLine)
+        {
+            string strResponse = string.Empty;
+
+            string strPageText = post.PageText;
+            strResponse += strNewLine;
+            strResponse += string.Format("{0}", strPageText) + strNewLine;
+            strResponse += string.Format("{0} by {1}", post.GetFriendlyDate(), post.Username);
+
+            return strResponse;
+        }
+
         public Result GotoForumIndex(int iIndex, UserAdapter user)
         {
             return GotoForumIndex(iIndex, user, false);
@@ -528,15 +540,14 @@ namespace vbotserver
 
             if (curPostLoc != null)
             {
-                VBRequestResult r = VB.Instance.GetPostByIndex(ResponseChannel.ToName,
-                                        ResponseChannel.Connection.Alias, curPostLoc.LocationRemoteID, iChoice);
+                VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, curPostLoc.LocationRemoteID, iChoice);
 
-                if (r.ResultCode == VBRequestResultCode.Success)
+                if (r.Result.Code == 0)
                 {
-                    VBPost post = r.Data as VBPost;
-                    if (post != null)
+                    if (r.Post != null && r.Post.PostID > 0)
                     {
-                        string strText = FetchPostBit(post, ResponseChannel.Connection.NewLine);
+                        string strText = FetchPostBit(r.Post, ResponseChannel.Connection.NewLine);
                         user.SaveLastPostIndex(iChoice);
                         rs = new Result(ResultCode.Success, strText);
                     }
@@ -1129,18 +1140,31 @@ namespace vbotserver
 
                 if (loc != null)
                 {
-                    if (GetConfirmation(user, @"Mark this " + strField + "as read?"))
+                    if (GetConfirmation(user, @"Mark this " + strField + " read?"))
                     {
-                        VBRequestResult r = VB.Instance.MarkRead(ResponseChannel, loc.LocationRemoteID, strField);
-
-                        if (r.ResultCode == VBRequestResultCode.Success)
+                        VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                        
+                        VBotService.RequestResult r = null; 
+                        
+                        // TODO: this is a hack, redesign how MarkThreadRead and MarkForumRead are called
+                        if (strField == @"thread")
+                        {
+                            r = BotService.Instance.MarkThreadRead(uc, loc.LocationRemoteID);
+                        }
+                        else if (strField == @"forum")
+                        {
+                            r = BotService.Instance.MarkForumRead(uc, loc.LocationRemoteID);
+                        }
+                        
+                        // TODO: can r be null? if so, this could be bad
+                        if (r.Code == 0)
                         {
                             user.ResponseChannel.SendMessage(strUpper + @" marked as read.");
                         }
                         else
                         {
                             user.ResponseChannel.SendMessage(strUpper + @" could not be marked as read.");
-                            log.Error(r.Message);
+                            log.Error(r.Text);
                         }
                     }
                     else
@@ -1202,22 +1226,20 @@ namespace vbotserver
                 // check to see if iThreadId was set above
                 if (iThreadId > 0)
                 {
-                    VBRequestResult r = VB.Instance.GetThread(ResponseChannel, iThreadId);
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.GetThreadResult r = BotService.Instance.GetThread(uc, iThreadId);
 
-                    if (r != null && r.ResultCode == VBRequestResultCode.Success)
+                    if (r.Result.Code == 0)
                     {
-                        Dictionary<string, string> threadInfo = r.Data as Dictionary<string, string>;
-                        VBThread thread = new VBThread(threadInfo);
-
                         string strConf = string.Format("{1}Thread: {0}{1}Are you sure you wish to subscribe to this thread?",
-                                                thread.GetTitle(), user.ResponseChannel.NewLine);
+                                                r.Thread.GetTitle(), user.ResponseChannel.NewLine);
 
                         if (GetConfirmation(user, strConf))
                         {
-                            r = VB.Instance.SubscribeThread(ResponseChannel, iThreadId);
+                            r = BotService.Instance.SubscribeThread(uc, iThreadId);
 
                             // TODO: test what happens when r is null
-                            if (r.ResultCode == VBRequestResultCode.Success)
+                            if (r.Result.Code == 0)
                             {
                                 strMessage = string.Format("Subscribed to thread {0}", iThreadId);
                             }
@@ -1302,35 +1324,77 @@ namespace vbotserver
         public Result UnsubscribeThread(UserAdapter user, string[] options)
         {
             Result ret = null;
-            object[] objs = { user, options };
+            int iThread = 0;
 
             if (options.Count() > 0 && options[0].ToLower() == @"all")
             {
-                object[] param = { user, true, null };
-                Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-                t.Start(param);
-                ret = new Result(ResultCode.Halt, string.Empty);
+                iThread = -1;
             }
-            else if (options.Count() == 0)
+            else if (options.Count() > 0)
             {
-                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
-                if (threadLoc != null)
+                if (!int.TryParse(options[0], out iThread))
                 {
-                    object[] param = { user, false, threadLoc.LocationRemoteID };
-                    Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
-                    t.Start(param);
-
-                    ret = new Result(ResultCode.Halt, string.Empty);
-                }
-                else
-                {
-                    ret = new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
+                    // TODO: what happens to iThread if TryParse fails?
+                    iThread = 0;
                 }
             }
             else
             {
-                ret = new Result(ResultCode.Error, @"Invalid parameter to `usub` command");
+                // no parameters, get the current thread
+                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                if (threadLoc != null)
+                {
+                    iThread = threadLoc.LocationRemoteID;
+                }
+                else
+                {
+                    return new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
+                }
             }
+
+            if (iThread != 0)
+            {
+                object[] param = { user, iThread };
+                Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
+                t.Start(param);
+                ret = new Result(ResultCode.Halt, string.Empty);
+            }
+            else
+            {
+                ret = new Result(ResultCode.Error, @"Invalid parameter to `unsub` command");
+            }
+
+            //if (options.Count() > 0 && options[0].ToLower() == @"all")
+            //{
+            //    object[] param = { user, true, null };
+            //    Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
+            //    t.Start(param);
+            //    ret = new Result(ResultCode.Halt, string.Empty);
+            //}
+            ////else if (options.Count > 0)
+            ////{
+
+            ////}
+            //else if (options.Count() == 0)
+            //{
+            //    UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+            //    if (threadLoc != null)
+            //    {
+            //        object[] param = { user, false, threadLoc.LocationRemoteID };
+            //        Thread t = new Thread(new ParameterizedThreadStart(DoUnsubscribeThread));
+            //        t.Start(param);
+
+            //        ret = new Result(ResultCode.Halt, string.Empty);
+            //    }
+            //    else
+            //    {
+            //        ret = new Result(ResultCode.Error, @"No current thread. User `lt` to browse to a thread.");
+            //    }
+            //}
+            //else
+            //{
+            //    ret = new Result(ResultCode.Error, @"Invalid parameter to `usub` command");
+            //}
 
             return ret;
         }
@@ -1344,26 +1408,26 @@ namespace vbotserver
                 throw new Exception(@"Could not cast object to object[] in DoUnsubscribeThread");
             }
 
-            if (objs.Count() != 3)
+            if (objs.Count() != 2)
             {
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
             UserAdapter user = objs[0] as UserAdapter;
-            bool bAll = (bool)objs[1];
-            int iThreadID = -1;
+            int iThreadID = (int)objs[1];
             string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
 
-            if (!bAll)
+            if (iThreadID > 0)
             {
-                iThreadID = (int)objs[2];
                 strConfMsg = @"Are you sure you want to unsubscribe from thread " + iThreadID.ToString() + "?";
             }
 
             if (GetConfirmation(user, strConfMsg))
             {
-                VBRequestResult r = VB.Instance.UnSubscribeThread(user.ResponseChannel, iThreadID);
-                if (r.ResultCode == VBRequestResultCode.Success)
+                VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                VBotService.RequestResult r = BotService.Instance.UnSubscribeThread(uc, iThreadID);
+
+                if (r.Code == 0)
                 {
                     user.ResponseChannel.SendMessage(@"Subscription(s) removed.");
 
@@ -1371,7 +1435,7 @@ namespace vbotserver
                 else
                 {
                     user.ResponseChannel.SendMessage(@"Could not remove subscription(s).");
-                    log.Error(r.Message);
+                    log.Error(r.Text);
                 }
             }
             else
