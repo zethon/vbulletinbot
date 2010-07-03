@@ -39,5 +39,16 @@ $server->register(
     'encoded',
     'Returns a list of forums of the associated forumid'
 ); 
+
+$server->register(
+    'ListThreads',
+    array('UserCredentials'=>'tns:UserCredentials','ForumID'=>'xsd:int','PageNumber'=>'xsd:int','PerPage'=>'xsd:int'),
+    array('return'=>'tns:ThreadListResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Returns a list of forums of the associated forumid'
+);
                
 ?>

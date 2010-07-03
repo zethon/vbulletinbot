@@ -19,17 +19,38 @@ $structtypes['RemoteUser'] = array(
     );     
     
 $structtypes['Forum'] = array(
-        'ForumID' => array('UserID','type'=>'xsd:int'),
-        'Title' => array('Username','type'=>'xsd:string'),
+        'ForumID' => array('ForumID','type'=>'xsd:int'),
+        'Title' => array('Title','type'=>'xsd:string'),
         'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
-        'IsCurrent' => array('IsNew', 'type'=>'xsd:boolean')
+        'IsCurrent' => array('IsCurrent', 'type'=>'xsd:boolean')
     ); 
+    
+$structtypes['Thread'] = array(
+        'ThreadID' => array('ThreadID','type'=>'xsd:int'),
+        'ThreadTitle' => array('ThreadTitle','type'=>'xsd:string'),
+        'ForumID' => array('ForumID','type'=>'xsd:int'),
+        'PostID' => array('PostID','type'=>'xsd:int'), 
+        'LastPost' => array('LastPost','type'=>'xsd:int'), 
+        'LastPoster' => array('LastPoster','type'=>'xsd:string'), 
+        'PostUsername' => array('PostUsername','type'=>'xsd:string'), 
+        'ReplyCount' => array('ReplyCount','type'=>'xsd:int'), 
+        'IsSubscribed' => array('IsSubscribed', 'type'=>'xsd:boolean'),
+        'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
+        'DateLine' => array('DateLine','type'=>'xsd:int'), 
+    ); 
+    
     
 $structtypes['ForumListResult'] = array(
         'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
         'CurrentForum' => array('name'=>'CurrentForum','type'=>'tns:Forum'),
         'ForumList' => array('name'=>'ForumList','type'=>'tns:ForumArray'),
     );
+    
+$structtypes['ThreadListResult'] = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'ThreadList' => array('name'=>'ThreadList','type'=>'tns:ThreadArray'),
+        'ThreadCount' => array('name'=>'ThreadCount','type'=>'xsd:int')
+    );    
     
 foreach ($structtypes as $key => $val)
 {
@@ -65,6 +86,17 @@ $server->wsdl->addComplexType(
         array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Forum[]')),
         'tns:Forum'
 );    
+
+$server->wsdl->addComplexType(
+        'ThreadArray', 
+        'complexType',
+        'array',
+        '',
+        'SOAP-ENC:Array',
+        array(),
+        array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Thread[]')),
+        'tns:Thread'
+); 
 
 function ConsumeArray($datarray,$destarray)
 {
