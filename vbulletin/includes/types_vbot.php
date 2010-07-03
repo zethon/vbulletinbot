@@ -28,6 +28,7 @@ $structtypes['Forum'] = array(
 $structtypes['Thread'] = array(
         'ThreadID' => array('ThreadID','type'=>'xsd:int'),
         'ThreadTitle' => array('ThreadTitle','type'=>'xsd:string'),
+        'Title' => array('Title','type'=>'xsd:string'),
         'ForumID' => array('ForumID','type'=>'xsd:int'),
         'PostID' => array('PostID','type'=>'xsd:int'), 
         'LastPost' => array('LastPost','type'=>'xsd:int'), 
@@ -65,7 +66,17 @@ $structtypes['PostListResult'] = array(
         'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
         'Thread' => array('name'=>'Thread','type'=>'tns:Thread'),
         'PostList' => array('name'=>'PostList','type'=>'tns:PostArray')
-    );       
+    ); 
+    
+$structtypes['GetPostResult']  = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'Post' => array('name'=>'Post','type'=>'tns:Post'),
+    );          
+    
+$structtypes['GetThreadResult']  = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'Thread' => array('name'=>'Thread','type'=>'tns:Thread'),
+    );   
     
 foreach ($structtypes as $key => $val)
 {
