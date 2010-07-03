@@ -210,6 +210,102 @@ function ListParentForums($who,$forumid)
     }      
 }
 
+function ListThreads($who,$forumid,$pagenumber,$perpage)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }
+
+    // get the total threads count    
+    $threadcount = $db->query_first("SELECT threadcount FROM " . TABLE_PREFIX . "forum WHERE (forumid = $forumid);");
+    
+    if ($threadcount > 0)
+    {
+        $forumperms = fetch_permissions($forumid);
+        if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']))
+        {
+            // TODO: handle this properly
+            //print_error_xml('no_permission_fetch_threadsxml');
+        }            
+        
+        $userid = $vbulletin->userinfo['userid'];
+        $limitlower = ($pagenumber - 1) * $perpage;
+        
+        $getthreadidssql = ("
+            SELECT 
+                thread.threadid, 
+                thread.lastpost, 
+                thread.lastposter, 
+                thread.lastpostid, 
+                thread.replycount, 
+                IF(thread.views<=thread.replycount, thread.replycount+1, thread.views) AS views
+            FROM " . TABLE_PREFIX . "thread AS thread
+            WHERE forumid = $forumid
+                AND sticky = 0
+                AND visible = 1
+            ORDER BY 
+                lastpost DESC         
+            LIMIT $limitlower, $perpage
+        ");    
+    
+        $getthreadids = $db->query_read_slave($getthreadidssql);
+        
+        $ids = '';
+        while ($thread = $db->fetch_array($getthreadids))
+        {
+            $ids .= ',' . $thread['threadid'];
+        }
+    
+            $threadssql = "
+                SELECT 
+                    thread.threadid, 
+                    thread.title AS threadtitle, 
+                    thread.forumid, 
+                    thread.lastpost, 
+                    thread.lastposter, 
+                    thread.lastpostid, 
+                    thread.replycount,
+                    threadread.readtime AS threadread,
+                    forumread.readtime as forumread,
+                    subscribethread.subscribethreadid AS subscribethreadid
+                FROM " . TABLE_PREFIX . "thread AS thread    
+                LEFT JOIN " . TABLE_PREFIX . "threadread AS threadread ON (threadread.threadid = thread.threadid AND threadread.userid = $userid)         
+                LEFT JOIN " . TABLE_PREFIX . "forumread AS forumread ON (thread.forumid = forumread.forumid AND forumread.userid = $userid)         
+                LEFT JOIN " . TABLE_PREFIX . "subscribethread AS subscribethread ON (thread.threadid = subscribethread.threadid AND subscribethread.userid = $userid)        
+                WHERE thread.threadid IN (0$ids)
+                ORDER BY lastpost DESC
+            ";
+            
+        $threads = $db->query_read_slave($threadssql);        
+        $threadlist = array();
+    
+        while ($thread = $db->fetch_array($threads))
+        {   
+            $thread['issubscribed'] = $thread['subscribethreadid'] > 0;
+            
+            $thread['isnew'] = true;        
+            if ($thread['forumread'] >= $thread['lastpost'] || $thread['threadread'] >= $thread['lastpost'] || (TIMENOW - ($vbulletin->options['markinglimit'] * 86400)) > $thread['lastpost'] )
+            {
+                $thread['isnew'] = false;
+            }
+
+            $thread = ConsumeArray($thread,$structtypes['Thread']);            
+            array_push($threadlist,$thread);
+        }        
+    }      
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']);   
+    $retval['Result'] = $result;
+    $retval['ThreadList'] = $threadlist;
+    $retval['ThreadCount'] = $threadcount['threadcount'];
+    
+    return $retval;
+}
+
 function WhoAmI($who)
 {
 	global $db,$vbulletin,$server,$structtypes;
