@@ -210,6 +210,93 @@ function ListParentForums($who,$forumid)
     }      
 }
 
+function ListPosts($who,$threadid,$pagenumber,$perpage)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }    
+    
+    // *********************************************************************************
+    // get thread info
+    $threadinfo = $thread = fetch_threadinfo($threadid);
+    
+    if (!($thread['threadid'] > 0))
+    {
+        print_error_xml('invalid_threadid_fetch_postsxml');            
+    }
+    
+    // *********************************************************************************
+    // get forum info
+    $forum = fetch_foruminfo($thread['forumid']);
+    $foruminfo =& $forum;
+
+    // *********************************************************************************
+    // check forum permissions
+    $forumperms = fetch_permissions($thread['forumid']);
+    if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']) OR !($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewthreads']))
+    {
+        print_error_xml('no_permission_fetch_postsxml');
+    }
+    if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canviewothers']) AND ($thread['postuserid'] != $vbulletin->userinfo['userid'] OR $vbulletin->userinfo['userid'] == 0))
+    {
+        print_error_xml('no_permission_fetch_postsxml');
+    }
+    
+    // *********************************************************************************
+    // check if there is a forum password and if so, ensure the user has it set
+    verify_forum_password($foruminfo['forumid'], $foruminfo['password']);    
+    
+    
+    // TODO: the client expects 'threadtitle', remove this HACK
+    $threadinfo['threadtitle'] = $threadinfo['title'];
+    
+    $retval['Thread'] = ConsumeArray($threadinfo,$structtypes['Thread']);
+    
+    $limitlower = ($pagenumber - 1) * $perpage;
+    $userid = $vbulletin->userinfo['userid'];
+    
+    $postssql = "
+        SELECT 
+            *,
+            post.dateline as dateline,
+            threadread.readtime as threadread,
+            forumread.readtime as forumread
+        FROM " . TABLE_PREFIX . "post as post 
+        LEFT JOIN " . TABLE_PREFIX . "thread AS thread ON (thread.threadid = post.threadid)
+        LEFT JOIN " . TABLE_PREFIX . "threadread AS threadread ON (threadread.threadid = post.threadid AND threadread.userid = $userid) 
+        LEFT JOIN " . TABLE_PREFIX . "forumread AS forumread ON (thread.forumid = forumread.forumid AND forumread.userid = $userid) 
+        WHERE 
+            post.threadid = $threadid 
+            AND post.visible = 1 
+        ORDER By post.dateline ASC 
+        LIMIT $limitlower, $perpage        
+    ";
+    
+    $postlist = array();
+    $posts = $db->query_read_slave($postssql);        
+    while ($post = $db->fetch_array($posts))
+    {    
+        $post['isnew'] = true;        
+        if ($post['threadread'] >= $post['dateline'] || (TIMENOW - ($vbulletin->options['markinglimit'] * 86400)) >= $post['dateline'] )
+        {
+            $post['isnew'] = false;
+        }        
+        
+        $post['pagetext'] = strip_bbcode($post['pagetext'],true,false,false); 
+        array_push($postlist,ConsumeArray($post,$structtypes['Post']));
+    }    
+    
+    $retval['PostList'] = $postlist;  
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']);   
+    $retval['Result'] = $result;    
+    return $retval;
+}
+
 function ListThreads($who,$forumid,$pagenumber,$perpage)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;

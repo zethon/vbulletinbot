@@ -39,7 +39,16 @@ $structtypes['Thread'] = array(
         'DateLine' => array('DateLine','type'=>'xsd:int'), 
     ); 
     
-    
+$structtypes['Post'] = array(
+        'PostID' => array('PostID','type'=>'xsd:int'),
+        'Username' => array('Username','type'=>'xsd:string'),
+        'PageText' => array('PageText','type'=>'xsd:string'),
+        'Title' => array('Title','type'=>'xsd:string'),
+        'DateLine' => array('DateLine','type'=>'xsd:int'),
+        'IpAddress' => array('IpAddress','type'=>'xsd:string'),
+        'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
+    );
+            
 $structtypes['ForumListResult'] = array(
         'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
         'CurrentForum' => array('name'=>'CurrentForum','type'=>'tns:Forum'),
@@ -51,6 +60,12 @@ $structtypes['ThreadListResult'] = array(
         'ThreadList' => array('name'=>'ThreadList','type'=>'tns:ThreadArray'),
         'ThreadCount' => array('name'=>'ThreadCount','type'=>'xsd:int')
     );    
+    
+$structtypes['PostListResult'] = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'Thread' => array('name'=>'Thread','type'=>'tns:Thread'),
+        'PostList' => array('name'=>'PostList','type'=>'tns:PostArray')
+    );       
     
 foreach ($structtypes as $key => $val)
 {
@@ -96,6 +111,17 @@ $server->wsdl->addComplexType(
         array(),
         array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Thread[]')),
         'tns:Thread'
+); 
+
+$server->wsdl->addComplexType(
+        'PostArray', 
+        'complexType',
+        'array',
+        '',
+        'SOAP-ENC:Array',
+        array(),
+        array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Post[]')),
+        'tns:Post'
 ); 
 
 function ConsumeArray($datarray,$destarray)
