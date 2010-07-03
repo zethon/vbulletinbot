@@ -31,11 +31,33 @@
           <xsd:element name="IsCurrent" type="xsd:boolean" />
         </xsd:all>
       </xsd:complexType>
+      <xsd:complexType name="Thread">
+        <xsd:all>
+          <xsd:element name="ThreadID" type="xsd:int" />
+          <xsd:element name="ThreadTitle" type="xsd:string" />
+          <xsd:element name="ForumID" type="xsd:int" />
+          <xsd:element name="PostID" type="xsd:int" />
+          <xsd:element name="LastPost" type="xsd:int" />
+          <xsd:element name="LastPoster" type="xsd:string" />
+          <xsd:element name="PostUsername" type="xsd:string" />
+          <xsd:element name="ReplyCount" type="xsd:int" />
+          <xsd:element name="IsSubscribed" type="xsd:boolean" />
+          <xsd:element name="IsNew" type="xsd:boolean" />
+          <xsd:element name="DateLine" type="xsd:int" />
+        </xsd:all>
+      </xsd:complexType>
       <xsd:complexType name="ForumListResult">
         <xsd:all>
           <xsd:element name="Result" type="tns:RequestResult" />
           <xsd:element name="CurrentForum" type="tns:Forum" />
           <xsd:element name="ForumList" type="tns:ForumArray" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="ThreadListResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="ThreadList" type="tns:ThreadArray" />
+          <xsd:element name="ThreadCount" type="xsd:int" />
         </xsd:all>
       </xsd:complexType>
       <xsd:complexType name="RemoteUserArray">
@@ -49,6 +71,13 @@
         <xsd:complexContent mixed="false">
           <xsd:restriction base="SOAP-ENC:Array">
             <xsd:attribute wsdl:arrayType="tns:Forum[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="ThreadArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:Thread[]" ref="SOAP-ENC:arrayType" />
           </xsd:restriction>
         </xsd:complexContent>
       </xsd:complexType>
@@ -74,6 +103,15 @@
   <wsdl:message name="ListParentForumsResponse">
     <wsdl:part name="return" type="tns:ForumListResult" />
   </wsdl:message>
+  <wsdl:message name="ListThreadsRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+    <wsdl:part name="PageNumber" type="xsd:int" />
+    <wsdl:part name="PerPage" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="ListThreadsResponse">
+    <wsdl:part name="return" type="tns:ThreadListResult" />
+  </wsdl:message>
   <wsdl:portType name="VBotServicePortType">
     <wsdl:operation name="WhoAmI">
       <documentation>Returns the user information of the associated user credentials</documentation>
@@ -89,6 +127,11 @@
       <documentation>Returns a list of forums of the associated forumid</documentation>
       <wsdl:input message="tns:ListParentForumsRequest" />
       <wsdl:output message="tns:ListParentForumsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ListThreads">
+      <documentation>Returns a list of forums of the associated forumid</documentation>
+      <wsdl:input message="tns:ListThreadsRequest" />
+      <wsdl:output message="tns:ListThreadsResponse" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="VBotServiceBinding" type="tns:VBotServicePortType">
@@ -113,6 +156,15 @@
     </wsdl:operation>
     <wsdl:operation name="ListParentForums">
       <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListParentForums" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListThreads">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListThreads" style="rpc" />
       <wsdl:input>
         <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
       </wsdl:input>

@@ -27,6 +27,7 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="VBotServiceBinding", Namespace="urn:VBotService")]
+    [System.Xml.Serialization.SoapIncludeAttribute(typeof(Thread))]
     public partial class VBotService : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
         private System.Threading.SendOrPostCallback WhoAmIOperationCompleted;
@@ -34,6 +35,8 @@ namespace vbotserver.VBotService {
         private System.Threading.SendOrPostCallback ListForumsOperationCompleted;
         
         private System.Threading.SendOrPostCallback ListParentForumsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback ListThreadsOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -81,6 +84,9 @@ namespace vbotserver.VBotService {
         
         /// <remarks/>
         public event ListParentForumsCompletedEventHandler ListParentForumsCompleted;
+        
+        /// <remarks/>
+        public event ListThreadsCompletedEventHandler ListThreadsCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/WhoAmI", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
@@ -177,6 +183,42 @@ namespace vbotserver.VBotService {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/ListThreads", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public ThreadListResult ListThreads(UserCredentials UserCredentials, int ForumID, int PageNumber, int PerPage) {
+            object[] results = this.Invoke("ListThreads", new object[] {
+                        UserCredentials,
+                        ForumID,
+                        PageNumber,
+                        PerPage});
+            return ((ThreadListResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ListThreadsAsync(UserCredentials UserCredentials, int ForumID, int PageNumber, int PerPage) {
+            this.ListThreadsAsync(UserCredentials, ForumID, PageNumber, PerPage, null);
+        }
+        
+        /// <remarks/>
+        public void ListThreadsAsync(UserCredentials UserCredentials, int ForumID, int PageNumber, int PerPage, object userState) {
+            if ((this.ListThreadsOperationCompleted == null)) {
+                this.ListThreadsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnListThreadsOperationCompleted);
+            }
+            this.InvokeAsync("ListThreads", new object[] {
+                        UserCredentials,
+                        ForumID,
+                        PageNumber,
+                        PerPage}, this.ListThreadsOperationCompleted, userState);
+        }
+        
+        private void OnListThreadsOperationCompleted(object arg) {
+            if ((this.ListThreadsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ListThreadsCompleted(this, new ListThreadsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -224,6 +266,270 @@ namespace vbotserver.VBotService {
             }
             set {
                 this.serviceNameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class Thread {
+        
+        private int threadIDField;
+        
+        private string threadTitleField;
+        
+        private int forumIDField;
+        
+        private int postIDField;
+        
+        private int lastPostField;
+        
+        private string lastPosterField;
+        
+        private string postUsernameField;
+        
+        private int replyCountField;
+        
+        private bool isSubscribedField;
+        
+        private bool isNewField;
+        
+        private int dateLineField;
+        
+        /// <remarks/>
+        public int ThreadID {
+            get {
+                return this.threadIDField;
+            }
+            set {
+                this.threadIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ThreadTitle {
+            get {
+                return this.threadTitleField;
+            }
+            set {
+                this.threadTitleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int ForumID {
+            get {
+                return this.forumIDField;
+            }
+            set {
+                this.forumIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int PostID {
+            get {
+                return this.postIDField;
+            }
+            set {
+                this.postIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int LastPost {
+            get {
+                return this.lastPostField;
+            }
+            set {
+                this.lastPostField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string LastPoster {
+            get {
+                return this.lastPosterField;
+            }
+            set {
+                this.lastPosterField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PostUsername {
+            get {
+                return this.postUsernameField;
+            }
+            set {
+                this.postUsernameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int ReplyCount {
+            get {
+                return this.replyCountField;
+            }
+            set {
+                this.replyCountField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsSubscribed {
+            get {
+                return this.isSubscribedField;
+            }
+            set {
+                this.isSubscribedField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsNew {
+            get {
+                return this.isNewField;
+            }
+            set {
+                this.isNewField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int DateLine {
+            get {
+                return this.dateLineField;
+            }
+            set {
+                this.dateLineField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class ThreadListResult {
+        
+        private RequestResult resultField;
+        
+        private Thread[] threadListField;
+        
+        private int threadCountField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Thread[] ThreadList {
+            get {
+                return this.threadListField;
+            }
+            set {
+                this.threadListField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int ThreadCount {
+            get {
+                return this.threadCountField;
+            }
+            set {
+                this.threadCountField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class RequestResult {
+        
+        private int codeField;
+        
+        private string textField;
+        
+        private RemoteUser remoteUserField;
+        
+        /// <remarks/>
+        public int Code {
+            get {
+                return this.codeField;
+            }
+            set {
+                this.codeField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Text {
+            get {
+                return this.textField;
+            }
+            set {
+                this.textField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public RemoteUser RemoteUser {
+            get {
+                return this.remoteUserField;
+            }
+            set {
+                this.remoteUserField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class RemoteUser {
+        
+        private int userIDField;
+        
+        private string usernameField;
+        
+        /// <remarks/>
+        public int UserID {
+            get {
+                return this.userIDField;
+            }
+            set {
+                this.userIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Username {
+            get {
+                return this.usernameField;
+            }
+            set {
+                this.usernameField = value;
             }
         }
     }
@@ -331,84 +637,6 @@ namespace vbotserver.VBotService {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
-    public partial class RequestResult {
-        
-        private int codeField;
-        
-        private string textField;
-        
-        private RemoteUser remoteUserField;
-        
-        /// <remarks/>
-        public int Code {
-            get {
-                return this.codeField;
-            }
-            set {
-                this.codeField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Text {
-            get {
-                return this.textField;
-            }
-            set {
-                this.textField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public RemoteUser RemoteUser {
-            get {
-                return this.remoteUserField;
-            }
-            set {
-                this.remoteUserField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
-    public partial class RemoteUser {
-        
-        private int userIDField;
-        
-        private string usernameField;
-        
-        /// <remarks/>
-        public int UserID {
-            get {
-                return this.userIDField;
-            }
-            set {
-                this.userIDField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string Username {
-            get {
-                return this.usernameField;
-            }
-            set {
-                this.usernameField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
     public delegate void WhoAmICompletedEventHandler(object sender, WhoAmICompletedEventArgs e);
     
@@ -482,6 +710,32 @@ namespace vbotserver.VBotService {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((ForumListResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ListThreadsCompletedEventHandler(object sender, ListThreadsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ListThreadsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ListThreadsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public ThreadListResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((ThreadListResult)(this.results[0]));
             }
         }
     }
