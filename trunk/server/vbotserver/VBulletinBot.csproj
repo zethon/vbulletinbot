@@ -93,6 +93,8 @@
   <ItemGroup>
     <Compile Include="AIMConnection.cs" />
     <Compile Include="BotConfigSection.cs" />
+    <Compile Include="Forum.cs" />
+    <Compile Include="VBEntity.cs" />
     <Compile Include="LocalUser.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="UserLocationType.cs" />

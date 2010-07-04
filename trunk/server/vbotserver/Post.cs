@@ -6,8 +6,21 @@ using System.Text.RegularExpressions;
 
 namespace VBulletinBot.VBotService
 {
-    public partial class Post
+    public partial class Post : VBEntity
     {
+        public int DatabaseID
+        {
+            get
+            {
+                return PostID;
+            }
+
+            set
+            {
+                PostID = value;
+            }
+        }
+
         public string GetFriendlyDate()
         {
             string strRet = string.Empty;
