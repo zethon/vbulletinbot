@@ -92,6 +92,7 @@
     <Compile Include="AIMConnection.cs" />
     <Compile Include="BotConfigSection.cs" />
     <Compile Include="BotService.cs" />
+    <Compile Include="Post.cs" />
     <Compile Include="VBotService.cs" />
     <Compile Include="CommandClass.cs" />
     <Compile Include="CommandParser.cs" />
@@ -121,7 +122,6 @@
     <Compile Include="VBThread.cs" />
     <Compile Include="UserAdapter.cs" />
     <Compile Include="UserLocationAdapter.cs" />
-    <Compile Include="VB.cs" />
     <Compile Include="Web References\VBotService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -182,6 +182,21 @@
       <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
     <None Include="Web References\VBotService\ForumListResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\GetPostResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\GetThreadResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\IMNotificationsResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\PostListResult.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\VBotService\PostReplyResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\Reference.map">
