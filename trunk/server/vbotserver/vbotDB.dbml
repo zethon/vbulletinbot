@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Database Name="vbot" Class="VBotDB" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="vbot" Class="VBotDB" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Table Name="LocalUser" Member="LocalUsers">
     <Type Name="LocalUser">
       <Column Name="LocalUserID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />

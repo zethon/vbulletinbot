@@ -13,7 +13,7 @@
 // 
 #pragma warning disable 1591
 
-namespace vbotserver.VBotService {
+namespace VBulletinBot {
     using System;
     using System.Web.Services;
     using System.Diagnostics;
@@ -62,7 +62,7 @@ namespace vbotserver.VBotService {
         
         /// <remarks/>
         public VBotService() {
-            this.Url = global::vbotserver.Properties.Settings.Default.vbotserver_VBotService_VBotService;
+            this.Url = global::VBulletinBot.Properties.Settings.Default.vbotserver_VBotService_VBotService;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

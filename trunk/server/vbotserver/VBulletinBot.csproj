@@ -8,8 +8,8 @@
     <ProjectGuid>{3DA7962A-6330-4E98-A108-B749FD41CC3A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>vbotserver</RootNamespace>
-    <AssemblyName>vbotserver</AssemblyName>
+    <RootNamespace>VBulletinBot</RootNamespace>
+    <AssemblyName>VBulletinBot</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -91,7 +91,6 @@
   <ItemGroup>
     <Compile Include="AIMConnection.cs" />
     <Compile Include="BotConfigSection.cs" />
-    <Compile Include="BotService.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="VBotService.cs" />
     <Compile Include="CommandClass.cs" />
@@ -179,32 +178,32 @@
     <None Include="vbotDB.dbml.layout">
       <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\ForumListResult.datasource">
+    <None Include="Web References\VBotService\ForumListResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\GetPostResult.datasource">
+    <None Include="Web References\VBotService\GetPostResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\GetThreadResult.datasource">
+    <None Include="Web References\VBotService\GetThreadResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\IMNotificationsResult.datasource">
+    <None Include="Web References\VBotService\IMNotificationsResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\PostListResult.datasource">
+    <None Include="Web References\VBotService\PostListResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\PostReplyResult.datasource">
+    <None Include="Web References\VBotService\PostReplyResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Web References\VBotService\RequestResult.datasource">
+    <None Include="Web References\VBotService\RequestResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\ThreadListResult.datasource">
+    <None Include="Web References\VBotService\ThreadListResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\vbulletinbot.wsdl" />

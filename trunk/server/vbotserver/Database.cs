@@ -5,7 +5,7 @@ using System.Text;
 using System.Configuration;
 using System.Data;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     /// <summary>
     /// Class to wrap the DataContext into a Singleton object

@@ -7,7 +7,7 @@ using jabber.client;
 using jabber.connection.sasl;
 
 
-namespace vbotserver
+namespace VBulletinBot
 {
     class GTalkConnection : Connection
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     /// <summary>Implements a basic command-line switch by taking the
     /// switching name and the associated description.</summary>

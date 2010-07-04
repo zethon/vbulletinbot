@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using log4net;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     public enum UserLocationTypeEnum
     {
@@ -86,37 +86,37 @@ namespace vbotserver
             }
         }
 
-        public void ParsePostList(VBotService.Post[] list)
+        public void ParsePostList(Post[] list)
         {
             IDList.Clear();
 
-            foreach (VBotService.Post post in list)
+            foreach (Post post in list)
             {
                 IDList.Add(post.PostID.ToString());
             }
         }
 
-        public void ParseThreadList(VBotService.Thread[] list)
+        public void ParseThreadList(Thread[] list)
         {
             IDList.Clear();
 
-            foreach (VBotService.Thread thread in list)
+            foreach (Thread thread in list)
             {
                 _IDList.Add(thread.ThreadID.ToString());
             }
         }
 
-        public void ParseForumsList(VBotService.Forum[] forums)
+        public void ParseForumsList(Forum[] forums)
         {
             IDList.Clear();
 
-            foreach (VBotService.Forum forum in forums)
+            foreach (Forum forum in forums)
             {
                 IDList.Add(forum.ForumID.ToString());
             }
         }
 
-        public void SetCurrentForum(VBotService.Forum forum)
+        public void SetCurrentForum(Forum forum)
         {
             LocationRemoteID = forum.ForumID;
             Title = forum.Title;
