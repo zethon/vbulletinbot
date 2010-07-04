@@ -27,7 +27,7 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="VBotServiceBinding", Namespace="urn:VBotService")]
-    [System.Xml.Serialization.SoapIncludeAttribute(typeof(Thread))]
+    [System.Xml.Serialization.SoapIncludeAttribute(typeof(IMNotification))]
     public partial class VBotService : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
         private System.Threading.SendOrPostCallback WhoAmIOperationCompleted;
@@ -37,6 +37,26 @@ namespace vbotserver.VBotService {
         private System.Threading.SendOrPostCallback ListParentForumsOperationCompleted;
         
         private System.Threading.SendOrPostCallback ListThreadsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback ListPostsOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetPostByIndexOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetThreadOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback SubscribeThreadOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback UnSubscribeThreadOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback MarkForumReadOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback MarkThreadReadOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback SetIMNotificationOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback PostReplyOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetIMNotificationsOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
         
@@ -87,6 +107,36 @@ namespace vbotserver.VBotService {
         
         /// <remarks/>
         public event ListThreadsCompletedEventHandler ListThreadsCompleted;
+        
+        /// <remarks/>
+        public event ListPostsCompletedEventHandler ListPostsCompleted;
+        
+        /// <remarks/>
+        public event GetPostByIndexCompletedEventHandler GetPostByIndexCompleted;
+        
+        /// <remarks/>
+        public event GetThreadCompletedEventHandler GetThreadCompleted;
+        
+        /// <remarks/>
+        public event SubscribeThreadCompletedEventHandler SubscribeThreadCompleted;
+        
+        /// <remarks/>
+        public event UnSubscribeThreadCompletedEventHandler UnSubscribeThreadCompleted;
+        
+        /// <remarks/>
+        public event MarkForumReadCompletedEventHandler MarkForumReadCompleted;
+        
+        /// <remarks/>
+        public event MarkThreadReadCompletedEventHandler MarkThreadReadCompleted;
+        
+        /// <remarks/>
+        public event SetIMNotificationCompletedEventHandler SetIMNotificationCompleted;
+        
+        /// <remarks/>
+        public event PostReplyCompletedEventHandler PostReplyCompleted;
+        
+        /// <remarks/>
+        public event GetIMNotificationsCompletedEventHandler GetIMNotificationsCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/WhoAmI", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
@@ -219,6 +269,332 @@ namespace vbotserver.VBotService {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/ListPosts", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public PostListResult ListPosts(UserCredentials UserCredentials, int ThreadID, int PageNumber, int PerPage) {
+            object[] results = this.Invoke("ListPosts", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        PageNumber,
+                        PerPage});
+            return ((PostListResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ListPostsAsync(UserCredentials UserCredentials, int ThreadID, int PageNumber, int PerPage) {
+            this.ListPostsAsync(UserCredentials, ThreadID, PageNumber, PerPage, null);
+        }
+        
+        /// <remarks/>
+        public void ListPostsAsync(UserCredentials UserCredentials, int ThreadID, int PageNumber, int PerPage, object userState) {
+            if ((this.ListPostsOperationCompleted == null)) {
+                this.ListPostsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnListPostsOperationCompleted);
+            }
+            this.InvokeAsync("ListPosts", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        PageNumber,
+                        PerPage}, this.ListPostsOperationCompleted, userState);
+        }
+        
+        private void OnListPostsOperationCompleted(object arg) {
+            if ((this.ListPostsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ListPostsCompleted(this, new ListPostsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/GetPostByIndex", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public GetPostResult GetPostByIndex(UserCredentials UserCredentials, int ThreadID, int Index) {
+            object[] results = this.Invoke("GetPostByIndex", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        Index});
+            return ((GetPostResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index) {
+            this.GetPostByIndexAsync(UserCredentials, ThreadID, Index, null);
+        }
+        
+        /// <remarks/>
+        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index, object userState) {
+            if ((this.GetPostByIndexOperationCompleted == null)) {
+                this.GetPostByIndexOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetPostByIndexOperationCompleted);
+            }
+            this.InvokeAsync("GetPostByIndex", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        Index}, this.GetPostByIndexOperationCompleted, userState);
+        }
+        
+        private void OnGetPostByIndexOperationCompleted(object arg) {
+            if ((this.GetPostByIndexCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetPostByIndexCompleted(this, new GetPostByIndexCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/GetThread", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public GetThreadResult GetThread(UserCredentials UserCredentials, int ThreadID) {
+            object[] results = this.Invoke("GetThread", new object[] {
+                        UserCredentials,
+                        ThreadID});
+            return ((GetThreadResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetThreadAsync(UserCredentials UserCredentials, int ThreadID) {
+            this.GetThreadAsync(UserCredentials, ThreadID, null);
+        }
+        
+        /// <remarks/>
+        public void GetThreadAsync(UserCredentials UserCredentials, int ThreadID, object userState) {
+            if ((this.GetThreadOperationCompleted == null)) {
+                this.GetThreadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetThreadOperationCompleted);
+            }
+            this.InvokeAsync("GetThread", new object[] {
+                        UserCredentials,
+                        ThreadID}, this.GetThreadOperationCompleted, userState);
+        }
+        
+        private void OnGetThreadOperationCompleted(object arg) {
+            if ((this.GetThreadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetThreadCompleted(this, new GetThreadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/SubscribeThread", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public GetThreadResult SubscribeThread(UserCredentials UserCredentials, int ThreadID) {
+            object[] results = this.Invoke("SubscribeThread", new object[] {
+                        UserCredentials,
+                        ThreadID});
+            return ((GetThreadResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void SubscribeThreadAsync(UserCredentials UserCredentials, int ThreadID) {
+            this.SubscribeThreadAsync(UserCredentials, ThreadID, null);
+        }
+        
+        /// <remarks/>
+        public void SubscribeThreadAsync(UserCredentials UserCredentials, int ThreadID, object userState) {
+            if ((this.SubscribeThreadOperationCompleted == null)) {
+                this.SubscribeThreadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSubscribeThreadOperationCompleted);
+            }
+            this.InvokeAsync("SubscribeThread", new object[] {
+                        UserCredentials,
+                        ThreadID}, this.SubscribeThreadOperationCompleted, userState);
+        }
+        
+        private void OnSubscribeThreadOperationCompleted(object arg) {
+            if ((this.SubscribeThreadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SubscribeThreadCompleted(this, new SubscribeThreadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/UnSubscribeThread", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public RequestResult UnSubscribeThread(UserCredentials UserCredentials, int ThreadID) {
+            object[] results = this.Invoke("UnSubscribeThread", new object[] {
+                        UserCredentials,
+                        ThreadID});
+            return ((RequestResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void UnSubscribeThreadAsync(UserCredentials UserCredentials, int ThreadID) {
+            this.UnSubscribeThreadAsync(UserCredentials, ThreadID, null);
+        }
+        
+        /// <remarks/>
+        public void UnSubscribeThreadAsync(UserCredentials UserCredentials, int ThreadID, object userState) {
+            if ((this.UnSubscribeThreadOperationCompleted == null)) {
+                this.UnSubscribeThreadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnUnSubscribeThreadOperationCompleted);
+            }
+            this.InvokeAsync("UnSubscribeThread", new object[] {
+                        UserCredentials,
+                        ThreadID}, this.UnSubscribeThreadOperationCompleted, userState);
+        }
+        
+        private void OnUnSubscribeThreadOperationCompleted(object arg) {
+            if ((this.UnSubscribeThreadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.UnSubscribeThreadCompleted(this, new UnSubscribeThreadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/MarkForumRead", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public RequestResult MarkForumRead(UserCredentials UserCredentials, int ForumID) {
+            object[] results = this.Invoke("MarkForumRead", new object[] {
+                        UserCredentials,
+                        ForumID});
+            return ((RequestResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void MarkForumReadAsync(UserCredentials UserCredentials, int ForumID) {
+            this.MarkForumReadAsync(UserCredentials, ForumID, null);
+        }
+        
+        /// <remarks/>
+        public void MarkForumReadAsync(UserCredentials UserCredentials, int ForumID, object userState) {
+            if ((this.MarkForumReadOperationCompleted == null)) {
+                this.MarkForumReadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnMarkForumReadOperationCompleted);
+            }
+            this.InvokeAsync("MarkForumRead", new object[] {
+                        UserCredentials,
+                        ForumID}, this.MarkForumReadOperationCompleted, userState);
+        }
+        
+        private void OnMarkForumReadOperationCompleted(object arg) {
+            if ((this.MarkForumReadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.MarkForumReadCompleted(this, new MarkForumReadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/MarkThreadRead", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public RequestResult MarkThreadRead(UserCredentials UserCredentials, int ThreadID) {
+            object[] results = this.Invoke("MarkThreadRead", new object[] {
+                        UserCredentials,
+                        ThreadID});
+            return ((RequestResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void MarkThreadReadAsync(UserCredentials UserCredentials, int ThreadID) {
+            this.MarkThreadReadAsync(UserCredentials, ThreadID, null);
+        }
+        
+        /// <remarks/>
+        public void MarkThreadReadAsync(UserCredentials UserCredentials, int ThreadID, object userState) {
+            if ((this.MarkThreadReadOperationCompleted == null)) {
+                this.MarkThreadReadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnMarkThreadReadOperationCompleted);
+            }
+            this.InvokeAsync("MarkThreadRead", new object[] {
+                        UserCredentials,
+                        ThreadID}, this.MarkThreadReadOperationCompleted, userState);
+        }
+        
+        private void OnMarkThreadReadOperationCompleted(object arg) {
+            if ((this.MarkThreadReadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.MarkThreadReadCompleted(this, new MarkThreadReadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/SetIMNotification", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public RequestResult SetIMNotification(UserCredentials UserCredentials, bool On) {
+            object[] results = this.Invoke("SetIMNotification", new object[] {
+                        UserCredentials,
+                        On});
+            return ((RequestResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void SetIMNotificationAsync(UserCredentials UserCredentials, bool On) {
+            this.SetIMNotificationAsync(UserCredentials, On, null);
+        }
+        
+        /// <remarks/>
+        public void SetIMNotificationAsync(UserCredentials UserCredentials, bool On, object userState) {
+            if ((this.SetIMNotificationOperationCompleted == null)) {
+                this.SetIMNotificationOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSetIMNotificationOperationCompleted);
+            }
+            this.InvokeAsync("SetIMNotification", new object[] {
+                        UserCredentials,
+                        On}, this.SetIMNotificationOperationCompleted, userState);
+        }
+        
+        private void OnSetIMNotificationOperationCompleted(object arg) {
+            if ((this.SetIMNotificationCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SetIMNotificationCompleted(this, new SetIMNotificationCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/PostReply", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public PostReplyResult PostReply(UserCredentials UserCredentials, int ThreadID, string PageText) {
+            object[] results = this.Invoke("PostReply", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        PageText});
+            return ((PostReplyResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText) {
+            this.PostReplyAsync(UserCredentials, ThreadID, PageText, null);
+        }
+        
+        /// <remarks/>
+        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText, object userState) {
+            if ((this.PostReplyOperationCompleted == null)) {
+                this.PostReplyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPostReplyOperationCompleted);
+            }
+            this.InvokeAsync("PostReply", new object[] {
+                        UserCredentials,
+                        ThreadID,
+                        PageText}, this.PostReplyOperationCompleted, userState);
+        }
+        
+        private void OnPostReplyOperationCompleted(object arg) {
+            if ((this.PostReplyCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PostReplyCompleted(this, new PostReplyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/GetIMNotifications", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public IMNotificationsResult GetIMNotifications(bool DoDelete) {
+            object[] results = this.Invoke("GetIMNotifications", new object[] {
+                        DoDelete});
+            return ((IMNotificationsResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetIMNotificationsAsync(bool DoDelete) {
+            this.GetIMNotificationsAsync(DoDelete, null);
+        }
+        
+        /// <remarks/>
+        public void GetIMNotificationsAsync(bool DoDelete, object userState) {
+            if ((this.GetIMNotificationsOperationCompleted == null)) {
+                this.GetIMNotificationsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetIMNotificationsOperationCompleted);
+            }
+            this.InvokeAsync("GetIMNotifications", new object[] {
+                        DoDelete}, this.GetIMNotificationsOperationCompleted, userState);
+        }
+        
+        private void OnGetIMNotificationsOperationCompleted(object arg) {
+            if ((this.GetIMNotificationsCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetIMNotificationsCompleted(this, new GetIMNotificationsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -276,11 +652,244 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class IMNotificationInfo {
+        
+        private int iMNotificationIDField;
+        
+        private string instantIMServiceField;
+        
+        private string instantIMScreennameField;
+        
+        private int postDateLineField;
+        
+        private string threadTitleField;
+        
+        private string newPostUsernameField;
+        
+        /// <remarks/>
+        public int IMNotificationID {
+            get {
+                return this.iMNotificationIDField;
+            }
+            set {
+                this.iMNotificationIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string InstantIMService {
+            get {
+                return this.instantIMServiceField;
+            }
+            set {
+                this.instantIMServiceField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string InstantIMScreenname {
+            get {
+                return this.instantIMScreennameField;
+            }
+            set {
+                this.instantIMScreennameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int PostDateLine {
+            get {
+                return this.postDateLineField;
+            }
+            set {
+                this.postDateLineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string ThreadTitle {
+            get {
+                return this.threadTitleField;
+            }
+            set {
+                this.threadTitleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string NewPostUsername {
+            get {
+                return this.newPostUsernameField;
+            }
+            set {
+                this.newPostUsernameField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class IMNotification {
+        
+        private IMNotificationInfo iMNotificationInfoField;
+        
+        private Post postField;
+        
+        private Thread threadField;
+        
+        private Forum forumField;
+        
+        /// <remarks/>
+        public IMNotificationInfo IMNotificationInfo {
+            get {
+                return this.iMNotificationInfoField;
+            }
+            set {
+                this.iMNotificationInfoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Post Post {
+            get {
+                return this.postField;
+            }
+            set {
+                this.postField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Thread Thread {
+            get {
+                return this.threadField;
+            }
+            set {
+                this.threadField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Forum Forum {
+            get {
+                return this.forumField;
+            }
+            set {
+                this.forumField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class Post {
+        
+        private int postIDField;
+        
+        private string usernameField;
+        
+        private string pageTextField;
+        
+        private string titleField;
+        
+        private int dateLineField;
+        
+        private string ipAddressField;
+        
+        private bool isNewField;
+        
+        /// <remarks/>
+        public int PostID {
+            get {
+                return this.postIDField;
+            }
+            set {
+                this.postIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Username {
+            get {
+                return this.usernameField;
+            }
+            set {
+                this.usernameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string PageText {
+            get {
+                return this.pageTextField;
+            }
+            set {
+                this.pageTextField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Title {
+            get {
+                return this.titleField;
+            }
+            set {
+                this.titleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int DateLine {
+            get {
+                return this.dateLineField;
+            }
+            set {
+                this.dateLineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string IpAddress {
+            get {
+                return this.ipAddressField;
+            }
+            set {
+                this.ipAddressField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsNew {
+            get {
+                return this.isNewField;
+            }
+            set {
+                this.isNewField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
     public partial class Thread {
         
         private int threadIDField;
         
         private string threadTitleField;
+        
+        private string titleField;
         
         private int forumIDField;
         
@@ -317,6 +926,16 @@ namespace vbotserver.VBotService {
             }
             set {
                 this.threadTitleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Title {
+            get {
+                return this.titleField;
+            }
+            set {
+                this.titleField = value;
             }
         }
         
@@ -417,13 +1036,68 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
-    public partial class ThreadListResult {
+    public partial class Forum {
+        
+        private int forumIDField;
+        
+        private string titleField;
+        
+        private bool isNewField;
+        
+        private bool isCurrentField;
+        
+        /// <remarks/>
+        public int ForumID {
+            get {
+                return this.forumIDField;
+            }
+            set {
+                this.forumIDField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string Title {
+            get {
+                return this.titleField;
+            }
+            set {
+                this.titleField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsNew {
+            get {
+                return this.isNewField;
+            }
+            set {
+                this.isNewField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public bool IsCurrent {
+            get {
+                return this.isCurrentField;
+            }
+            set {
+                this.isCurrentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class IMNotificationsResult {
         
         private RequestResult resultField;
         
-        private Thread[] threadListField;
-        
-        private int threadCountField;
+        private IMNotification[] iMNotificationListField;
         
         /// <remarks/>
         public RequestResult Result {
@@ -436,22 +1110,12 @@ namespace vbotserver.VBotService {
         }
         
         /// <remarks/>
-        public Thread[] ThreadList {
+        public IMNotification[] IMNotificationList {
             get {
-                return this.threadListField;
+                return this.iMNotificationListField;
             }
             set {
-                this.threadListField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public int ThreadCount {
-            get {
-                return this.threadCountField;
-            }
-            set {
-                this.threadCountField = value;
+                this.iMNotificationListField = value;
             }
         }
     }
@@ -540,53 +1204,185 @@ namespace vbotserver.VBotService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
-    public partial class Forum {
+    public partial class PostReplyResult {
         
-        private int forumIDField;
+        private RequestResult resultField;
         
-        private string titleField;
-        
-        private bool isNewField;
-        
-        private bool isCurrentField;
+        private int postIDField;
         
         /// <remarks/>
-        public int ForumID {
+        public RequestResult Result {
             get {
-                return this.forumIDField;
+                return this.resultField;
             }
             set {
-                this.forumIDField = value;
+                this.resultField = value;
             }
         }
         
         /// <remarks/>
-        public string Title {
+        public int PostID {
             get {
-                return this.titleField;
+                return this.postIDField;
             }
             set {
-                this.titleField = value;
+                this.postIDField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class GetThreadResult {
+        
+        private RequestResult resultField;
+        
+        private Thread threadField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
             }
         }
         
         /// <remarks/>
-        public bool IsNew {
+        public Thread Thread {
             get {
-                return this.isNewField;
+                return this.threadField;
             }
             set {
-                this.isNewField = value;
+                this.threadField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class GetPostResult {
+        
+        private RequestResult resultField;
+        
+        private Post postField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
             }
         }
         
         /// <remarks/>
-        public bool IsCurrent {
+        public Post Post {
             get {
-                return this.isCurrentField;
+                return this.postField;
             }
             set {
-                this.isCurrentField = value;
+                this.postField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class PostListResult {
+        
+        private RequestResult resultField;
+        
+        private Thread threadField;
+        
+        private Post[] postListField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Thread Thread {
+            get {
+                return this.threadField;
+            }
+            set {
+                this.threadField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Post[] PostList {
+            get {
+                return this.postListField;
+            }
+            set {
+                this.postListField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:VBotService")]
+    public partial class ThreadListResult {
+        
+        private RequestResult resultField;
+        
+        private Thread[] threadListField;
+        
+        private int threadCountField;
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public Thread[] ThreadList {
+            get {
+                return this.threadListField;
+            }
+            set {
+                this.threadListField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public int ThreadCount {
+            get {
+                return this.threadCountField;
+            }
+            set {
+                this.threadCountField = value;
             }
         }
     }
@@ -736,6 +1532,266 @@ namespace vbotserver.VBotService {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((ThreadListResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void ListPostsCompletedEventHandler(object sender, ListPostsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ListPostsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ListPostsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public PostListResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((PostListResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void GetPostByIndexCompletedEventHandler(object sender, GetPostByIndexCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetPostByIndexCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetPostByIndexCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public GetPostResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((GetPostResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void GetThreadCompletedEventHandler(object sender, GetThreadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetThreadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetThreadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public GetThreadResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((GetThreadResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void SubscribeThreadCompletedEventHandler(object sender, SubscribeThreadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SubscribeThreadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal SubscribeThreadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public GetThreadResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((GetThreadResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void UnSubscribeThreadCompletedEventHandler(object sender, UnSubscribeThreadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class UnSubscribeThreadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal UnSubscribeThreadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((RequestResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void MarkForumReadCompletedEventHandler(object sender, MarkForumReadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class MarkForumReadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal MarkForumReadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((RequestResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void MarkThreadReadCompletedEventHandler(object sender, MarkThreadReadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class MarkThreadReadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal MarkThreadReadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((RequestResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void SetIMNotificationCompletedEventHandler(object sender, SetIMNotificationCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SetIMNotificationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal SetIMNotificationCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public RequestResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((RequestResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void PostReplyCompletedEventHandler(object sender, PostReplyCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class PostReplyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal PostReplyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public PostReplyResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((PostReplyResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void GetIMNotificationsCompletedEventHandler(object sender, GetIMNotificationsCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetIMNotificationsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetIMNotificationsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public IMNotificationsResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((IMNotificationsResult)(this.results[0]));
             }
         }
     }

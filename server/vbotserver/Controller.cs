@@ -67,9 +67,6 @@ namespace vbotserver
 
             _commands = new CommandClass(this);
 
-            VB.Instance.ServiceURL = botconfig.WebServiceURL;
-            VB.Instance.ServicePassword = botconfig.WebServicePassword;
-
             // start the notification timer
             //_notTimer = new System.Timers.Timer(1000 * 60);
             //_notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
@@ -83,23 +80,22 @@ namespace vbotserver
             log.Info("Notification Timer Elapsed()");
             if (_conComp.Connections != null && _conComp.Connections.Count() > 0)
             {
-                VBRequestResult r = VB.Instance.GetPostNotifications(true);
+                VBotService.IMNotificationsResult result = BotService.Instance.GetIMNotifications(true);
 
-                if (r.ResultCode == VBRequestResultCode.Success)
+                if (result.Result.Code == 0)
                 {
-                    List<Dictionary<string, string>> nots = r.Data as List<Dictionary<string, string>>;
-                    if (nots != null)
+                    if (result.IMNotificationList != null && result.IMNotificationList.Count() > 0)
                     {
-                        log.Info(string.Format("{0} post notifications recieved", nots.Count()));
-                        foreach (Dictionary<string, string> infoDict in nots)
-                        {
-                            Connection c = _conComp.GetConnection(infoDict[@"instantimservice"]);
-                            string strScreenName = infoDict[@"instantimscreenname"];
+                        log.Info(string.Format("{0} post notifications recieved", result.IMNotificationList.Count()));
 
-                            VBPost post = new VBPost(infoDict);
-                            string strResponse = c.NewLine + "Forum: '" + infoDict["title"] + "'" + c.NewLine + "Thread: '" + infoDict["threadtitle"] + "'" + c.NewLine;
-                            strResponse += FetchPostBit(post, c.NewLine) + c.NewLine;
-                            strResponse += "(Type 'gt " + infoDict["threadid"] + "' to go to the thread. Type 'im off' to turn off IM Notification)";
+                        foreach(VBotService.IMNotification not in result.IMNotificationList)
+                        {
+                            Connection c = _conComp.GetConnection(not.IMNotificationInfo.InstantIMService);
+                            string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
+
+                            string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
+                            strResponse += FetchPostBit(not.Post, c.NewLine) + c.NewLine;
+                            strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
 
                             ResponseChannel rc = new vbotserver.ResponseChannel(strScreenName, c);
                             rc.SendMessage(strResponse);
@@ -139,7 +135,6 @@ namespace vbotserver
             {
                 log.InfoFormat("INMSG ({0}) << {1}: {2}", conn.GetType().Name, im.User, im.Text);
 
-                int iReqCount = VB.Instance.RequestCount;
                 DateTime dtStart = DateTime.Now;
 
                 try
@@ -198,8 +193,7 @@ namespace vbotserver
                 {
                     TimeSpan elapsed = DateTime.Now - dtStart;
 
-                    log.InfoFormat("Response Time: {0}.{1} seconds, Requests: {2}",
-                        elapsed.Seconds, elapsed.Milliseconds, VB.Instance.RequestCount - iReqCount);
+                    log.InfoFormat("Response Time: {0}.{1} seconds",elapsed.Seconds, elapsed.Milliseconds);
                 }
             }
         }
@@ -1294,9 +1288,10 @@ namespace vbotserver
                 {
                     if (GetConfirmation(user))
                     {
-                        VBRequestResult r = VB.Instance.PostReply(ResponseChannel, postLoc.LocationRemoteID, strPostText);
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, postLoc.LocationRemoteID, strPostText);
 
-                        if (r.ResultCode == VBRequestResultCode.Success && r.Data != null && (int)r.Data > 0)
+                        if (r.Result.Code != 0 && r.PostID > 0)
                         {
                             user.ResponseChannel.SendMessage(@"Post submitted successfully.");
                         }
