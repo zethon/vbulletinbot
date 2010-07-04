@@ -390,7 +390,8 @@ namespace VBulletinBot
                 if (result.Result.Code == 0)
                 {
                     curLoc.SetCurrentForum(result.CurrentForum);
-                    curLoc.ParseForumsList(result.ForumList);
+                    //curLoc.ParseForumsList(result.ForumList);
+                    curLoc.ParseIDList(result.ForumList);
                     curLoc.SaveLocation();
                 }
             }
@@ -418,7 +419,7 @@ namespace VBulletinBot
 
                 // TODO: error checking of the above call
                 curLoc.SetCurrentForum(res.CurrentForum);
-                curLoc.ParseForumsList(res.ForumList);
+                curLoc.ParseIDList(res.ForumList);
                 curLoc.SaveLocation();
 
                 // reset the THREAD location
@@ -486,7 +487,7 @@ namespace VBulletinBot
                 if (result.Result.Code == 0)
                 {
                     forumLoc.SetCurrentForum(result.CurrentForum);
-                    forumLoc.ParseForumsList(result.ForumList);
+                    forumLoc.ParseIDList(result.ForumList);
                     forumLoc.SaveLocation();
 
                     // reset the THREAD location
@@ -579,8 +580,8 @@ namespace VBulletinBot
                                         r.Thread.PostUsername);
 
                         postLoc.LocationRemoteID = iNewThreadID;
-                        
-                        postLoc.ParsePostList(r.PostList);
+
+                        postLoc.ParseIDList(r.PostList);
                         postLoc.SaveLocation();
 
                         rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, r);
@@ -642,7 +643,7 @@ namespace VBulletinBot
                                             r.Thread.PostUsername);
 
                             postLoc.LocationRemoteID = iNewThreadID;
-                            postLoc.ParsePostList(r.PostList);
+                            postLoc.ParseIDList(r.PostList);
                             postLoc.SaveLocation();
 
                             rs = ListPosts(user, new string[] { postLoc.PageNumber.ToString(), postLoc.PerPage.ToString() }, r);
@@ -682,7 +683,7 @@ namespace VBulletinBot
 
                     // TODO: error checking of the above call
                     loc.SetCurrentForum(res.CurrentForum);
-                    loc.ParseForumsList(res.ForumList);
+                    loc.ParseIDList(res.ForumList);
                     loc.SaveLocation();
                 }
 
@@ -933,7 +934,7 @@ namespace VBulletinBot
                     {
                         loc.PageNumber = iPageNumber;
                         loc.PerPage = iPerPage;
-                        loc.ParseThreadList(r.ThreadList);                        
+                        loc.ParseIDList(r.ThreadList);                        
                         loc.SaveLocation();
 
                         rc = ResultCode.Success;

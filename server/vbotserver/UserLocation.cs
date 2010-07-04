@@ -45,35 +45,15 @@ namespace VBulletinBot
 			}
 		}
 
-		public void ParsePostList(Post[] list)
-		{
-			IDList.Clear();
+        public void ParseIDList(VBEntity[] list)
+        {
+            IDList.Clear();
 
-			foreach (Post post in list)
-			{
-				IDList.Add(post.PostID.ToString());
-			}
-		}
-
-		public void ParseThreadList(Thread[] list)
-		{
-			IDList.Clear();
-
-			foreach (Thread thread in list)
-			{
-				IDList.Add(thread.ThreadID.ToString());
-			}
-		}
-
-		public void ParseForumsList(Forum[] forums)
-		{
-			IDList.Clear();
-
-			foreach (Forum forum in forums)
-			{
-				IDList.Add(forum.ForumID.ToString());
-			}
-		}
+            foreach (VBEntity item in list)
+            {
+                IDList.Add(item.DatabaseID.ToString());
+            }
+        }
 
 		public void SaveLocation()
 		{
