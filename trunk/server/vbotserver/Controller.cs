@@ -359,18 +359,6 @@ namespace vbotserver
             };
         }
 
-        public string FetchPostBit(VBPost post, string strNewLine)
-        {
-            string strResponse = string.Empty;
-
-            string strPageText = post.PageText;
-            strResponse += strNewLine;
-            strResponse += string.Format("{0}", strPageText) + strNewLine;
-            strResponse += string.Format("{0} by {1}", post.GetFriendlyDate(), post.Username);
-
-            return strResponse;
-        }
-
         public string FetchPostBit(VBotService.Post post, string strNewLine)
         {
             string strResponse = string.Empty;
