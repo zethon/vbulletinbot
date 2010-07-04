@@ -5,7 +5,7 @@ using System.Text;
 using System.Configuration;
 using System.Net;
 
-namespace VBulletinBot
+namespace VBulletinBot.VBotService
 {
     /// <summary>
     /// Extension of the VBotService class to add Credentials to the SoapContext
