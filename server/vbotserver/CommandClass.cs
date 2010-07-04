@@ -81,9 +81,9 @@ namespace VBulletinBot
         [CommandMethod("resetdb", "reset the local database")]
         public void ResetDatabase(CommandParser parser)
         {
-            Database.Instance.Connection.Close();
-            Database.Instance.DeleteDatabase();
-            Database.Instance.CreateDatabase();
+            VBotDB.Instance.Connection.Close();
+            VBotDB.Instance.DeleteDatabase();
+            VBotDB.Instance.CreateDatabase();
             log.Info("Database reset");
         }
 

@@ -95,13 +95,15 @@
     <Compile Include="BotConfigSection.cs" />
     <Compile Include="LocalUser.cs" />
     <Compile Include="Post.cs" />
+    <Compile Include="VBotDB.cs">
+      <DependentUpon>vbotDB.dbml</DependentUpon>
+    </Compile>
     <Compile Include="VBotService.cs" />
     <Compile Include="CommandClass.cs" />
     <Compile Include="CommandParser.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="ConnectionComposite.cs" />
     <Compile Include="Controller.cs" />
-    <Compile Include="Database.cs" />
     <Compile Include="GTalkConnection.cs" />
     <Compile Include="InputState.cs" />
     <Compile Include="InstantMessage.cs" />
