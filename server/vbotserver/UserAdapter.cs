@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using vbotserver.VBotService;
+//using VBulletinBot.VBotService;
 using log4net;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     public class UserAdapter
     {

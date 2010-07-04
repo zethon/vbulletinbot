@@ -5,7 +5,7 @@ using System.Configuration;
 using System.Xml;
 
 
-namespace vbotserver
+namespace VBulletinBot
 {
     public class BotConfigSection : ConfigurationSection
     {

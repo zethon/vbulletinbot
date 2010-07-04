@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vbotserver", "vbotserver\vbotserver.csproj", "{3DA7962A-6330-4E98-A108-B749FD41CC3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VBulletinBot", "vbotserver\VBulletinBot.csproj", "{3DA7962A-6330-4E98-A108-B749FD41CC3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

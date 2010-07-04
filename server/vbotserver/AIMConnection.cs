@@ -5,7 +5,7 @@ using System.Text;
 using dotTOC;
 using log4net;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     class AIMConnection : Connection
     {

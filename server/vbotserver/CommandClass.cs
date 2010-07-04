@@ -6,8 +6,12 @@ using System.Reflection;
 using System.Data;
 using System.Net;
 using log4net;
+using Microsoft.Web.Services2;
+using Microsoft.Web.Services2.Security;
+using Microsoft.Web.Services2.Security.Tokens;
 
-namespace vbotserver
+
+namespace VBulletinBot
 {
     class CommandClass
     {
@@ -123,29 +127,6 @@ namespace vbotserver
         }
 
 
-        [CommandMethod("rc",@"Display current VB Request Count")]
-        public void rc()
-        {
-            RequestCount(null);
-        }
-
-        public void RequestCount(CommandParser parser)
-        {
-            log.Info("VB Request Count: " + VB.Instance.RequestCount.ToString());
-        }
-
-        [CommandMethod("rrc", @"Reset VB Request Count")]
-        public void rrc()
-        {
-            ResetRequestCount(null);
-        }
-
-        public void ResetRequestCount(CommandParser parser)
-        {
-            VB.Instance.ResetCount();
-            log.InfoFormat("Reset Request Count done.");
-        }
-
         public void SetUser(CommandParser parser)
         {
             if (parser.Parameters.Length > 0)
@@ -158,19 +139,32 @@ namespace vbotserver
         [CommandMethod("whoami", "[username] [service alias]")]
         public void WhoAmI(CommandParser parser)
         {
-            string strUsername = parser.Parameters[0];
-            string strService = parser.Parameters[1];
-
-            Dictionary<string, string> user = VB.Instance.WhoAMI(strUsername, strService);
-
-            if (user.ContainsKey(@"userid") && user.ContainsKey(@"username"))
+            try
             {
-                log.InfoFormat("UserID: {0}", user[@"userid"]);
-                log.InfoFormat("UserName: {0}", user[@"username"]);
+                UserCredentials uc = new UserCredentials();
+
+                uc.Username = parser.Parameters[0];
+                uc.ServiceName = parser.Parameters[1];
+
+                RequestResult result = VBotService.Instance.WhoAmI(uc);
+
+                if (result.Code == 0 && result.RemoteUser.UserID > 0)
+                {
+                    log.InfoFormat("UserID: {0}", result.RemoteUser.UserID);
+                    log.InfoFormat("UserName: {0}", result.RemoteUser.Username);
+                }
+                else if (result.Code == 0)
+                {
+                    log.Info("Unknown User");
+                }
+                else
+                {
+                    log.InfoFormat("Web Service Error: {0}", result.Text);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                log.Info("Unknown user");
+                log.Error("Could not execute WhoAMI()", ex);
             }
         }
 

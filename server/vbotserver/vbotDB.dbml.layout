@@ -1,1 +1,30 @@
-﻿
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5">
+  <DataContextMoniker Name="/VBotDB" />
+  <nestedChildShapes>
+    <classShape Id="3fb3719b-9ef9-4709-abd2-63b91183066d" absoluteBounds="0.75, 0.75, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/VBotDB/LocalUser" />
+      <nestedChildShapes>
+        <elementListCompartment Id="adcb9a38-89e1-43b5-9ab6-2c3cadea1493" absoluteBounds="0.765, 1.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="23df5d09-49fa-43d9-b418-499405716187" absoluteBounds="3.75, 0.75, 2, 1.3862939453125">
+      <DataClassMoniker Name="/VBotDB/UserLastList" />
+      <nestedChildShapes>
+        <elementListCompartment Id="b25a494a-39ce-44df-bde6-2063459a21c1" absoluteBounds="3.765, 1.21, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="16484283-23db-47a6-bfd5-79d6a5aacac4" absoluteBounds="0.75, 3.75, 2, 2.347801106770834">
+      <DataClassMoniker Name="/VBotDB/UserLocation" />
+      <nestedChildShapes>
+        <elementListCompartment Id="d8e736c0-8844-45d9-8609-3418f01fe7a3" absoluteBounds="0.765, 4.21, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="2728a418-95f3-48bd-9889-4f0abdf9e62d" absoluteBounds="3.75, 3.75, 2, 1.3862939453125005">
+      <DataClassMoniker Name="/VBotDB/UserPostIndex" />
+      <nestedChildShapes>
+        <elementListCompartment Id="f02b4d5f-cb2a-49b7-a937-85f5733da7fe" absoluteBounds="3.765, 4.21, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using System.Reflection;
 using log4net;
 
-namespace vbotserver
+namespace VBulletinBot
 {
     class ConnectionComposite
     {
