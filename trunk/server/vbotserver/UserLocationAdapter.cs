@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using log4net;
+using VBulletinBot.VBotService;
 
 namespace VBulletinBot
 {

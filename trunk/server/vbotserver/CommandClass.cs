@@ -6,9 +6,8 @@ using System.Reflection;
 using System.Data;
 using System.Net;
 using log4net;
-using Microsoft.Web.Services2;
-using Microsoft.Web.Services2.Security;
-using Microsoft.Web.Services2.Security.Tokens;
+using BotService = VBulletinBot.VBotService.VBotService;
+using VBulletinBot.VBotService;
 
 
 namespace VBulletinBot
@@ -146,7 +145,8 @@ namespace VBulletinBot
                 uc.Username = parser.Parameters[0];
                 uc.ServiceName = parser.Parameters[1];
 
-                RequestResult result = VBotService.Instance.WhoAmI(uc);
+                
+                RequestResult result = BotService.Instance.WhoAmI(uc);
 
                 if (result.Code == 0 && result.RemoteUser.UserID > 0)
                 {
