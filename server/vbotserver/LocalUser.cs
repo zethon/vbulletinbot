@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using log4net;
+using BotService = VBulletinBot.VBotService.VBotService;
+using VBulletinBot.VBotService;
 
 namespace VBulletinBot
 {
@@ -54,6 +56,36 @@ namespace VBulletinBot
             }
 
             VBotDB.Instance.SubmitChanges();
+        }
+
+        static public LocalUser GetUser(ResponseChannel rc)
+        {
+            LocalUser luser = VBotDB.Instance.LocalUsers.FirstOrDefault(
+                u => u.Screenname == rc.ToName && u.Service == rc.Connection.Alias);
+
+            if (luser == null)
+            {
+                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(rc));
+
+                luser = new LocalUser
+                {
+                    Screenname = rc.ToName,
+                    Service = rc.Connection.Alias,
+                    BoardUserID = result.RemoteUser.UserID,
+                    LastUpdate = DateTime.Now
+                };
+
+                VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
+                VBotDB.Instance.SubmitChanges();
+            }
+            else
+            {
+                luser.LastUpdate = DateTime.Now;
+                VBotDB.Instance.SubmitChanges();
+            }
+
+            luser.ResponseChannel = rc;
+            return luser;
         }
     }
 }

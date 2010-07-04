@@ -142,9 +142,7 @@ namespace VBulletinBot
                 try
                 {
                     ResponseChannel = new ResponseChannel(im.User, conn);
-
-                    //UserAdapter user = GetUser(im.User,conn.Alias);
-                    LocalUser user = GetUser(im.User, conn.Alias);
+                    LocalUser user = LocalUser.GetUser(ResponseChannel);
 
                     if (user != null && user.LocalUserID > 0)
                     {
@@ -320,43 +318,6 @@ namespace VBulletinBot
             }
 
             return retval;
-        }
-
-        /// <summary>
-        /// Returns a User object associated with the screen name and service
-        /// </summary>
-        /// <param name="ScreenName">The screen name of the user</param>
-        /// <param name="ServiceAlias">The corresponding server (aim,gtalk,yahoo)</param>
-        /// <returns>User object or null</returns>
-        public LocalUser GetUser(string ScreenName, string ServiceAlias)
-        {
-            LocalUser luser = VBotDB.Instance.LocalUsers.FirstOrDefault(
-                u => u.Screenname == ScreenName && u.Service == ServiceAlias);
-
-            if (luser == null)
-            {
-                //VBotService.RemoteUser user = new VBotService.RemoteUser();
-                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(ScreenName,ServiceAlias));
-
-                luser = new LocalUser
-                {
-                    Screenname = ScreenName,
-                    Service = ServiceAlias,
-                    BoardUserID = result.RemoteUser.UserID,
-                    LastUpdate = DateTime.Now
-                };
-
-                VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
-                VBotDB.Instance.SubmitChanges();
-            }
-            else
-            {
-                luser.LastUpdate = DateTime.Now;
-                VBotDB.Instance.SubmitChanges();
-            }
-
-            luser.ResponseChannel = ResponseChannel;
-            return luser;
         }
 
         public string FetchPostBit(VBotService.Post post, string strNewLine)
