@@ -70,9 +70,14 @@ namespace VBulletinBot
             _commands = new CommandClass(this);
 
             // start the notification timer
-            //_notTimer = new System.Timers.Timer(1000 * 60);
-            //_notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
-            //_notTimer.Enabled = true;
+            int iTimer = 0;
+            if (int.TryParse(botconfig.AutoInterval, out iTimer))
+            {
+                _notTimer = new System.Timers.Timer(1000 * 60 * iTimer);
+                _notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
+                _notTimer.Enabled = true;
+                _notTimer.Start();
+            }
 
             return true;
         }
