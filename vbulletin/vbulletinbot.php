@@ -128,6 +128,73 @@ function GetPostByIndex($who,$threadid,$index)
     
 }
 
+function GetIMNotifications($dodelete)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = array();
+    if (!$vbulletin->options['vbb_serviceonoff'])
+    {
+        $result['Code'] = 1;
+        $result['Text'] = 'vbb_service_turned_off';
+        return array('Result'=>$result);
+    }    
+    else if ($vbulletin->options['vbb_servicepw'] != $_SERVER['PHP_AUTH_PW'])
+    {
+        $result['Code'] = 1;
+        $result['Text'] = 'vbb_invalid_servicepw';
+        return array('Result'=>$result);
+    }   
+
+    $query = "
+        SELECT 
+            imnotification.*, 
+            post.*, 
+            thread.*, 
+            forum.*, 
+            post.dateline as postdateline,
+            thread.title as threadtitle,
+            user.username AS newpostusername,
+            user.instantimnotification AS instantimnotification,  
+            user.instantimscreenname AS instantimscreenname,  
+            user.instantimservice AS instantimservice
+        FROM " . TABLE_PREFIX . "imnotification AS imnotification 
+        LEFT JOIN " . TABLE_PREFIX . "user AS user ON (imnotification.userid = user.userid)
+        LEFT JOIN " . TABLE_PREFIX . "post AS post ON (imnotification.postid = post.postid)
+        LEFT JOIN " . TABLE_PREFIX . "thread AS thread ON (post.threadid = thread.threadid)
+        LEFT JOIN " . TABLE_PREFIX . "forum AS forum ON (thread.forumid = forum.forumid)
+
+        ORDER By imnotification.dateline ASC 
+    ";
+    
+    $notificationlist = array();
+    
+    $postnotifications = $db->query_read_slave($query);        
+    while ($notification = $db->fetch_array($postnotifications))
+    {    
+        $notification['pagetext'] = strip_bbcode($notification['pagetext'],true,false,false);
+
+        $temp['IMNotificationInfo'] = ConsumeArray($notification,$structtypes['IMNotificationInfo']);          
+        $temp['Thread'] = ConsumeArray($notification,$structtypes['Thread']);           
+        $temp['Post'] = ConsumeArray($notification,$structtypes['Post']);           
+        $temp['Forum'] = ConsumeArray($notification,$structtypes['Forum']);           
+        
+        if ($dodelete)
+        {
+            $db->query_write("DELETE FROM " . TABLE_PREFIX . "imnotification WHERE (imnotificationid = $notification[imnotificationid]);");
+        }
+        
+        array_push($notificationlist,$temp);
+    }    
+                                  
+    $result['Code'] = 0;
+    $result['Text'] = print_r($notificationlist,true);
+    $retval['Result'] = $result;
+    $retval['IMNotificationList'] = $notificationlist;
+    
+    return $retval;
+}
+
 function GetThread($who,$threadid)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
@@ -530,6 +597,87 @@ function MarkThreadRead($who,$threadid)
     $foruminfo = fetch_foruminfo($threadinfo['forumid']);
 
     mark_thread_read($threadinfo,$foruminfo,$vbulletin->userinfo['userid'],TIMENOW);    
+    
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    $retval['Result'] = $result;
+   
+    return $retval;      
+}
+
+function PostReply($who,$threadid,$pagetext)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }     
+
+    $threadinfo = fetch_threadinfo($threadid);
+    $foruminfo = fetch_foruminfo($threadinfo['forumid'],false);
+
+    $postdm = new vB_DataManager_Post($vbulletin, ERRTYPE_STANDARD);
+    $postdm->set_info('skip_maximagescheck', true);
+    $postdm->set_info('forum', $foruminfo);
+    $postdm->set_info('thread', $threadinfo);  
+    $postdm->set('threadid', $threadid);    
+    $postdm->set('userid', $vbulletin->userinfo['userid']);    
+    $postdm->set('pagetext', $pagetext);
+    $postdm->set('allowsmilie', 1);
+    $postdm->set('visible', 1);
+    $postdm->set('dateline', TIMENOW);        
+    
+    $postdm->pre_save();
+    $postid = 0;
+    
+    if (count($postdm->errors) > 0)
+    { // pre_save failed
+        return ErrorResult('pre_save_failed_thread_reply');
+    }    
+    else
+    {
+        $postid = $postdm->save();
+        
+        require_once('./includes/functions_databuild.php'); 
+        build_thread_counters($threadinfo['threadid']); 
+        build_forum_counters($foruminfo['forumid']);                    
+        correct_forum_counters($threadinfo['threadid'], $foruminfo['forumid']);        
+        
+        mark_thread_read($threadinfo, $foruminfo, $vbulletin->userinfo['userid'], TIMENOW);
+    }    
+    
+    $retval['PostID'] = $postid;
+    $retval['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+    
+    $result['Code'] = 1;
+    $retval['Result'] = $result;
+    
+    return $retval;      
+}
+
+function SetIMNotification($who,$on)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+    
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }   
+
+    $userid = $vbulletin->userinfo['userid'];
+    $onoff = 0;
+    if ($on)
+    {
+        $onoff = 1;
+    }
+    
+    $db->query_write("
+        UPDATE " . TABLE_PREFIX . "user 
+        SET instantimnotification=$onoff
+        WHERE (userid = $userid);
+    ");   
     
     $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
     $retval['Result'] = $result;

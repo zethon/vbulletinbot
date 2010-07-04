@@ -127,5 +127,38 @@ $server->register(
     'encoded',
     'Subscribes user to threadid and returns the thread info'
 );  
+
+$server->register(
+    'SetIMNotification',
+    array('UserCredentials'=>'tns:UserCredentials','On'=>'xsd:boolean'),
+    array('return'=>'tns:RequestResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Turns IM notifications on and off'
+);  
+            
+$server->register(
+    'PostReply',
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int','PageText'=>'xsd:string'),
+    array('return'=>'tns:PostReplyResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Posts reply to threadid'
+);  
+
+$server->register(
+    'GetIMNotifications',
+    array('DoDelete'=>'xsd:boolean'),
+    array('return'=>'tns:IMNotificationsResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Get IM Notifications'
+);           
             
 ?>

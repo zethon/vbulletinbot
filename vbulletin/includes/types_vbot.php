@@ -49,7 +49,23 @@ $structtypes['Post'] = array(
         'IpAddress' => array('IpAddress','type'=>'xsd:string'),
         'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
     );
+    
+$structtypes['IMNotificationInfo'] = array(
+        'IMNotificationID' => array('IMNotificationID','type'=>'xsd:int'),
+        'InstantIMService' => array('InstantIMService','type'=>'xsd:string'),
+        'InstantIMScreenname' => array('InstantIMScreenname','type'=>'xsd:string'),
+        'PostDateLine' => array('PostDateLine','type'=>'xsd:int'),
+        'ThreadTitle' => array('ThreadTitle','type'=>'xsd:string'),
+        'NewPostUsername' => array('NewPostUsername','type'=>'xsd:string'),        
+    );    
             
+$structtypes['IMNotification'] = array(
+        'IMNotificationInfo' => array('IMNotificationInfo','type'=>'tns:IMNotificationInfo'),
+        'Post' => array('Post','type'=>'tns:Post'),
+        'Thread' => array('Thread','type'=>'tns:Thread'),
+        'Forum' => array('Forum','type'=>'tns:Forum'),
+    );
+                
 $structtypes['ForumListResult'] = array(
         'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
         'CurrentForum' => array('name'=>'CurrentForum','type'=>'tns:Forum'),
@@ -78,6 +94,16 @@ $structtypes['GetThreadResult']  = array(
         'Thread' => array('name'=>'Thread','type'=>'tns:Thread'),
     );   
     
+$structtypes['PostReplyResult']  = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'PostID' => array('name'=>'PostID','type'=>'xsd:int'),
+    );     
+    
+$structtypes['IMNotificationsResult']  = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'IMNotificationList' => array('name'=>'PostID','type'=>'tns:IMNotificationArray'),
+    );  
+        
 foreach ($structtypes as $key => $val)
 {
 	$server->wsdl->addComplexType(	
@@ -134,6 +160,17 @@ $server->wsdl->addComplexType(
         array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:Post[]')),
         'tns:Post'
 ); 
+
+$server->wsdl->addComplexType(
+        'IMNotificationArray', 
+        'complexType',
+        'array',
+        '',
+        'SOAP-ENC:Array',
+        array(),
+        array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:IMNotification[]')),
+        'tns:IMNotification'
+);
 
 function ConsumeArray($datarray,$destarray)
 {
