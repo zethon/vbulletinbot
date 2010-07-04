@@ -10,6 +10,8 @@ using System.Threading;
 using System.Timers;
 using System.Configuration;
 using log4net;
+using BotService = VBulletinBot.VBotService.VBotService;
+using VBulletinBot.VBotService;
 
 namespace VBulletinBot
 {
@@ -80,7 +82,7 @@ namespace VBulletinBot
             log.Info("Notification Timer Elapsed()");
             if (_conComp.Connections != null && _conComp.Connections.Count() > 0)
             {
-                IMNotificationsResult result = VBotService.Instance.GetIMNotifications(true);
+                VBotService.IMNotificationsResult result = BotService.Instance.GetIMNotifications(true);
 
                 if (result.Result.Code == 0)
                 {
@@ -88,7 +90,7 @@ namespace VBulletinBot
                     {
                         log.Info(string.Format("{0} post notifications recieved", result.IMNotificationList.Count()));
 
-                        foreach(IMNotification not in result.IMNotificationList)
+                        foreach(VBotService.IMNotification not in result.IMNotificationList)
                         {
                             Connection c = _conComp.GetConnection(not.IMNotificationInfo.InstantIMService);
                             string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
@@ -332,8 +334,8 @@ namespace VBulletinBot
 
             if (luser == null)
             {
-                //RemoteUser user = new RemoteUser();
-                RequestResult result = VBotService.Instance.WhoAmI(VBotService.Credentialize(ScreenName,ServiceAlias));
+                //VBotService.RemoteUser user = new VBotService.RemoteUser();
+                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(ScreenName,ServiceAlias));
 
                 luser = new LocalUser
                 {
@@ -359,7 +361,7 @@ namespace VBulletinBot
             };
         }
 
-        public string FetchPostBit(Post post, string strNewLine)
+        public string FetchPostBit(VBotService.Post post, string strNewLine)
         {
             string strResponse = string.Empty;
 
@@ -385,7 +387,7 @@ namespace VBulletinBot
             { // this location does not exist
 
                 curLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                ForumListResult result = VBotService.Instance.ListForums(VBotService.Credentialize(ResponseChannel), curLoc.LocationRemoteID);
+                VBotService.ForumListResult result = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), curLoc.LocationRemoteID);
 
                 if (result.Result.Code == 0)
                 {
@@ -414,7 +416,7 @@ namespace VBulletinBot
                 }
 
                 // set the FORUMS location
-                ForumListResult res = VBotService.Instance.ListForums(VBotService.Credentialize(ResponseChannel), iNewForumID);
+                VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), iNewForumID);
 
                 // TODO: error checking of the above call
                 curLoc.SetCurrentForum(res.CurrentForum);
@@ -481,7 +483,7 @@ namespace VBulletinBot
 
             if (forumLoc != null)
             {
-                ForumListResult result = VBotService.Instance.ListParentForums(VBotService.Credentialize(ResponseChannel), forumLoc.LocationRemoteID);
+                VBotService.ForumListResult result = BotService.Instance.ListParentForums(BotService.Credentialize(ResponseChannel), forumLoc.LocationRemoteID);
 
                 if (result.Result.Code == 0)
                 {
@@ -522,8 +524,8 @@ namespace VBulletinBot
 
             if (curPostLoc != null)
             {
-                UserCredentials uc = VBotService.Credentialize(ResponseChannel);
-                GetPostResult r = VBotService.Instance.GetPostByIndex(uc, curPostLoc.LocationRemoteID, iChoice);
+                VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, curPostLoc.LocationRemoteID, iChoice);
 
                 if (r.Result.Code == 0)
                 {
@@ -567,8 +569,8 @@ namespace VBulletinBot
                         postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.POST, user);
                     }
 
-                    UserCredentials uc = VBotService.Credentialize(ResponseChannel);
-                    PostListResult r = VBotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
 
                     if (r.Result.Code == 0)
                     {
@@ -630,8 +632,8 @@ namespace VBulletinBot
 
                     if (int.TryParse(strNewThreadID, out iNewThreadID))
                     {
-                        UserCredentials uc = VBotService.Credentialize(ResponseChannel);
-                        PostListResult r = VBotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
+                        VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                        VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
 
                         if (r.Result.Code == 0)
                         {
@@ -667,7 +669,7 @@ namespace VBulletinBot
             return ListForum(user, null);
         }
 
-        public Result ListForum(UserAdapter user, Forum[] forums)
+        public Result ListForum(UserAdapter user, VBotService.Forum[] forums)
         {
             lock (this)
             {
@@ -678,7 +680,7 @@ namespace VBulletinBot
                 { // this location does not exist
 
                     loc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                    ForumListResult res = VBotService.Instance.ListForums(VBotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
 
                     // TODO: error checking of the above call
                     loc.SetCurrentForum(res.CurrentForum);
@@ -688,7 +690,7 @@ namespace VBulletinBot
 
                 if (forums == null)
                 {
-                    ForumListResult res = VBotService.Instance.ListForums(VBotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
                     forums = res.ForumList;
                 }
 
@@ -699,7 +701,7 @@ namespace VBulletinBot
                 if (forums.Count() > 0)
                 {
                     int iCount = 1;
-                    foreach (Forum foruminfo in forums)
+                    foreach (VBotService.Forum foruminfo in forums)
                     {
                         strIsNew = string.Empty;
                         if (foruminfo.IsNew)
@@ -734,7 +736,7 @@ namespace VBulletinBot
             return ListPosts(user, options, null);
         }
 
-        public Result ListPosts(UserAdapter user, string[] options, PostListResult result)
+        public Result ListPosts(UserAdapter user, string[] options, VBotService.PostListResult result)
         {
             lock (this)
             {
@@ -768,8 +770,8 @@ namespace VBulletinBot
 
                 if (result == null)
                 {
-                    UserCredentials uc = VBotService.Credentialize(ResponseChannel);
-                    result = VBotService.Instance.ListPosts(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    result = BotService.Instance.ListPosts(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
                 }
 
                 string strResponse = ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
@@ -786,7 +788,7 @@ namespace VBulletinBot
                 if (result.PostList.Count() > 0)
                 {
                     int iCount = ((iPageNumber - 1) * iPerPage) + 1;
-                    foreach (Post postInfo in result.PostList)
+                    foreach (VBotService.Post postInfo in result.PostList)
                     {
                         strIsNew = string.Empty;
                         if (postInfo.IsNew)
@@ -855,8 +857,8 @@ namespace VBulletinBot
                     }
 
 
-                    UserCredentials uc = VBotService.Credentialize(ResponseChannel);
-                    ThreadListResult r = VBotService.Instance.ListThreads(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
+                    VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
+                    VBotService.ThreadListResult r = BotService.Instance.ListThreads(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
 
                     if (r.Result.Code != 0)
                     {
@@ -892,7 +894,7 @@ namespace VBulletinBot
                         }
 
                         int iCount = 1;
-                        foreach (Thread thread in r.ThreadList)
+                        foreach (VBotService.Thread thread in r.ThreadList)
                         {
                             string strID = string.Empty;
                             if (bShowIDs)
@@ -998,7 +1000,7 @@ namespace VBulletinBot
 
             try
             {
-                RequestResult result = VBotService.Instance.WhoAmI(VBotService.Credentialize(strUsername,strConnectionName));
+                VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(strUsername,strConnectionName));
 
                 if (result.Code == 0)
                 {
@@ -1124,18 +1126,18 @@ namespace VBulletinBot
                 {
                     if (GetConfirmation(user, @"Mark this " + strField + " read?"))
                     {
-                        UserCredentials uc = VBotService.Credentialize(user.ResponseChannel);
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
                         
-                        RequestResult r = null; 
+                        VBotService.RequestResult r = null; 
                         
                         // TODO: this is a hack, redesign how MarkThreadRead and MarkForumRead are called
                         if (strField == @"thread")
                         {
-                            r = VBotService.Instance.MarkThreadRead(uc, loc.LocationRemoteID);
+                            r = BotService.Instance.MarkThreadRead(uc, loc.LocationRemoteID);
                         }
                         else if (strField == @"forum")
                         {
-                            r = VBotService.Instance.MarkForumRead(uc, loc.LocationRemoteID);
+                            r = BotService.Instance.MarkForumRead(uc, loc.LocationRemoteID);
                         }
                         
                         // TODO: can r be null? if so, this could be bad
@@ -1208,8 +1210,8 @@ namespace VBulletinBot
                 // check to see if iThreadId was set above
                 if (iThreadId > 0)
                 {
-                    UserCredentials uc = VBotService.Credentialize(user.ResponseChannel);
-                    GetThreadResult r = VBotService.Instance.GetThread(uc, iThreadId);
+                    VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                    VBotService.GetThreadResult r = BotService.Instance.GetThread(uc, iThreadId);
 
                     if (r.Result.Code == 0)
                     {
@@ -1218,7 +1220,7 @@ namespace VBulletinBot
 
                         if (GetConfirmation(user, strConf))
                         {
-                            r = VBotService.Instance.SubscribeThread(uc, iThreadId);
+                            r = BotService.Instance.SubscribeThread(uc, iThreadId);
 
                             // TODO: test what happens when r is null
                             if (r.Result.Code == 0)
@@ -1276,8 +1278,8 @@ namespace VBulletinBot
                 {
                     if (GetConfirmation(user))
                     {
-                        UserCredentials uc = VBotService.Credentialize(user.ResponseChannel);
-                        PostReplyResult r = VBotService.Instance.PostReply(uc, postLoc.LocationRemoteID, strPostText);
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, postLoc.LocationRemoteID, strPostText);
 
                         if (r.Result.Code != 0 && r.PostID > 0)
                         {
@@ -1375,8 +1377,8 @@ namespace VBulletinBot
 
             if (GetConfirmation(user, strConfMsg))
             {
-                UserCredentials uc = VBotService.Credentialize(user.ResponseChannel);
-                RequestResult r = VBotService.Instance.UnSubscribeThread(uc, iThreadID);
+                VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                VBotService.RequestResult r = BotService.Instance.UnSubscribeThread(uc, iThreadID);
 
                 if (r.Code == 0)
                 {
@@ -1453,8 +1455,8 @@ namespace VBulletinBot
 
             if (GetConfirmation(user, "Are you sure you want to turn IM Notification " + strOnOff + "?"))
             {
-                UserCredentials uc = VBotService.Credentialize(user.ResponseChannel);
-                RequestResult r = VBotService.Instance.SetIMNotification(uc, bOn);
+                VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                VBotService.RequestResult r = BotService.Instance.SetIMNotification(uc, bOn);
 
                 if (r.Code == 0)
                 {

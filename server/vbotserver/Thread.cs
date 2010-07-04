@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace VBulletinBot
+namespace VBulletinBot.VBotService
 {
     public partial class Thread
     {
