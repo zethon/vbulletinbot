@@ -59,6 +59,15 @@ namespace VBulletinBot
                 return (base["localdatabase"] as string);
             }
         }
+
+        [ConfigurationProperty("autointerval", IsRequired = true)]
+        public string  AutoInterval
+        {
+            get
+            {
+                return (base["autointerval"] as string);
+            }
+        }
     }
 
     public class IMServiceElement : ConfigurationElement
