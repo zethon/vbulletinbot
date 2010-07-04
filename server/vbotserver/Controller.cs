@@ -143,18 +143,19 @@ namespace VBulletinBot
                 {
                     ResponseChannel = new ResponseChannel(im.User, conn);
 
-                    UserAdapter user = GetUser(im.User,conn.Alias);
+                    //UserAdapter user = GetUser(im.User,conn.Alias);
+                    LocalUser user = GetUser(im.User, conn.Alias);
 
-                    if (user != null && user.LocalUser.LocalUserID > 0)
+                    if (user != null && user.LocalUserID > 0)
                     {
                         #region if
 
-                        if (_inputs.ContainsKey(user.LocalUser.LocalUserID) && _inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Waiting)
+                        if (_inputs.ContainsKey(user.LocalUserID) && _inputs[user.LocalUserID].State == InputStateEnum.Waiting)
                         { // waiting for input?
 
                             InputState ist = new InputState(InputStateEnum.Responded);
                             ist.PageText = im.Text;
-                            _inputs[user.LocalUser.LocalUserID] = ist;
+                            _inputs[user.LocalUserID] = ist;
                         }
                         else
                         { // the user is at the 'main menu'
@@ -200,7 +201,7 @@ namespace VBulletinBot
             }
         }
 
-        public Result DoCommand(string strCommand,UserAdapter user)
+        public Result DoCommand(string strCommand,LocalUser user)
         {
             Result retval = new Result();
             CommandParser parser = new CommandParser(strCommand);
@@ -212,7 +213,7 @@ namespace VBulletinBot
                 if (int.TryParse(parser.ApplicationName, out iListChoice) && iListChoice > 0)
                 { 
                     // user entered a number, let's deal with the lastlists
-                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUser.LocalUserID);
+                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUserID);
 
                     if (ll != null)
                     {
@@ -221,15 +222,15 @@ namespace VBulletinBot
                         {
                             case @"forum":
                                 retval = GotoForumIndex(iListChoice, user);
-                            break;
+                                break;
 
                             case @"thread":
                                 retval = GotoThreadIndex(iListChoice, user);
-                            break;
+                                break;
 
                             case @"post":
                                 retval = GotoPostIndex(iListChoice, user);
-                            break;
+                                break;
 
                             default:
                                 log.ErrorFormat("Unknown lastlist {0}", ll.Name);
@@ -276,11 +277,11 @@ namespace VBulletinBot
 
                         case "mfr":
                             retval = MarkRead(user, @"forum");
-                        break;
+                            break;
 
                         case "mtr":
                             retval = MarkRead(user, @"thread");
-                        break; 
+                            break;
 
                         case @"n":
                             retval = GotoNextPost(user, true);
@@ -292,19 +293,19 @@ namespace VBulletinBot
 
                         case @"r":
                             retval = ThreadReply(user);
-                        break;
+                            break;
 
                         case "sub":
                             retval = SubscribeThread(user, parser.Parameters);
-                        break;
+                            break;
 
                         case "unsub":
                             retval = UnsubscribeThread(user, parser.Parameters);
-                        break;
+                            break;
 
                         case @"whereami":
                             retval = WhereAmI(user);
-                        break;
+                            break;
 
                         case "whoami":
                             // TODO: the string in UserConnectionName should come from somewhere else?
@@ -327,7 +328,7 @@ namespace VBulletinBot
         /// <param name="ScreenName">The screen name of the user</param>
         /// <param name="ServiceAlias">The corresponding server (aim,gtalk,yahoo)</param>
         /// <returns>User object or null</returns>
-        public UserAdapter GetUser(string ScreenName, string ServiceAlias)
+        public LocalUser GetUser(string ScreenName, string ServiceAlias)
         {
             LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == ScreenName && u.Service == ServiceAlias);
@@ -354,11 +355,14 @@ namespace VBulletinBot
                 Database.Instance.SubmitChanges();
             }
 
-            return new UserAdapter 
-            { 
-                LocalUser = luser, 
-                ResponseChannel = ResponseChannel
-            };
+            luser.ResponseChannel = ResponseChannel;
+            return luser;
+
+            //return new UserAdapter 
+            //{ 
+            //    LocalUser = luser, 
+            //    ResponseChannel = ResponseChannel
+            //};
         }
 
         public string FetchPostBit(VBotService.Post post, string strNewLine)
@@ -373,12 +377,12 @@ namespace VBulletinBot
             return strResponse;
         }
 
-        public Result GotoForumIndex(int iIndex, UserAdapter user)
+        public Result GotoForumIndex(int iIndex, LocalUser user)
         {
             return GotoForumIndex(iIndex, user, false);
         }
 
-        public Result GotoForumIndex(int iIndex, UserAdapter user, bool bGotoRoot)
+        public Result GotoForumIndex(int iIndex, LocalUser user, bool bGotoRoot)
         {
             Result retval = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -441,7 +445,7 @@ namespace VBulletinBot
             return retval;
         }
 
-        public Result GotoNextPost(UserAdapter user, bool bGotoNext)
+        public Result GotoNextPost(LocalUser user, bool bGotoNext)
         {
             Result rs = null;
 
@@ -449,7 +453,7 @@ namespace VBulletinBot
 
             if (curThreadLocation != null)
             {
-                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUser.LocalUserID);
+                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUserID);
 
                 if (upi != null)
                 {
@@ -465,7 +469,7 @@ namespace VBulletinBot
                 else
                 {
                     rs = new Result(ResultCode.Error, @"Invalid post index. Use `lp` to browse a thread.");
-                    log.WarnFormat("Invalid `UserPostIndex` for LocalUserID {0}", user.LocalUser.LocalUserID);
+                    log.WarnFormat("Invalid `UserPostIndex` for LocalUserID {0}", user.LocalUserID);
                 }
             }
             else
@@ -476,7 +480,7 @@ namespace VBulletinBot
             return rs;
         }
 
-        public Result GotoParentForum(UserAdapter user)
+        public Result GotoParentForum(LocalUser user)
         {
             Result ret = null;
             UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
@@ -517,7 +521,7 @@ namespace VBulletinBot
             return ret;
         }
 
-        public Result GotoPostIndex(int iChoice, UserAdapter user)
+        public Result GotoPostIndex(int iChoice, LocalUser user)
         {
             Result rs = null;
             UserLocationAdapter curPostLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
@@ -553,7 +557,7 @@ namespace VBulletinBot
             return rs;
         }
 
-        public Result GotoThread(UserAdapter user, string[] options)
+        public Result GotoThread(LocalUser user, string[] options)
         {
             Result rs = null;
 
@@ -607,7 +611,7 @@ namespace VBulletinBot
             return rs;
         }
 
-        public Result GotoThreadIndex(int iChoice, UserAdapter user)
+        public Result GotoThreadIndex(int iChoice, LocalUser user)
         {
             Result rs = null;
             UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
@@ -664,12 +668,12 @@ namespace VBulletinBot
             return rs;
         }
 
-        public Result ListForum(UserAdapter user)
+        public Result ListForum(LocalUser user)
         {
             return ListForum(user, null);
         }
 
-        public Result ListForum(UserAdapter user, VBotService.Forum[] forums)
+        public Result ListForum(LocalUser user, VBotService.Forum[] forums)
         {
             lock (this)
             {
@@ -731,12 +735,12 @@ namespace VBulletinBot
             }
         }
 
-        public Result ListPosts(UserAdapter user, string[] options)
+        public Result ListPosts(LocalUser user, string[] options)
         {
             return ListPosts(user, options, null);
         }
 
-        public Result ListPosts(UserAdapter user, string[] options, VBotService.PostListResult result)
+        public Result ListPosts(LocalUser user, string[] options, VBotService.PostListResult result)
         {
             lock (this)
             {
@@ -819,9 +823,9 @@ namespace VBulletinBot
                 user.SaveLastPostIndex(1);
                 return new Result(rc, strResponse);
             }
-        }        
+        }
 
-        public Result ListThreads(UserAdapter user, string[] options)
+        public Result ListThreads(LocalUser user, string[] options)
         {
             lock (this)
             {
@@ -957,7 +961,7 @@ namespace VBulletinBot
         /// </summary>
         /// <param name="user">The user</param>
         /// <returns></returns>
-        public Result WhereAmI(UserAdapter user)
+        public Result WhereAmI(LocalUser user)
         {
             string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
@@ -1034,14 +1038,14 @@ namespace VBulletinBot
         }
 
         #region Threaded Functions
-        public string GetString(UserAdapter user)
+        public string GetString(LocalUser user)
         {
             string strRet = string.Empty;
             DateTime start = DateTime.Now;
 
-            _inputs[user.LocalUser.LocalUserID] = new InputState(InputStateEnum.Waiting);
+            _inputs[user.LocalUserID] = new InputState(InputStateEnum.Waiting);
 
-            while (_inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Waiting)
+            while (_inputs[user.LocalUserID].State == InputStateEnum.Waiting)
             {
                 TimeSpan span = DateTime.Now - start;
                 if (span.TotalMinutes > 9) // ten minute wait for input
@@ -1055,21 +1059,21 @@ namespace VBulletinBot
             };
 
             // state is set to 'Responded' in the callback....
-            if (_inputs[user.LocalUser.LocalUserID].State == InputStateEnum.Responded)
+            if (_inputs[user.LocalUserID].State == InputStateEnum.Responded)
             {
-                strRet = _inputs[user.LocalUser.LocalUserID].PageText;
+                strRet = _inputs[user.LocalUserID].PageText;
             }
 
-            _inputs.Remove(user.LocalUser.LocalUserID);
+            _inputs.Remove(user.LocalUserID);
             return strRet;
         }
 
-        public bool GetConfirmation(UserAdapter user)
+        public bool GetConfirmation(LocalUser user)
         {
             return GetConfirmation(user, @"Are you sure? (y or n)");
         }
 
-        public bool GetConfirmation(UserAdapter user, string strMessage)
+        public bool GetConfirmation(LocalUser user, string strMessage)
         {
             bool bRetval = false;
             //Connection c = user.Connection;
@@ -1086,7 +1090,7 @@ namespace VBulletinBot
             return bRetval;
         }
 
-        public Result MarkRead(UserAdapter user, string strField)
+        public Result MarkRead(LocalUser user, string strField)
         {
             object[] objs = { user, strField };
             System.Threading.Thread t = new System.Threading.Thread(new ParameterizedThreadStart(DoMarkRead));
@@ -1101,7 +1105,7 @@ namespace VBulletinBot
 
             if (objs != null && objs.Count() == 2)
             {
-                UserAdapter user = objs[0] as UserAdapter;
+                LocalUser user = objs[0] as LocalUser;
 
                 string strField = objs[1] as string;
                 string strUpper = char.ToUpper(strField[0]) + strField.Substring(1);
@@ -1167,7 +1171,7 @@ namespace VBulletinBot
             }
         }
 
-        public Result SubscribeThread(UserAdapter user, string[] options)
+        public Result SubscribeThread(LocalUser user, string[] options)
         {
             int iThreadID = 0;
 
@@ -1192,7 +1196,7 @@ namespace VBulletinBot
 
             if (objs != null && objs.Count() == 2)
             {
-                UserAdapter user = objs[0] as UserAdapter;
+                LocalUser user = objs[0] as LocalUser;
 
                 int iThreadId = (int)objs[1];
                 string strMessage = string.Empty;
@@ -1252,7 +1256,7 @@ namespace VBulletinBot
             }
         }
 
-        public Result ThreadReply(UserAdapter user)
+        public Result ThreadReply(LocalUser user)
         {
             System.Threading.Thread replyThread = new System.Threading.Thread(new ParameterizedThreadStart(DoThreadReply));
             replyThread.Start(user);
@@ -1262,7 +1266,7 @@ namespace VBulletinBot
 
         public void DoThreadReply(object userObj)
         {
-            UserAdapter user = userObj as UserAdapter;
+            LocalUser user = userObj as LocalUser;
             UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
 
             if (postLoc != null)
@@ -1306,7 +1310,7 @@ namespace VBulletinBot
             }
         }
 
-        public Result UnsubscribeThread(UserAdapter user, string[] options)
+        public Result UnsubscribeThread(LocalUser user, string[] options)
         {
             Result ret = null;
             int iThread = 0;
@@ -1366,7 +1370,7 @@ namespace VBulletinBot
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            UserAdapter user = objs[0] as UserAdapter;
+            LocalUser user = objs[0] as LocalUser;
             int iThreadID = (int)objs[1];
             string strConfMsg = @"Are you sure you want to unsubscribe from all threads?";
 
@@ -1398,7 +1402,7 @@ namespace VBulletinBot
             }
         }
 
-        public Result TurnOnOffAutoIMS(UserAdapter user, string[] options)
+        public Result TurnOnOffAutoIMS(LocalUser user, string[] options)
         {
             Result ret = null;
 
@@ -1444,7 +1448,7 @@ namespace VBulletinBot
                 throw new Exception(@"Something weird passed into DoUnsubscribeThread");
             }
 
-            UserAdapter user = objs[0] as UserAdapter;
+            LocalUser user = objs[0] as LocalUser;
             bool bOn = (bool)objs[1];
 
             string strOnOff = "off";
