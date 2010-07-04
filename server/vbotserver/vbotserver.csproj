@@ -118,8 +118,6 @@
       <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Thread.cs" />
-    <Compile Include="VBPost.cs" />
-    <Compile Include="VBThread.cs" />
     <Compile Include="UserAdapter.cs" />
     <Compile Include="UserLocationAdapter.cs" />
     <Compile Include="Web References\VBotService\Reference.cs">
