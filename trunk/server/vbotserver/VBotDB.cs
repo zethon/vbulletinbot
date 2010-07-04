@@ -7,15 +7,13 @@ using System.Data;
 
 namespace VBulletinBot
 {
-    /// <summary>
-    /// Class to wrap the DataContext into a Singleton object
-    /// </summary>
-    class Database
+    public partial class VBotDB
     {
         private static VBotDB _instance;
+
         public static VBotDB Instance
         {
-            get 
+            get
             {
                 if (_instance == null)
                 {
@@ -24,13 +22,9 @@ namespace VBulletinBot
                     IDbConnection conn = new System.Data.SqlServerCe.SqlCeConnection(string.Format("Data Source={0}", botconfig.LocalDatabase));
                     _instance = new VBotDB(conn);
                 }
-                
+
                 return _instance;
             }
-        }
-
-        private Database()
-        {
         }
     }
 }

@@ -14,7 +14,7 @@ namespace VBulletinBot
 
         public void SaveLastList(string strLastList)
         {
-            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
+            UserLastList ll = VBotDB.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
 
             if (ll != null)
             {
@@ -22,16 +22,21 @@ namespace VBulletinBot
             }
             else
             {
-                Database.Instance.UserLastLists.InsertOnSubmit(
+                VBotDB.Instance.UserLastLists.InsertOnSubmit(
                     new UserLastList { LocalUserID = LocalUserID, Name = strLastList.ToLower() });
             }
 
-            Database.Instance.SubmitChanges();
+            if (log.IsDebugEnabled)
+            {
+                log.DebugFormat("Saved last list {0} for LocalUser {1}", strLastList, _LocalUserID);
+            }
+
+            VBotDB.Instance.SubmitChanges();
         }
 
         public void SaveLastPostIndex(int iPostIndex)
         {
-            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
+            UserPostIndex upi = VBotDB.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
 
             if (upi != null)
             {
@@ -39,11 +44,16 @@ namespace VBulletinBot
             }
             else
             {
-                Database.Instance.UserPostIndexes.InsertOnSubmit(
+                VBotDB.Instance.UserPostIndexes.InsertOnSubmit(
                     new UserPostIndex { LocalUserID = LocalUserID, PostIndex = iPostIndex });
             }
 
-            Database.Instance.SubmitChanges();
+            if (log.IsDebugEnabled)
+            {
+                log.DebugFormat("Saved post index {0} for LocalUser {1}", iPostIndex, _LocalUserID);
+            }
+
+            VBotDB.Instance.SubmitChanges();
         }
     }
 }

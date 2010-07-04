@@ -49,10 +49,10 @@ namespace VBulletinBot
         {
             BotConfigSection botconfig = (BotConfigSection)ConfigurationManager.GetSection("botconfig");
 
-            if (!Database.Instance.DatabaseExists())
+            if (!VBotDB.Instance.DatabaseExists())
             {
                 log.InfoFormat("Creating local database from datacontext...");
-                Database.Instance.CreateDatabase();
+                VBotDB.Instance.CreateDatabase();
             }
 
             log.InfoFormat("ServiceURL: {0}", botconfig.WebServiceURL);
@@ -213,7 +213,7 @@ namespace VBulletinBot
                 if (int.TryParse(parser.ApplicationName, out iListChoice) && iListChoice > 0)
                 { 
                     // user entered a number, let's deal with the lastlists
-                    UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUserID);
+                    UserLastList ll = VBotDB.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == user.LocalUserID);
 
                     if (ll != null)
                     {
@@ -330,7 +330,7 @@ namespace VBulletinBot
         /// <returns>User object or null</returns>
         public LocalUser GetUser(string ScreenName, string ServiceAlias)
         {
-            LocalUser luser = Database.Instance.LocalUsers.FirstOrDefault(
+            LocalUser luser = VBotDB.Instance.LocalUsers.FirstOrDefault(
                 u => u.Screenname == ScreenName && u.Service == ServiceAlias);
 
             if (luser == null)
@@ -346,23 +346,17 @@ namespace VBulletinBot
                     LastUpdate = DateTime.Now
                 };
 
-                Database.Instance.LocalUsers.InsertOnSubmit(luser);
-                Database.Instance.SubmitChanges();
+                VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
+                VBotDB.Instance.SubmitChanges();
             }
             else
             {
                 luser.LastUpdate = DateTime.Now;
-                Database.Instance.SubmitChanges();
+                VBotDB.Instance.SubmitChanges();
             }
 
             luser.ResponseChannel = ResponseChannel;
             return luser;
-
-            //return new UserAdapter 
-            //{ 
-            //    LocalUser = luser, 
-            //    ResponseChannel = ResponseChannel
-            //};
         }
 
         public string FetchPostBit(VBotService.Post post, string strNewLine)
@@ -453,7 +447,7 @@ namespace VBulletinBot
 
             if (curThreadLocation != null)
             {
-                UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUserID);
+                UserPostIndex upi = VBotDB.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == user.LocalUserID);
 
                 if (upi != null)
                 {

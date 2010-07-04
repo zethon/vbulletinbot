@@ -128,15 +128,15 @@ namespace VBulletinBot
             if (UserLocation.UserLocationID > 0)
             {
                 UserLocation.List = string.Join(" ", IDList.ToArray());
-                Database.Instance.SubmitChanges();
+                VBotDB.Instance.SubmitChanges();
             }
             else
             {
                 UserLocation.List = string.Join(" ", IDList.ToArray());
-                Database.Instance.UserLocations.InsertOnSubmit(UserLocation);
+                VBotDB.Instance.UserLocations.InsertOnSubmit(UserLocation);
             }
 
-            Database.Instance.SubmitChanges();
+            VBotDB.Instance.SubmitChanges();
             log.DebugFormat("Saved Location LocalUserID '{0}', UserLocationType '{1}', LocationRemoteID '{2}'",
                     UserLocation.LocalUserID, UserLocation.UserLocationType, UserLocation.LocationRemoteID);
         }
@@ -189,7 +189,7 @@ namespace VBulletinBot
         {
             UserLocationAdapter retval = null;
 
-            UserLocation ul = Database.Instance.UserLocations.FirstOrDefault(
+            UserLocation ul = VBotDB.Instance.UserLocations.FirstOrDefault(
                 l => l.LocalUserID == user.LocalUserID
                     && l.UserLocationType == locType.ToString().ToLower());
 
