@@ -379,13 +379,13 @@ namespace VBulletinBot
         public Result GotoForumIndex(int iIndex, LocalUser user, bool bGotoRoot)
         {
             Result retval = null;
-            UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
+            UserLocation curLoc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
 
             if (curLoc == null)
             { // this location does not exist
 
-                curLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                VBotService.ForumListResult result = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), curLoc.LocationRemoteID);
+                curLoc = UserLocation.GetDefaultLocation(UserLocationType.FORUM, user);
+                VBotService.ForumListResult result = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), (int)curLoc.LocationRemoteID);
 
                 if (result.Result.Code == 0)
                 {
@@ -422,11 +422,11 @@ namespace VBulletinBot
                 curLoc.SaveLocation();
 
                 // reset the THREAD location
-                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
+                UserLocation threadLoc = UserLocation.LoadLocation(UserLocationType.THREAD, user);
 
                 if (threadLoc == null)
                 {
-                    threadLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.THREAD, user);
+                    threadLoc = UserLocation.GetDefaultLocation(UserLocationType.THREAD, user);
                 }
 
                 threadLoc.Title = curLoc.Title;
@@ -443,7 +443,7 @@ namespace VBulletinBot
         {
             Result rs = null;
 
-            UserLocationAdapter curThreadLocation = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+            UserLocation curThreadLocation = UserLocation.LoadLocation(UserLocationType.POST, user);
 
             if (curThreadLocation != null)
             {
@@ -477,11 +477,11 @@ namespace VBulletinBot
         public Result GotoParentForum(LocalUser user)
         {
             Result ret = null;
-            UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
+            UserLocation forumLoc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
 
             if (forumLoc != null)
             {
-                VBotService.ForumListResult result = BotService.Instance.ListParentForums(BotService.Credentialize(ResponseChannel), forumLoc.LocationRemoteID);
+                VBotService.ForumListResult result = BotService.Instance.ListParentForums(BotService.Credentialize(ResponseChannel), (int)forumLoc.LocationRemoteID);
 
                 if (result.Result.Code == 0)
                 {
@@ -490,7 +490,7 @@ namespace VBulletinBot
                     forumLoc.SaveLocation();
 
                     // reset the THREAD location
-                    UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
+                    UserLocation threadLoc = UserLocation.LoadLocation(UserLocationType.THREAD, user);
 
                     if (threadLoc != null)
                     {
@@ -518,12 +518,12 @@ namespace VBulletinBot
         public Result GotoPostIndex(int iChoice, LocalUser user)
         {
             Result rs = null;
-            UserLocationAdapter curPostLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+            UserLocation curPostLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
             if (curPostLoc != null)
             {
                 VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, curPostLoc.LocationRemoteID, iChoice);
+                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, (int)curPostLoc.LocationRemoteID, iChoice);
 
                 if (r.Result.Code == 0)
                 {
@@ -561,14 +561,14 @@ namespace VBulletinBot
 
                 if (int.TryParse(options[0], out iNewThreadID))
                 {
-                    UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                    UserLocation postLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
                     if (postLoc == null)
                     {
-                        postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.POST, user);
+                        postLoc = UserLocation.GetDefaultLocation(UserLocationType.POST, user);
                     }
 
                     VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                    VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
+                    VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, (int)postLoc.PageNumber, (int)postLoc.PerPage);
 
                     if (r.Result.Code == 0)
                     {
@@ -608,7 +608,7 @@ namespace VBulletinBot
         public Result GotoThreadIndex(int iChoice, LocalUser user)
         {
             Result rs = null;
-            UserLocationAdapter curLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
+            UserLocation curLoc = UserLocation.LoadLocation(UserLocationType.THREAD, user);
 
             if (curLoc != null)
             {
@@ -622,16 +622,16 @@ namespace VBulletinBot
                     int iNewThreadID = 0;
                     string strNewThreadID = curLoc.IDList[iChoice - 1];
 
-                    UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                    UserLocation postLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
                     if (postLoc == null)
                     {
-                        postLoc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.POST, user);
+                        postLoc = UserLocation.GetDefaultLocation(UserLocationType.POST, user);
                     }
 
                     if (int.TryParse(strNewThreadID, out iNewThreadID))
                     {
                         VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                        VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, postLoc.PageNumber, postLoc.PerPage);
+                        VBotService.PostListResult r = BotService.Instance.ListPosts(uc, iNewThreadID, (int)postLoc.PageNumber, (int)postLoc.PerPage);
 
                         if (r.Result.Code == 0)
                         {
@@ -672,13 +672,13 @@ namespace VBulletinBot
             lock (this)
             {
                 Result resval = null;
-                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
+                UserLocation loc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
 
                 if (loc == null)
                 { // this location does not exist
 
-                    loc = UserLocationAdapter.GetDefaultLocation(UserLocationTypeEnum.FORUM, user);
-                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
+                    loc = UserLocation.GetDefaultLocation(UserLocationType.FORUM, user);
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), (int)loc.LocationRemoteID);
 
                     // TODO: error checking of the above call
                     loc.SetCurrentForum(res.CurrentForum);
@@ -688,7 +688,7 @@ namespace VBulletinBot
 
                 if (forums == null)
                 {
-                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), loc.LocationRemoteID);
+                    VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), (int)loc.LocationRemoteID);
                     forums = res.ForumList;
                 }
 
@@ -739,7 +739,7 @@ namespace VBulletinBot
             lock (this)
             {
                 ResultCode rc = ResultCode.Unknown;
-                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                UserLocation loc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
                 if (loc == null)
                 {
@@ -769,7 +769,7 @@ namespace VBulletinBot
                 if (result == null)
                 {
                     VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                    result = BotService.Instance.ListPosts(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
+                    result = BotService.Instance.ListPosts(uc, (int)loc.LocationRemoteID, iPageNumber, iPerPage);
                 }
 
                 string strResponse = ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
@@ -826,7 +826,7 @@ namespace VBulletinBot
                 ResultCode rc = ResultCode.Unknown;
 
                 string strResponse = string.Empty;
-                UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.THREAD, user);
+                UserLocation loc = UserLocation.LoadLocation(UserLocationType.THREAD, user);
 
                 if (loc == null)
                 {
@@ -856,7 +856,7 @@ namespace VBulletinBot
 
 
                     VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                    VBotService.ThreadListResult r = BotService.Instance.ListThreads(uc, loc.LocationRemoteID, iPageNumber, iPerPage);
+                    VBotService.ThreadListResult r = BotService.Instance.ListThreads(uc, (int)loc.LocationRemoteID, iPageNumber, iPerPage);
 
                     if (r.Result.Code != 0)
                     {
@@ -960,7 +960,7 @@ namespace VBulletinBot
             string strNewLine = ResponseChannel.Connection.NewLine;
             string strResponse = strNewLine;
 
-            UserLocationAdapter forumLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
+            UserLocation forumLoc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
             strResponse += "Current Forum: ";
             if (forumLoc != null)
             {
@@ -970,8 +970,8 @@ namespace VBulletinBot
             {
                 strResponse += "None" + strNewLine;
             }
-            
-            UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+
+            UserLocation threadLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
             strResponse += "Current Thread: ";
             if (threadLoc != null)
             {
@@ -1104,14 +1104,14 @@ namespace VBulletinBot
                 string strField = objs[1] as string;
                 string strUpper = char.ToUpper(strField[0]) + strField.Substring(1);
 
-                UserLocationAdapter loc = null;
+                UserLocation loc = null;
                 if (strField == @"thread")
                 {
-                    loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                    loc = UserLocation.LoadLocation(UserLocationType.POST, user);
                 }
                 else if (strField == @"forum")
                 {
-                    loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.FORUM, user);
+                    loc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
                 }
                 else
                 {
@@ -1131,11 +1131,11 @@ namespace VBulletinBot
                         // TODO: this is a hack, redesign how MarkThreadRead and MarkForumRead are called
                         if (strField == @"thread")
                         {
-                            r = BotService.Instance.MarkThreadRead(uc, loc.LocationRemoteID);
+                            r = BotService.Instance.MarkThreadRead(uc, (int)loc.LocationRemoteID);
                         }
                         else if (strField == @"forum")
                         {
-                            r = BotService.Instance.MarkForumRead(uc, loc.LocationRemoteID);
+                            r = BotService.Instance.MarkForumRead(uc, (int)loc.LocationRemoteID);
                         }
                         
                         // TODO: can r be null? if so, this could be bad
@@ -1197,11 +1197,11 @@ namespace VBulletinBot
 
                 if (iThreadId == 0)
                 {
-                    UserLocationAdapter loc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                    UserLocation loc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
                     if (loc != null)
                     {
-                        iThreadId = loc.LocationRemoteID;
+                        iThreadId = (int)loc.LocationRemoteID;
                     }
                 }
 
@@ -1261,7 +1261,7 @@ namespace VBulletinBot
         public void DoThreadReply(object userObj)
         {
             LocalUser user = userObj as LocalUser;
-            UserLocationAdapter postLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+            UserLocation postLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
             if (postLoc != null)
             {
@@ -1277,7 +1277,7 @@ namespace VBulletinBot
                     if (GetConfirmation(user))
                     {
                         VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
-                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, postLoc.LocationRemoteID, strPostText);
+                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, (int)postLoc.LocationRemoteID, strPostText);
 
                         if (r.Result.Code != 0 && r.PostID > 0)
                         {
@@ -1324,10 +1324,10 @@ namespace VBulletinBot
             else
             {
                 // no parameters, get the current thread
-                UserLocationAdapter threadLoc = UserLocationAdapter.LoadLocation(UserLocationTypeEnum.POST, user);
+                UserLocation threadLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
                 if (threadLoc != null)
                 {
-                    iThread = threadLoc.LocationRemoteID;
+                    iThread = (int)threadLoc.LocationRemoteID;
                 }
                 else
                 {
