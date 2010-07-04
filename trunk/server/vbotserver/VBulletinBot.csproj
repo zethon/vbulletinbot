@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="AIMConnection.cs" />
     <Compile Include="BotConfigSection.cs" />
+    <Compile Include="LocalUser.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="VBotService.cs" />
     <Compile Include="CommandClass.cs" />
@@ -119,7 +120,6 @@
       <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Thread.cs" />
-    <Compile Include="UserAdapter.cs" />
     <Compile Include="UserLocationAdapter.cs" />
     <Compile Include="Web References\VBotService\Reference.cs">
       <AutoGen>True</AutoGen>

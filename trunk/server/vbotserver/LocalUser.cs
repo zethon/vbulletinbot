@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VBulletinBot.VBotService;
 using log4net;
 
 namespace VBulletinBot
 {
-    public class UserAdapter
+    public partial class LocalUser
     {
-        static ILog log = LogManager.GetLogger(typeof(UserAdapter));
-
-        public LocalUser LocalUser;
-
+        static ILog log = LogManager.GetLogger(typeof(LocalUser));
+        
         public ResponseChannel ResponseChannel;
 
         public void SaveLastList(string strLastList)
         {
-            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUser.LocalUserID);
+            UserLastList ll = Database.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
 
             if (ll != null)
             {
@@ -26,7 +23,7 @@ namespace VBulletinBot
             else
             {
                 Database.Instance.UserLastLists.InsertOnSubmit(
-                    new UserLastList { LocalUserID = this.LocalUser.LocalUserID, Name = strLastList.ToLower() });
+                    new UserLastList { LocalUserID = LocalUserID, Name = strLastList.ToLower() });
             }
 
             Database.Instance.SubmitChanges();
@@ -34,7 +31,7 @@ namespace VBulletinBot
 
         public void SaveLastPostIndex(int iPostIndex)
         {
-            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUser.LocalUserID);
+            UserPostIndex upi = Database.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
 
             if (upi != null)
             {
@@ -43,7 +40,7 @@ namespace VBulletinBot
             else
             {
                 Database.Instance.UserPostIndexes.InsertOnSubmit(
-                    new UserPostIndex { LocalUserID = this.LocalUser.LocalUserID, PostIndex = iPostIndex });
+                    new UserPostIndex { LocalUserID = LocalUserID, PostIndex = iPostIndex });
             }
 
             Database.Instance.SubmitChanges();

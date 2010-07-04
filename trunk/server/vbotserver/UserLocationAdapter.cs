@@ -20,7 +20,7 @@ namespace VBulletinBot
         static ILog log = LogManager.GetLogger(typeof(UserLocationAdapter));
 
         public UserLocation UserLocation;
-        public UserAdapter User;
+        public LocalUser User;
         public UserLocationTypeEnum UserLocationType;
 
         public int UserLocationID
@@ -141,7 +141,7 @@ namespace VBulletinBot
                     UserLocation.LocalUserID, UserLocation.UserLocationType, UserLocation.LocationRemoteID);
         }
 
-        static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,UserAdapter owner)
+        static public UserLocationAdapter GetDefaultLocation(UserLocationTypeEnum locType,LocalUser owner)
         {
             UserLocationAdapter loc = null;
 
@@ -154,7 +154,7 @@ namespace VBulletinBot
                 ul.LocationRemoteID = -1;
                 ul.List = string.Empty;
                 ul.UserLocationType = @"forum";
-                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                ul.LocalUserID = owner.LocalUserID;
                 loc = new UserLocationAdapter(ul);
             }
             else if (locType == UserLocationTypeEnum.THREAD)
@@ -166,7 +166,7 @@ namespace VBulletinBot
                 ul.LocationRemoteID = 0;
                 ul.List = string.Empty;
                 ul.UserLocationType = @"thread";
-                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                ul.LocalUserID = owner.LocalUserID;
                 loc = new UserLocationAdapter(ul);
             }
             else if (locType == UserLocationTypeEnum.POST)
@@ -178,19 +178,19 @@ namespace VBulletinBot
                 ul.LocationRemoteID = 0;
                 ul.List = string.Empty;
                 ul.UserLocationType = @"post";
-                ul.LocalUserID = owner.LocalUser.LocalUserID;
+                ul.LocalUserID = owner.LocalUserID;
                 loc = new UserLocationAdapter(ul);
             }
 
             return loc;
         }
 
-        static public UserLocationAdapter LoadLocation(UserLocationTypeEnum locType, UserAdapter user)
+        static public UserLocationAdapter LoadLocation(UserLocationTypeEnum locType, LocalUser user)
         {
             UserLocationAdapter retval = null;
 
             UserLocation ul = Database.Instance.UserLocations.FirstOrDefault(
-                l => l.LocalUserID == user.LocalUser.LocalUserID
+                l => l.LocalUserID == user.LocalUserID
                     && l.UserLocationType == locType.ToString().ToLower());
 
             if (ul != null)
