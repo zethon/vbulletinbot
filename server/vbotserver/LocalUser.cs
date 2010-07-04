@@ -67,16 +67,19 @@ namespace VBulletinBot
             {
                 VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(rc));
 
-                luser = new LocalUser
+                if (result.Code == 0)
                 {
-                    Screenname = rc.ToName,
-                    Service = rc.Connection.Alias,
-                    BoardUserID = result.RemoteUser.UserID,
-                    LastUpdate = DateTime.Now
-                };
+                    luser = new LocalUser
+                    {
+                        Screenname = rc.ToName,
+                        Service = rc.Connection.Alias,
+                        BoardUserID = result.RemoteUser.UserID,
+                        LastUpdate = DateTime.Now
+                    };
 
-                VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
-                VBotDB.Instance.SubmitChanges();
+                    VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
+                    VBotDB.Instance.SubmitChanges();
+                }
             }
             else
             {
@@ -84,7 +87,11 @@ namespace VBulletinBot
                 VBotDB.Instance.SubmitChanges();
             }
 
-            luser.ResponseChannel = rc;
+            if (luser != null)
+            {
+                luser.ResponseChannel = rc;
+            }
+
             return luser;
         }
     }
