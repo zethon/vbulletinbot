@@ -76,6 +76,8 @@
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
@@ -178,32 +180,32 @@
     <None Include="vbotDB.dbml.layout">
       <DependentUpon>vbotDB.dbml</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\ForumListResult1.datasource">
+    <None Include="Web References\VBotService\ForumListResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\GetPostResult1.datasource">
+    <None Include="Web References\VBotService\GetPostResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\GetThreadResult1.datasource">
+    <None Include="Web References\VBotService\GetThreadResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\IMNotificationsResult1.datasource">
+    <None Include="Web References\VBotService\IMNotificationsResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\PostListResult1.datasource">
+    <None Include="Web References\VBotService\PostListResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\PostReplyResult1.datasource">
+    <None Include="Web References\VBotService\PostReplyResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Web References\VBotService\RequestResult1.datasource">
+    <None Include="Web References\VBotService\RequestResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\ThreadListResult1.datasource">
+    <None Include="Web References\VBotService\ThreadListResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\vbulletinbot.wsdl" />
@@ -227,7 +229,7 @@
       <CachedDynamicPropName>
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>vbotserver_VBotService_VBotService</CachedSettingsPropName>
+      <CachedSettingsPropName>VBulletinBot_VBotService_VBotService</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
