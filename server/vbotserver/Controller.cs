@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO;
-using System.Data.SQLite;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Timers;
