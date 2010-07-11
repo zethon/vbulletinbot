@@ -78,6 +78,12 @@ namespace VBulletinBot
                 _notTimer.Start();
             }
 
+            if (botconfig.AutoConnect)
+            {
+                log.Info("Auto-connecting all connections");
+                _conComp.Connect();
+            }
+
             return true;
         }
 
