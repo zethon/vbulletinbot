@@ -68,6 +68,15 @@ namespace VBulletinBot
                 return (base["autointerval"] as string);
             }
         }
+
+        [ConfigurationProperty("autoconnect", IsRequired = true)]
+        public bool AutoConnect
+        {
+            get
+            {
+                return (bool)base["autoconnect"];
+            }
+        }
     }
 
     public class IMServiceElement : ConfigurationElement
