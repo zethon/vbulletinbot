@@ -56,6 +56,8 @@ namespace VBulletinBot.VBotService {
         
         private System.Threading.SendOrPostCallback PostReplyOperationCompleted;
         
+        private System.Threading.SendOrPostCallback PostNewThreadOperationCompleted;
+        
         private System.Threading.SendOrPostCallback GetIMNotificationsOperationCompleted;
         
         private bool useDefaultCredentialsSetExplicitly;
@@ -134,6 +136,9 @@ namespace VBulletinBot.VBotService {
         
         /// <remarks/>
         public event PostReplyCompletedEventHandler PostReplyCompleted;
+        
+        /// <remarks/>
+        public event PostNewThreadCompletedEventHandler PostNewThreadCompleted;
         
         /// <remarks/>
         public event GetIMNotificationsCompletedEventHandler GetIMNotificationsCompleted;
@@ -561,6 +566,42 @@ namespace VBulletinBot.VBotService {
             if ((this.PostReplyCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.PostReplyCompleted(this, new PostReplyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/PostNewThread", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
+        [return: System.Xml.Serialization.SoapElementAttribute("return")]
+        public PostReplyResult PostNewThread(UserCredentials UserCredentials, int ForumID, string Title, string PageText) {
+            object[] results = this.Invoke("PostNewThread", new object[] {
+                        UserCredentials,
+                        ForumID,
+                        Title,
+                        PageText});
+            return ((PostReplyResult)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void PostNewThreadAsync(UserCredentials UserCredentials, int ForumID, string Title, string PageText) {
+            this.PostNewThreadAsync(UserCredentials, ForumID, Title, PageText, null);
+        }
+        
+        /// <remarks/>
+        public void PostNewThreadAsync(UserCredentials UserCredentials, int ForumID, string Title, string PageText, object userState) {
+            if ((this.PostNewThreadOperationCompleted == null)) {
+                this.PostNewThreadOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPostNewThreadOperationCompleted);
+            }
+            this.InvokeAsync("PostNewThread", new object[] {
+                        UserCredentials,
+                        ForumID,
+                        Title,
+                        PageText}, this.PostNewThreadOperationCompleted, userState);
+        }
+        
+        private void OnPostNewThreadOperationCompleted(object arg) {
+            if ((this.PostNewThreadCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.PostNewThreadCompleted(this, new PostNewThreadCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -1757,6 +1798,32 @@ namespace VBulletinBot.VBotService {
         private object[] results;
         
         internal PostReplyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public PostReplyResult Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((PostReplyResult)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    public delegate void PostNewThreadCompletedEventHandler(object sender, PostNewThreadCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class PostNewThreadCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal PostNewThreadCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

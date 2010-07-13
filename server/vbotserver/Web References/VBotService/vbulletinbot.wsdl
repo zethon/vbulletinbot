@@ -254,6 +254,15 @@
   <wsdl:message name="PostReplyResponse">
     <wsdl:part name="return" type="tns:PostReplyResult" />
   </wsdl:message>
+  <wsdl:message name="PostNewThreadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+    <wsdl:part name="Title" type="xsd:string" />
+    <wsdl:part name="PageText" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="PostNewThreadResponse">
+    <wsdl:part name="return" type="tns:PostReplyResult" />
+  </wsdl:message>
   <wsdl:message name="GetIMNotificationsRequest">
     <wsdl:part name="DoDelete" type="xsd:boolean" />
   </wsdl:message>
@@ -325,6 +334,11 @@
       <documentation>Posts reply to threadid</documentation>
       <wsdl:input message="tns:PostReplyRequest" />
       <wsdl:output message="tns:PostReplyResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="PostNewThread">
+      <documentation>Posts a new thread to ForumID</documentation>
+      <wsdl:input message="tns:PostNewThreadRequest" />
+      <wsdl:output message="tns:PostNewThreadResponse" />
     </wsdl:operation>
     <wsdl:operation name="GetIMNotifications">
       <documentation>Get IM Notifications</documentation>
@@ -444,6 +458,15 @@
     </wsdl:operation>
     <wsdl:operation name="PostReply">
       <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/PostReply" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostNewThread">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/PostNewThread" style="rpc" />
       <wsdl:input>
         <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
       </wsdl:input>
