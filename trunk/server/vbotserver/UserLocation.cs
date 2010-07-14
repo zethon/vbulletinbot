@@ -91,7 +91,6 @@ namespace VBulletinBot
 		{
 			UserLocation ul = new UserLocation();
 
-            
 			if (locType == VBulletinBot.UserLocationType.FORUM)
 			{
 				ul.PerPage = 5;

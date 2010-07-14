@@ -6,8 +6,9 @@ using System.Reflection;
 using System.Data;
 using System.Net;
 using log4net;
-using BotService = VBulletinBot.VBotService.VBotService;
 using VBulletinBot.VBotService;
+
+using BotService = VBulletinBot.VBotService.VBotService;
 
 
 namespace VBulletinBot
@@ -133,6 +134,16 @@ namespace VBulletinBot
                 _strUsername = parser.Parameters[0];
                _connection = new AIMConnection(null, null);
             }
+        }
+
+        public void Test(CommandParser parser)
+        {
+            UserCredentials uc = new UserCredentials();
+            uc.ServiceName = @"gtalk";
+            uc.Username = @"aclaure@gmail.com";
+
+            VBotService.PostReplyResult res = BotService.Instance.PostNewThread(uc, 2, @"title", "page text");
+
         }
 
         [CommandMethod("whoami", "[username] [service alias]")]
