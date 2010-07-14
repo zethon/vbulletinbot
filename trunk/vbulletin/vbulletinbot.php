@@ -656,6 +656,75 @@ function PostReply($who,$threadid,$pagetext)
     return $retval;      
 }
 
+function PostNewThread($who,$forumid,$title,$pagetext)
+{
+    global $db,$vbulletin,$server,$structtypes,$lastpostarray;
+
+    $result = RegisterService($who);
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }
+    
+    $insertid = 0;
+    $foruminfo = fetch_foruminfo($forumid,false);
+    if ($foruminfo['forumid'] > 0)
+    {
+        $userid = 0;             // such is the case for network posts
+        $postuserid = 0;     // same as above
+        $forumid = $foruminfo['forumid'];
+        $pagetext = fetch_censored_text($pagetext);
+        //$title = $title;
+        $allowsmilie = '1';
+        $visible = '1';
+        $dateline = TIMENOW;
+        
+        $threaddm = new vB_DataManager_Thread_FirstPost($vbulletin, ERRTYPE_STANDARD);
+        
+        // there is no (easy) way to parse out an excessive amount of smilies when dong the image check
+        // so we check for [IMG] tags only and then disable the check for smilies
+        #$threaddm->set_info('skip_maximagescheck', true);
+        $threaddm->do_set('userid', $vbulletin->userinfo['userid']);    
+        $threaddm->do_set('username', $vbulletin->userinfo['username']); 
+        $threaddm->do_set('postuserid', $postuserid);
+        $threaddm->do_set('forumid', $forumid);
+        $threaddm->do_set('pagetext', $pagetext);
+        $threaddm->do_set('title', $title);
+        $threaddm->do_set('allowsmilie', $allowsmilie);
+        $threaddm->do_set('visible', $visible);
+        $threaddm->do_set('dateline', $dateline);
+
+        $threaddm->pre_save();        
+        if (count($threaddm->errors) > 0)
+        {
+            return ErrorResult('pre_save_failed_new_thread'); 
+        }
+        else
+        {
+            // save the thread
+            $insertid = $threaddm->save();
+            
+            require_once('./includes/functions_databuild.php'); 
+            build_forum_counters($forumid);
+        }        
+    }
+    
+    if ($insertid > 0)
+    {
+        $retval['PostID'] = $insertid;
+        $retval['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+        
+        $result['Code'] = 1;
+        $retval['Result'] = $result;
+    }
+    else
+    {
+        return ErrorResult('save_failed_thread_reply');  
+    }
+    
+    return $retval;              
+}
+
 function SetIMNotification($who,$on)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
