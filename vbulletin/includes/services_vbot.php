@@ -151,6 +151,17 @@ $server->register(
 );  
 
 $server->register(
+    'PostNewThread',
+    array('UserCredentials'=>'tns:UserCredentials','ForumID'=>'xsd:int','Title'=>'xsd:string','PageText'=>'xsd:string'),
+    array('return'=>'tns:PostReplyResult'),
+    $namespace,
+    false,
+    'rpc',
+    'encoded',
+    'Posts a new thread to ForumID'
+);  
+
+$server->register(
     'GetIMNotifications',
     array('DoDelete'=>'xsd:boolean'),
     array('return'=>'tns:IMNotificationsResult'),
