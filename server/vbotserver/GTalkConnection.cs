@@ -26,38 +26,20 @@ namespace VBulletinBot
             _jc.SSL = false;
             _jc.Proxy = jabber.connection.ProxyType.None;
             _jc.Server = "gmail.com";
-
             _jc.Password = strPassword;
             _jc.User = strUsername;
 
-            //_jc.OnRegisterInfo += new jabber.client.RegisterInfoHandler(this.jc_OnRegisterInfo);
             _jc.OnError += new bedrock.ExceptionHandler(_jc_OnError);
-            //_jc.OnIQ += new jabber.client.IQHandler(this.jc_OnIQ);
-            //_jc.OnAuthenticate += new bedrock.ObjectHandler(this.jc_OnAuthenticate);
-            //_jc.OnStreamError += new jabber.protocol.ProtocolHandler(this.jc_OnStreamError);
             _jc.OnConnect += new jabber.connection.StanzaStreamHandler(this._jc_OnConnect);
             _jc.OnInvalidCertificate += new System.Net.Security.RemoteCertificateValidationCallback(_jc_OnInvalidCertificate);
-            //_jc.OnDisconnect += new bedrock.ObjectHandler(this.jc_OnDisconnect);
             _jc.OnAuthError += new jabber.protocol.ProtocolHandler(_jc_OnAuthError);
-            //_jc.OnRegistered += new jabber.client.IQHandler(this.jc_OnRegistered);
-            //_jc.OnMessage += new jabber.client.MessageHandler(this.jc_OnMessage);
             _jc.OnMessage += new MessageHandler(_jc_OnMessage);
+            _jc.OnDisconnect += new bedrock.ObjectHandler(_jc_OnDisconnect);
+        }
 
-            //_jc = new JabberClient();
-            //_jc.AutoReconnect = 3F;
-            //_jc.AutoStartCompression = true;
-            //_jc.AutoStartTLS = true;
-            //_jc.KeepAlive = 30F;
-            //_jc.LocalCertificate = null;
-
-            //_jc.User = strUsername;
-            //_jc.Password = strPassword;
-            //_jc.Server = "gmail.com";
-            //_jc.NetworkHost = "gmail.com";
-            //_jc.Port = 5222;
-
-            //_jc.OnConnect += new jabber.connection.StanzaStreamHandler(_jc_OnConnect);
-
+        void _jc_OnDisconnect(object sender)
+        {
+            log.Warn("GTalkConnection::_jc_OnDisconnect");
         }
 
         void _jc_OnMessage(object sender, jabber.protocol.client.Message msg)
