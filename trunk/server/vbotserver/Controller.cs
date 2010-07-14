@@ -295,6 +295,10 @@ namespace VBulletinBot
                             retval = GotoNextPost(user, true);
                             break;
 
+                        case @"nt":
+                            retval = NewThread(user);
+                            break;
+
                         case @"p":
                             retval = GotoNextPost(user, false);
                             break;
@@ -1219,6 +1223,59 @@ namespace VBulletinBot
                 }
 
                 user.ResponseChannel.SendMessage(strMessage);
+            }
+        }
+
+        public Result NewThread(LocalUser LocalUser)
+        {
+            System.Threading.Thread replyThread = new System.Threading.Thread(new ParameterizedThreadStart(DoNewThread));
+            replyThread.Start(LocalUser);
+
+            return new Result(ResultCode.Halt, string.Empty);
+        }
+
+        public void DoNewThread(object userObj)
+        {
+            LocalUser user = userObj as LocalUser;
+            UserLocation forumLoc = UserLocation.LoadLocation(UserLocationType.FORUM, user);
+
+            if (forumLoc != null)
+            {
+                string strResponse = string.Format("New Thread:{0}Current Forum: {1}{0}", user.ResponseChannel.NewLine, forumLoc.Title);
+                strResponse += @"Enter new thread title:";
+
+                user.ResponseChannel.SendMessage(strResponse);
+
+                string strThreadTitle = GetString(user);
+
+                if (strThreadTitle == string.Empty)
+                {
+                    user.ResponseChannel.SendMessage(@"No post entered");
+                    return;
+                }
+
+                strResponse = @"Enter post text:";
+                user.ResponseChannel.SendMessage(strResponse);
+                string strPost = GetString(user);
+
+                if (GetConfirmation(user))
+                {
+                    VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+                    VBotService.PostReplyResult r = BotService.Instance.PostNewThread(uc, (int)forumLoc.LocationRemoteID, strThreadTitle, strPost);
+
+                    if (r.Result.Code != 0 && r.PostID > 0)
+                    {
+                        user.ResponseChannel.SendMessage(@"Post submitted successfully.");
+                    }
+                    else
+                    {
+                        user.ResponseChannel.SendMessage(@"There was an error submitting the post.");
+                    }
+                }
+            }
+            else
+            {
+                user.ResponseChannel.SendMessage(@"No current forum. Use `lf` to browse to a forum.");
             }
         }
 
