@@ -30,6 +30,7 @@ $db->query_write("CREATE TABLE IF NOT EXISTS " . TABLE_PREFIX . "imnotification
 	  imnotificationid int(11) NOT NULL auto_increment,
 	  userid int(11) NOT NULL,
 	  postid int(11) NOT NULL,
+	  threadid int(11) NOT NULL,
   	dateline TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	  
 	  PRIMARY KEY  (imnotificationid)
 	);
@@ -50,7 +51,7 @@ $db->query_write("ALTER TABLE " . TABLE_PREFIX . "user DROP instantimservice");
 $db->query_write("ALTER TABLE " . TABLE_PREFIX . "user DROP instantimscreenname");
 
 // drop the im notification table
-$db->query_write("DROP TABLE imnotification;");
+$db->query_write("DROP TABLE " . TABLE_PREFIX . "imnotification;");
 
 // show errors
 $db->show_errors();
