@@ -15,6 +15,21 @@ namespace VBulletinBot
 		public LocalUser User;
 		public List<string> IDList = new List<string>();
 
+        public int GetIDListIndexOf(int iIndex)
+        {
+            int iRet = 0;
+
+            if (iIndex < IDList.Count())
+            {
+                if (!int.TryParse(IDList[iIndex], out iRet))
+                {
+                    log.ErrorFormat("Could not parse item in IDList: iIndex = {0}, IDList[iIndex] = {1}", iIndex, IDList[iIndex]);
+                }
+            }
+
+            return iRet;
+        }
+
 		public UserLocationType GetUserLocationType()
 		{
 			return (UserLocationType)Enum.Parse(typeof(UserLocationType), UserLocationType, true);
