@@ -105,7 +105,9 @@ namespace VBulletinBot
                             string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
 
                             string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
-                            strResponse += FetchPostBit(not.Post, c.NewLine) + c.NewLine;
+
+                            // TODO: get the index of the post
+                            strResponse += FetchPostBit(not.Post, 0,c.NewLine) + c.NewLine;
                             strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
 
                             ResponseChannel rc = new VBulletinBot.ResponseChannel(strScreenName, c);
@@ -235,7 +237,7 @@ namespace VBulletinBot
                                 break;
 
                             case @"post":
-                                retval = GotoPostIndex(iListChoice, user);
+                                retval = GotoPostIndex(iListChoice, user, parser);
                                 break;
 
                             default:
@@ -252,6 +254,7 @@ namespace VBulletinBot
                 { // assume a command was entered
                     switch (parser.ApplicationName.ToLower())
                     {
+                        #region long switch statement to be refactored
                         case @"\":
                         case "/":
                             retval = GotoForumIndex(-1, user, true);
@@ -259,6 +262,10 @@ namespace VBulletinBot
 
                         case @".":
                             retval = GotoParentForum(user);
+                            break;
+
+                        case @"cp":
+                            retval = GotoPostIndex(user.PostIndex,user,parser);
                             break;
 
                         case @"gt":
@@ -329,6 +336,8 @@ namespace VBulletinBot
                         default:
                             retval = new Result(ResultCode.Error, @"Unknown command. Please see http://code.google.com/p/vbulletinbot/ for help.");
                         break;
+
+                        #endregion 
                     }
                 }
             }
@@ -336,14 +345,14 @@ namespace VBulletinBot
             return retval;
         }
 
-        public string FetchPostBit(VBotService.Post post, string strNewLine)
+        public string FetchPostBit(VBotService.Post post, int iIndex, string strNewLine)
         {
             string strResponse = string.Empty;
 
             string strPageText = post.PageText;
             strResponse += strNewLine;
             strResponse += string.Format("{0}", strPageText) + strNewLine;
-            strResponse += string.Format("{0} by {1}", post.GetFriendlyDate(), post.Username);
+            strResponse += string.Format("Post #{0} {1} by {2}", iIndex, post.GetFriendlyDate(), post.Username);
 
             return strResponse;
         }
@@ -493,21 +502,43 @@ namespace VBulletinBot
             return ret;
         }
 
+
+
         public Result GotoPostIndex(int iChoice, LocalUser user)
         {
+            return GotoPostIndex(iChoice, user, null);
+        }
+
+        public Result GotoPostIndex(int iChoice, LocalUser user, CommandParser parser)
+        {
             Result rs = null;
+            bool bShowBBCode = false;
+
+            if (parser != null)
+            {
+                // TODO: need to refactor/rewrite the command parser
+                foreach (string strOption in parser.Parameters)
+                {
+                    if (strOption.ToLower() == "q")
+                    {
+                        bShowBBCode = true;
+                        break;
+                    }
+                }
+            }
+
             UserLocation curPostLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
             if (curPostLoc != null)
             {
                 VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
-                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, (int)curPostLoc.LocationRemoteID, iChoice);
+                VBotService.GetPostResult r = BotService.Instance.GetPostByIndex(uc, (int)curPostLoc.LocationRemoteID, iChoice, bShowBBCode);
 
                 if (r.Result.Code == 0)
                 {
                     if (r.Post != null && r.Post.PostID > 0)
                     {
-                        string strText = FetchPostBit(r.Post, ResponseChannel.Connection.NewLine);
+                        string strText = FetchPostBit(r.Post, iChoice, ResponseChannel.Connection.NewLine);
                         user.SaveLastPostIndex(iChoice);
                         rs = new Result(ResultCode.Success, strText);
                     }
