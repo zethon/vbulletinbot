@@ -250,6 +250,7 @@
     <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
     <wsdl:part name="ThreadID" type="xsd:int" />
     <wsdl:part name="PageText" type="xsd:string" />
+    <wsdl:part name="QuotePostID" type="xsd:int" />
   </wsdl:message>
   <wsdl:message name="PostReplyResponse">
     <wsdl:part name="return" type="tns:PostReplyResult" />
@@ -486,7 +487,7 @@
   </wsdl:binding>
   <wsdl:service name="VBotService">
     <wsdl:port name="VBotServicePort" binding="tns:VBotServiceBinding">
-      <soap:address location="http://www.anothermessageboard.com/vbulletinbot.php" />
+      <soap:address location="http://www.anothermessageboard.com/vbulletinbot.php?debug=1" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
