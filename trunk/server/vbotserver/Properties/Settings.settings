@@ -11,7 +11,7 @@
       <Value Profile="(Default)">Data Source=|DataDirectory|\Database1.sdf</Value>
     </Setting>
     <Setting Name="VBulletinBot_VBotService_VBotService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://www.anothermessageboard.com/vbulletinbot.php?debug=1</Value>
+      <Value Profile="(Default)">http://www.anothermessageboard.com/vbulletinbot.php</Value>
     </Setting>
     <Setting Name="VBulletinBot_VBulletinBot_VBotService" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://www.juot.net/forums/vbulletinbot.php</Value>

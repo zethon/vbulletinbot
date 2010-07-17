@@ -36,7 +36,7 @@ namespace VBulletinBot.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://www.anothermessageboard.com/vbulletinbot.php?debug=1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.anothermessageboard.com/vbulletinbot.php")]
         public string VBulletinBot_VBotService_VBotService {
             get {
                 return ((string)(this["VBulletinBot_VBotService_VBotService"]));
