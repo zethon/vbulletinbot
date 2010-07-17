@@ -200,6 +200,7 @@
     <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
     <wsdl:part name="ThreadID" type="xsd:int" />
     <wsdl:part name="Index" type="xsd:int" />
+    <wsdl:part name="ShowBBCode" type="xsd:boolean" />
   </wsdl:message>
   <wsdl:message name="GetPostByIndexResponse">
     <wsdl:part name="return" type="tns:GetPostResult" />
@@ -487,7 +488,7 @@
   </wsdl:binding>
   <wsdl:service name="VBotService">
     <wsdl:port name="VBotServicePort" binding="tns:VBotServiceBinding">
-      <soap:address location="http://www.anothermessageboard.com/vbulletinbot.php?debug=1" />
+      <soap:address location="http://www.anothermessageboard.com/vbulletinbot.php" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

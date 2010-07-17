@@ -312,28 +312,30 @@ namespace VBulletinBot.VBotService {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/GetPostByIndex", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
         [return: System.Xml.Serialization.SoapElementAttribute("return")]
-        public GetPostResult GetPostByIndex(UserCredentials UserCredentials, int ThreadID, int Index) {
+        public GetPostResult GetPostByIndex(UserCredentials UserCredentials, int ThreadID, int Index, bool ShowBBCode) {
             object[] results = this.Invoke("GetPostByIndex", new object[] {
                         UserCredentials,
                         ThreadID,
-                        Index});
+                        Index,
+                        ShowBBCode});
             return ((GetPostResult)(results[0]));
         }
         
         /// <remarks/>
-        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index) {
-            this.GetPostByIndexAsync(UserCredentials, ThreadID, Index, null);
+        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index, bool ShowBBCode) {
+            this.GetPostByIndexAsync(UserCredentials, ThreadID, Index, ShowBBCode, null);
         }
         
         /// <remarks/>
-        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index, object userState) {
+        public void GetPostByIndexAsync(UserCredentials UserCredentials, int ThreadID, int Index, bool ShowBBCode, object userState) {
             if ((this.GetPostByIndexOperationCompleted == null)) {
                 this.GetPostByIndexOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetPostByIndexOperationCompleted);
             }
             this.InvokeAsync("GetPostByIndex", new object[] {
                         UserCredentials,
                         ThreadID,
-                        Index}, this.GetPostByIndexOperationCompleted, userState);
+                        Index,
+                        ShowBBCode}, this.GetPostByIndexOperationCompleted, userState);
         }
         
         private void OnGetPostByIndexOperationCompleted(object arg) {
