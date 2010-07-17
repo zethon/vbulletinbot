@@ -93,7 +93,7 @@ function RegisterService($who)
 	return $result;
 }
 
-function GetPostByIndex($who,$threadid,$index)
+function GetPostByIndex($who,$threadid,$index,$showbbcode = false)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
     
@@ -110,7 +110,11 @@ function GetPostByIndex($who,$threadid,$index)
         
         if (is_array($postinfo))
         {
-            $postinfo['pagetext'] = strip_bbcode($postinfo['pagetext'],true,false,false);  
+            if (!$showbbcode)
+            {
+                $postinfo['pagetext'] = strip_bbcode($postinfo['pagetext'],true,false,false);  
+            }
+            
             $retval['Post'] = ConsumeArray($postinfo,$structtypes['Post']);    
         }
     
