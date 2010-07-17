@@ -25,6 +25,7 @@ require_once(DIR . '/includes/class_xml.php');
 require_once(DIR . '/includes/functions_bigthree.php');
 require_once(DIR . '/includes/functions_forumlist.php');
 require_once(DIR . '/includes/functions_vbot.php');
+require_once(DIR . '/includes/functions_newpost.php');
 
 // #######################################################################
 // ######################## START MAIN SCRIPT ############################
@@ -604,7 +605,7 @@ function MarkThreadRead($who,$threadid)
     return $retval;      
 }
 
-function PostReply($who,$threadid,$pagetext)
+function PostReply($who,$threadid,$pagetext,$quotepostid = 0)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
 
@@ -623,10 +624,19 @@ function PostReply($who,$threadid,$pagetext)
     $postdm->set_info('thread', $threadinfo);  
     $postdm->set('threadid', $threadid);    
     $postdm->set('userid', $vbulletin->userinfo['userid']);    
-    $postdm->set('pagetext', $pagetext);
     $postdm->set('allowsmilie', 1);
     $postdm->set('visible', 1);
     $postdm->set('dateline', TIMENOW);        
+    
+    if ($quotepostid > 0)
+    {
+        $quote_postids[] = $quotepostid;
+        $quotetxt = fetch_quotable_posts($quote_postids,$threadinfo['threadid'],$unquoted_post_count, $quoted_post_ids, 'only');
+        $pagetext = "$quotetxt$pagetext";
+    }
+    
+    $postdm->set('pagetext', "$pagetext");                                 
+    
     
     $postdm->pre_save();
     $postid = 0;
@@ -648,11 +658,13 @@ function PostReply($who,$threadid,$pagetext)
     }    
     
     $retval['PostID'] = $postid;
-    $retval['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
-    
+
     $result['Code'] = 1;
+    $result['Text'] = "QuotePostID: $quotepostid";
+    $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']); 
+                                                     
     $retval['Result'] = $result;
-    
+
     return $retval;      
 }
 
@@ -902,7 +914,8 @@ include (DIR . '/includes/services_vbot.php');
 $HTTP_RAW_POST_DATA = isset($GLOBALS['HTTP_RAW_POST_DATA']) 
                 ? $GLOBALS['HTTP_RAW_POST_DATA'] : '';
 
-// pass our posted data (or nothing) to the soap service                    
+// pass our posted data (or nothing) to the soap service    
+//$server->debug_flag = true;
 $server->service($HTTP_RAW_POST_DATA);                
 exit();
 ?>
