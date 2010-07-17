@@ -519,7 +519,7 @@ namespace VBulletinBot
                 // TODO: need to refactor/rewrite the command parser
                 foreach (string strOption in parser.Parameters)
                 {
-                    if (strOption.ToLower() == "q")
+                    if (strOption.ToLower() == "b")
                     {
                         bShowBBCode = true;
                         break;
