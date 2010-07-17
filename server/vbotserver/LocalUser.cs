@@ -14,6 +14,22 @@ namespace VBulletinBot
         
         public ResponseChannel ResponseChannel;
 
+        public int PostIndex
+        {
+            get
+            {
+                int iRet = 0;
+                UserPostIndex upi = VBotDB.Instance.UserPostIndexes.FirstOrDefault(u => u.LocalUserID == LocalUserID);
+
+                if (upi != null)
+                {
+                    iRet = (int)upi.PostIndex;
+                }
+
+                return iRet;
+            }
+        }
+
         public void SaveLastList(string strLastList)
         {
             UserLastList ll = VBotDB.Instance.UserLastLists.FirstOrDefault(l => l.LocalUserID == LocalUserID);
