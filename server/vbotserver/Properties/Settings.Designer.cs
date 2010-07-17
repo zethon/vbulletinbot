@@ -36,10 +36,19 @@ namespace VBulletinBot.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://www.anothermessageboard.com/vbulletinbot.php")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.anothermessageboard.com/vbulletinbot.php?debug=1")]
         public string VBulletinBot_VBotService_VBotService {
             get {
                 return ((string)(this["VBulletinBot_VBotService_VBotService"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www.juot.net/forums/vbulletinbot.php")]
+        public string VBulletinBot_VBulletinBot_VBotService {
+            get {
+                return ((string)(this["VBulletinBot_VBulletinBot_VBotService"]));
             }
         }
     }
