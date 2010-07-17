@@ -54,7 +54,6 @@ namespace VBulletinBot
                 VBotDB.Instance.CreateDatabase();
             }
 
-            log.InfoFormat("ServiceURL: {0}", botconfig.WebServiceURL);
             log.InfoFormat("Total IM Services Loaded: {0}", botconfig.IMServices.Count);
 
             _conComp = ConnectionComposite.MakeConnectionComposite(botconfig);
@@ -225,7 +224,6 @@ namespace VBulletinBot
 
                     if (ll != null)
                     {
-
                         switch (ll.Name)
                         {
                             case @"forum":
@@ -304,7 +302,11 @@ namespace VBulletinBot
                             break;
 
                         case @"r":
-                            retval = ThreadReply(user);
+                            retval = ThreadReply(user,false);
+                            break;
+
+                        case @"rq":
+                            retval = ThreadReply(user, true);
                             break;
 
                         case "sub":
@@ -1279,17 +1281,32 @@ namespace VBulletinBot
             }
         }
 
-        public Result ThreadReply(LocalUser user)
+        public Result ThreadReply(LocalUser user, bool bDoQuote)
         {
             System.Threading.Thread replyThread = new System.Threading.Thread(new ParameterizedThreadStart(DoThreadReply));
-            replyThread.Start(user);
+            
+            replyThread.Start(new object[] { user, bDoQuote} );
 
             return new Result(ResultCode.Halt, string.Empty);
         }
 
-        public void DoThreadReply(object userObj)
+        public void DoThreadReply(object obj)
         {
-            LocalUser user = userObj as LocalUser;
+            object[] objs = obj as object[];
+
+            if (obj == null)
+            {
+                throw new Exception(@"Could not cast DoThreadTreply parameters correctly");
+            }
+
+            LocalUser user = objs[0] as LocalUser;
+            bool? bDoQuote = objs[1] as bool?;
+
+            if (user == null || bDoQuote == null)
+            {
+                throw new Exception(@"Invalid cast of 'user' or 'bDoQuote' in DoThreadReply");
+            }
+
             UserLocation postLoc = UserLocation.LoadLocation(UserLocationType.POST, user);
 
             if (postLoc != null)
@@ -1305,9 +1322,24 @@ namespace VBulletinBot
                 {
                     if (GetConfirmation(user))
                     {
-                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
-                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, (int)postLoc.LocationRemoteID, strPostText);
+                        int iOriginalPostId = 0;
+                        if (bDoQuote != null && (bool)bDoQuote)
+                        {
+                            UserLocation postLost = UserLocation.LoadLocation(UserLocationType.POST, user);
+                            int iPostIndex = user.PostIndex;
 
+                            if (postLoc != null && iPostIndex > 0)
+                            {
+                                // user.PostIndex is 1 based array, IDList is zero based
+                                iOriginalPostId = postLoc.GetIDListIndexOf(iPostIndex-1);
+                            }
+                        }
+
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
+
+                        log.DebugFormat("PostReply Parameters: LocationRemoteID: {0}, iOriginalPostId: {1}", postLoc.LocationRemoteID, iOriginalPostId);
+                        VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, (int)postLoc.LocationRemoteID, strPostText, iOriginalPostId);
+                        
                         if (r.Result.Code != 0 && r.PostID > 0)
                         {
                             user.ResponseChannel.SendMessage(@"Post submitted successfully.");
