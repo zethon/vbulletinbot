@@ -13,20 +13,6 @@ namespace VBulletinBot
         {
         }
 
-        [ConfigurationProperty("webserviceurl", IsRequired = true)]
-        public string WebServiceURL
-        {
-            get
-            {
-                return (base["webserviceurl"] as string);
-            }
-
-            set
-            {
-                base["webserviceurl"] = value;
-            }
-        }
-
         [ConfigurationProperty("webservicepw", IsRequired = true)]
         public string WebServicePassword
         {
