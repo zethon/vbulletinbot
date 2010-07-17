@@ -538,28 +538,30 @@ namespace VBulletinBot.VBotService {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("http://www.anothermessageboard.com/vbulletinbot.php/PostReply", RequestNamespace="http://www.anothermessageboard.com", ResponseNamespace="http://www.anothermessageboard.com")]
         [return: System.Xml.Serialization.SoapElementAttribute("return")]
-        public PostReplyResult PostReply(UserCredentials UserCredentials, int ThreadID, string PageText) {
+        public PostReplyResult PostReply(UserCredentials UserCredentials, int ThreadID, string PageText, int QuotePostID) {
             object[] results = this.Invoke("PostReply", new object[] {
                         UserCredentials,
                         ThreadID,
-                        PageText});
+                        PageText,
+                        QuotePostID});
             return ((PostReplyResult)(results[0]));
         }
         
         /// <remarks/>
-        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText) {
-            this.PostReplyAsync(UserCredentials, ThreadID, PageText, null);
+        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText, int QuotePostID) {
+            this.PostReplyAsync(UserCredentials, ThreadID, PageText, QuotePostID, null);
         }
         
         /// <remarks/>
-        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText, object userState) {
+        public void PostReplyAsync(UserCredentials UserCredentials, int ThreadID, string PageText, int QuotePostID, object userState) {
             if ((this.PostReplyOperationCompleted == null)) {
                 this.PostReplyOperationCompleted = new System.Threading.SendOrPostCallback(this.OnPostReplyOperationCompleted);
             }
             this.InvokeAsync("PostReply", new object[] {
                         UserCredentials,
                         ThreadID,
-                        PageText}, this.PostReplyOperationCompleted, userState);
+                        PageText,
+                        QuotePostID}, this.PostReplyOperationCompleted, userState);
         }
         
         private void OnPostReplyOperationCompleted(object arg) {
