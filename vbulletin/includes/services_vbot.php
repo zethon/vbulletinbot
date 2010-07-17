@@ -141,7 +141,7 @@ $server->register(
             
 $server->register(
     'PostReply',
-    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int','PageText'=>'xsd:string'),
+    array('UserCredentials'=>'tns:UserCredentials','ThreadID'=>'xsd:int','PageText'=>'xsd:string','QuotePostID'=>'xsd:int'),
     array('return'=>'tns:PostReplyResult'),
     $namespace,
     false,
