@@ -54,6 +54,7 @@
           <xsd:element name="PageText" type="xsd:string" />
           <xsd:element name="Title" type="xsd:string" />
           <xsd:element name="DateLine" type="xsd:int" />
+          <xsd:element name="DateLineText" type="xsd:string" />
           <xsd:element name="IpAddress" type="xsd:string" />
           <xsd:element name="IsNew" type="xsd:boolean" />
         </xsd:all>
