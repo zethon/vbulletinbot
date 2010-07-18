@@ -847,6 +847,8 @@ namespace VBulletinBot.VBotService {
         
         private int dateLineField;
         
+        private string dateLineTextField;
+        
         private string ipAddressField;
         
         private bool isNewField;
@@ -902,6 +904,16 @@ namespace VBulletinBot.VBotService {
         }
         
         /// <remarks/>
+        public string DateLineText {
+            get {
+                return this.dateLineTextField;
+            }
+            set {
+                this.dateLineTextField = value;
+            }
+        }
+        
+        /// <remarks/>
         public string IpAddress {
             get {
                 return this.ipAddressField;
@@ -953,6 +965,8 @@ namespace VBulletinBot.VBotService {
         private bool isNewField;
         
         private int dateLineField;
+        
+        private string dateLineTextField;
         
         /// <remarks/>
         public int ThreadID {
@@ -1071,6 +1085,16 @@ namespace VBulletinBot.VBotService {
             }
             set {
                 this.dateLineField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string DateLineText {
+            get {
+                return this.dateLineTextField;
+            }
+            set {
+                this.dateLineTextField = value;
             }
         }
     }

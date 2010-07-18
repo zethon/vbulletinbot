@@ -45,6 +45,7 @@
           <xsd:element name="IsSubscribed" type="xsd:boolean" />
           <xsd:element name="IsNew" type="xsd:boolean" />
           <xsd:element name="DateLine" type="xsd:int" />
+          <xsd:element name="DateLineText" type="xsd:string" />
         </xsd:all>
       </xsd:complexType>
       <xsd:complexType name="Post">
