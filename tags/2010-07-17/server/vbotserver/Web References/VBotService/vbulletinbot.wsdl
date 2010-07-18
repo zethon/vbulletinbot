@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:VBotService" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="urn:VBotService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:VBotService">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+      <xsd:complexType name="RequestResult">
+        <xsd:all>
+          <xsd:element name="Code" type="xsd:int" />
+          <xsd:element name="Text" type="xsd:string" />
+          <xsd:element name="RemoteUser" type="tns:RemoteUser" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="UserCredentials">
+        <xsd:all>
+          <xsd:element name="Username" type="xsd:string" />
+          <xsd:element name="ServiceName" type="xsd:string" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="RemoteUser">
+        <xsd:all>
+          <xsd:element name="UserID" type="xsd:int" />
+          <xsd:element name="Username" type="xsd:string" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Forum">
+        <xsd:all>
+          <xsd:element name="ForumID" type="xsd:int" />
+          <xsd:element name="Title" type="xsd:string" />
+          <xsd:element name="IsNew" type="xsd:boolean" />
+          <xsd:element name="IsCurrent" type="xsd:boolean" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Thread">
+        <xsd:all>
+          <xsd:element name="ThreadID" type="xsd:int" />
+          <xsd:element name="ThreadTitle" type="xsd:string" />
+          <xsd:element name="Title" type="xsd:string" />
+          <xsd:element name="ForumID" type="xsd:int" />
+          <xsd:element name="PostID" type="xsd:int" />
+          <xsd:element name="LastPost" type="xsd:int" />
+          <xsd:element name="LastPoster" type="xsd:string" />
+          <xsd:element name="PostUsername" type="xsd:string" />
+          <xsd:element name="ReplyCount" type="xsd:int" />
+          <xsd:element name="IsSubscribed" type="xsd:boolean" />
+          <xsd:element name="IsNew" type="xsd:boolean" />
+          <xsd:element name="DateLine" type="xsd:int" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Post">
+        <xsd:all>
+          <xsd:element name="PostID" type="xsd:int" />
+          <xsd:element name="Username" type="xsd:string" />
+          <xsd:element name="PageText" type="xsd:string" />
+          <xsd:element name="Title" type="xsd:string" />
+          <xsd:element name="DateLine" type="xsd:int" />
+          <xsd:element name="IpAddress" type="xsd:string" />
+          <xsd:element name="IsNew" type="xsd:boolean" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="IMNotificationInfo">
+        <xsd:all>
+          <xsd:element name="IMNotificationID" type="xsd:int" />
+          <xsd:element name="InstantIMService" type="xsd:string" />
+          <xsd:element name="InstantIMScreenname" type="xsd:string" />
+          <xsd:element name="PostDateLine" type="xsd:int" />
+          <xsd:element name="ThreadTitle" type="xsd:string" />
+          <xsd:element name="NewPostUsername" type="xsd:string" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="IMNotification">
+        <xsd:all>
+          <xsd:element name="IMNotificationInfo" type="tns:IMNotificationInfo" />
+          <xsd:element name="Post" type="tns:Post" />
+          <xsd:element name="Thread" type="tns:Thread" />
+          <xsd:element name="Forum" type="tns:Forum" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="ForumListResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="CurrentForum" type="tns:Forum" />
+          <xsd:element name="ForumList" type="tns:ForumArray" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="ThreadListResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="ThreadList" type="tns:ThreadArray" />
+          <xsd:element name="ThreadCount" type="xsd:int" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="PostListResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="Thread" type="tns:Thread" />
+          <xsd:element name="PostList" type="tns:PostArray" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="GetPostResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="Post" type="tns:Post" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="GetThreadResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="Thread" type="tns:Thread" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="PostReplyResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="PostID" type="xsd:int" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="IMNotificationsResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="IMNotificationList" type="tns:IMNotificationArray" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="RemoteUserArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:RemoteUser[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="ForumArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:Forum[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="ThreadArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:Thread[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="PostArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:Post[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="IMNotificationArray">
+        <xsd:complexContent mixed="false">
+          <xsd:restriction base="SOAP-ENC:Array">
+            <xsd:attribute wsdl:arrayType="tns:IMNotification[]" ref="SOAP-ENC:arrayType" />
+          </xsd:restriction>
+        </xsd:complexContent>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="WhoAmIRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="WhoAmIResponse">
+    <wsdl:part name="return" type="tns:RequestResult" />
+  </wsdl:message>
+  <wsdl:message name="ListForumsRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="ListForumsResponse">
+    <wsdl:part name="return" type="tns:ForumListResult" />
+  </wsdl:message>
+  <wsdl:message name="ListParentForumsRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="ListParentForumsResponse">
+    <wsdl:part name="return" type="tns:ForumListResult" />
+  </wsdl:message>
+  <wsdl:message name="ListThreadsRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+    <wsdl:part name="PageNumber" type="xsd:int" />
+    <wsdl:part name="PerPage" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="ListThreadsResponse">
+    <wsdl:part name="return" type="tns:ThreadListResult" />
+  </wsdl:message>
+  <wsdl:message name="ListPostsRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+    <wsdl:part name="PageNumber" type="xsd:int" />
+    <wsdl:part name="PerPage" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="ListPostsResponse">
+    <wsdl:part name="return" type="tns:PostListResult" />
+  </wsdl:message>
+  <wsdl:message name="GetPostByIndexRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+    <wsdl:part name="Index" type="xsd:int" />
+    <wsdl:part name="ShowBBCode" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="GetPostByIndexResponse">
+    <wsdl:part name="return" type="tns:GetPostResult" />
+  </wsdl:message>
+  <wsdl:message name="GetThreadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="GetThreadResponse">
+    <wsdl:part name="return" type="tns:GetThreadResult" />
+  </wsdl:message>
+  <wsdl:message name="SubscribeThreadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="SubscribeThreadResponse">
+    <wsdl:part name="return" type="tns:GetThreadResult" />
+  </wsdl:message>
+  <wsdl:message name="UnSubscribeThreadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="UnSubscribeThreadResponse">
+    <wsdl:part name="return" type="tns:RequestResult" />
+  </wsdl:message>
+  <wsdl:message name="MarkForumReadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="MarkForumReadResponse">
+    <wsdl:part name="return" type="tns:RequestResult" />
+  </wsdl:message>
+  <wsdl:message name="MarkThreadReadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="MarkThreadReadResponse">
+    <wsdl:part name="return" type="tns:RequestResult" />
+  </wsdl:message>
+  <wsdl:message name="SetIMNotificationRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="On" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="SetIMNotificationResponse">
+    <wsdl:part name="return" type="tns:RequestResult" />
+  </wsdl:message>
+  <wsdl:message name="PostReplyRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ThreadID" type="xsd:int" />
+    <wsdl:part name="PageText" type="xsd:string" />
+    <wsdl:part name="QuotePostID" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="PostReplyResponse">
+    <wsdl:part name="return" type="tns:PostReplyResult" />
+  </wsdl:message>
+  <wsdl:message name="PostNewThreadRequest">
+    <wsdl:part name="UserCredentials" type="tns:UserCredentials" />
+    <wsdl:part name="ForumID" type="xsd:int" />
+    <wsdl:part name="Title" type="xsd:string" />
+    <wsdl:part name="PageText" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="PostNewThreadResponse">
+    <wsdl:part name="return" type="tns:PostReplyResult" />
+  </wsdl:message>
+  <wsdl:message name="GetIMNotificationsRequest">
+    <wsdl:part name="DoDelete" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="GetIMNotificationsResponse">
+    <wsdl:part name="return" type="tns:IMNotificationsResult" />
+  </wsdl:message>
+  <wsdl:portType name="VBotServicePortType">
+    <wsdl:operation name="WhoAmI">
+      <documentation>Returns the user information of the associated user credentials</documentation>
+      <wsdl:input message="tns:WhoAmIRequest" />
+      <wsdl:output message="tns:WhoAmIResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ListForums">
+      <documentation>Returns a list of forums of the associated forumid</documentation>
+      <wsdl:input message="tns:ListForumsRequest" />
+      <wsdl:output message="tns:ListForumsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ListParentForums">
+      <documentation>Returns a list of forums of the associated forumid</documentation>
+      <wsdl:input message="tns:ListParentForumsRequest" />
+      <wsdl:output message="tns:ListParentForumsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ListThreads">
+      <documentation>Returns a list of forums of the associated forumid</documentation>
+      <wsdl:input message="tns:ListThreadsRequest" />
+      <wsdl:output message="tns:ListThreadsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="ListPosts">
+      <documentation>Returns a list of posts of the associated threadid</documentation>
+      <wsdl:input message="tns:ListPostsRequest" />
+      <wsdl:output message="tns:ListPostsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPostByIndex">
+      <documentation>Resturns post information by index in the thread</documentation>
+      <wsdl:input message="tns:GetPostByIndexRequest" />
+      <wsdl:output message="tns:GetPostByIndexResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThread">
+      <documentation>Resturns thread information of the given threadid</documentation>
+      <wsdl:input message="tns:GetThreadRequest" />
+      <wsdl:output message="tns:GetThreadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="SubscribeThread">
+      <documentation>Subscribes user to threadid and returns the thread info</documentation>
+      <wsdl:input message="tns:SubscribeThreadRequest" />
+      <wsdl:output message="tns:SubscribeThreadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="UnSubscribeThread">
+      <documentation>Subscribes user to threadid and returns the thread info</documentation>
+      <wsdl:input message="tns:UnSubscribeThreadRequest" />
+      <wsdl:output message="tns:UnSubscribeThreadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="MarkForumRead">
+      <documentation>Subscribes user to threadid and returns the thread info</documentation>
+      <wsdl:input message="tns:MarkForumReadRequest" />
+      <wsdl:output message="tns:MarkForumReadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="MarkThreadRead">
+      <documentation>Subscribes user to threadid and returns the thread info</documentation>
+      <wsdl:input message="tns:MarkThreadReadRequest" />
+      <wsdl:output message="tns:MarkThreadReadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="SetIMNotification">
+      <documentation>Turns IM notifications on and off</documentation>
+      <wsdl:input message="tns:SetIMNotificationRequest" />
+      <wsdl:output message="tns:SetIMNotificationResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="PostReply">
+      <documentation>Posts reply to threadid</documentation>
+      <wsdl:input message="tns:PostReplyRequest" />
+      <wsdl:output message="tns:PostReplyResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="PostNewThread">
+      <documentation>Posts a new thread to ForumID</documentation>
+      <wsdl:input message="tns:PostNewThreadRequest" />
+      <wsdl:output message="tns:PostNewThreadResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIMNotifications">
+      <documentation>Get IM Notifications</documentation>
+      <wsdl:input message="tns:GetIMNotificationsRequest" />
+      <wsdl:output message="tns:GetIMNotificationsResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VBotServiceBinding" type="tns:VBotServicePortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="WhoAmI">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/WhoAmI" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListForums">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListForums" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListParentForums">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListParentForums" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListThreads">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListThreads" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListPosts">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/ListPosts" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPostByIndex">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/GetPostByIndex" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThread">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/GetThread" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubscribeThread">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/SubscribeThread" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnSubscribeThread">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/UnSubscribeThread" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MarkForumRead">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/MarkForumRead" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MarkThreadRead">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/MarkThreadRead" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetIMNotification">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/SetIMNotification" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostReply">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/PostReply" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PostNewThread">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/PostNewThread" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIMNotifications">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/GetIMNotifications" style="rpc" />
+      <wsdl:input>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VBotService">
+    <wsdl:port name="VBotServicePort" binding="tns:VBotServiceBinding">
+      <soap:address location="http://www.anothermessageboard.com/vbulletinbot.php" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
