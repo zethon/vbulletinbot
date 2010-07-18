@@ -352,7 +352,7 @@ namespace VBulletinBot
             string strPageText = post.PageText;
             strResponse += strNewLine;
             strResponse += string.Format("{0}", strPageText) + strNewLine;
-            strResponse += string.Format("Post #{0} {1} by {2}", iIndex, post.GetFriendlyDate(), post.Username);
+            strResponse += string.Format("Post #{0} {1} by {2}", iIndex, post.DateLineText, post.Username);
 
             return strResponse;
         }
