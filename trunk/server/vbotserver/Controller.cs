@@ -107,6 +107,8 @@ namespace VBulletinBot
                             string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
 
                             // TODO: get the index of the post
+                            //strResponse += c.FetchTemplate(@"postbit",new object[] { not, 0 });
+
                             strResponse += FetchPostBit(not.Post, 0,c.NewLine) + c.NewLine;
                             strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
 
@@ -584,7 +586,7 @@ namespace VBulletinBot
                         // TODO: build the postLoc location title here
                         postLoc.Title = string.Format("{0} - {1} created by {2}",
                                         Regex.Replace(r.Thread.ThreadTitle, @"[\']", string.Empty),
-                                        r.Thread.GetFriendlyDate(r.Thread.DateLine),
+                                        r.Thread.DateLineText,
                                         r.Thread.PostUsername);
 
                         postLoc.LocationRemoteID = iNewThreadID;
@@ -647,7 +649,7 @@ namespace VBulletinBot
                             // TODO: build the postLoc location title here
                             postLoc.Title = string.Format("{0} - {1} created by {2}",
                                             Regex.Replace(r.Thread.ThreadTitle, @"[\']", string.Empty),
-                                            r.Thread.GetFriendlyDate(r.Thread.DateLine),
+                                            r.Thread.DateLineText,
                                             r.Thread.PostUsername);
 
                             postLoc.LocationRemoteID = iNewThreadID;
@@ -807,7 +809,7 @@ namespace VBulletinBot
                                             iCount,
                                             strIsNew,
                                             postInfo.GetShortPostText(),
-                                            postInfo.GetFriendlyDate(),
+                                            postInfo.DateLineText,
                                             postInfo.Username
                                         );
 
@@ -926,7 +928,7 @@ namespace VBulletinBot
                                                 thread.ThreadTitle,
                                                 strID,
                                                 thread.ReplyCount + 1,
-                                                thread.GetFriendlyDate(),
+                                                thread.DateLineText,
                                                 thread.LastPoster
                                             );
                             iCount++;
