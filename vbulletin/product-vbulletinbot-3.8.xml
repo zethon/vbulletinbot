@@ -24,15 +24,15 @@ $db->query_write("ALTER TABLE " . TABLE_PREFIX . "user ADD instantimnotification
 $db->query_write("ALTER TABLE " . TABLE_PREFIX . "user ADD instantimservice VARCHAR(255) NOT NULL");
 $db->query_write("ALTER TABLE " . TABLE_PREFIX . "user ADD instantimscreenname VARCHAR(255) NOT NULL");
 
-// create im notification table
-$db->query_write("CREATE TABLE IF NOT EXISTS " . TABLE_PREFIX . "imnotification
+$db->query_write("CREATE TABLE IF NOT EXISTS " . TABLE_PREFIX . "vbotnotificaion
 	(
-	  imnotificationid int(11) NOT NULL auto_increment,
-	  userid int(11) NOT NULL,
-	  postid int(11) NOT NULL,
-	  threadid int(11) NOT NULL,
-  	dateline TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	  
-	  PRIMARY KEY  (imnotificationid)
+		vbotnotificaionid int(11) NOT NULL auto_increment,
+		userid int(11) NOT NULL,
+		dateline TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		notificationtype VARCHAR(255) NOT NULL,
+		datumid int(11) NOT NULL
+				
+		PRIMARY KEY  (vbotnotificaionid)
 	);
 ");
 
@@ -157,16 +157,21 @@ $db->query_write("UPDATE " . TABLE_PREFIX . "user AS user
 			<phpcode>
 			<![CDATA[		
 			
-if ($touser['instantimnotification'] && strlen($touser['instantimscreenname']) > 0 && in_array($touser['instantimservice'],array('aim','gtalk')) && $postid > 0)
+if (
+		$touser['instantimnotification'] 
+		&& strlen($touser['instantimscreenname']) > 0 
+		&& in_array($touser['instantimservice'],array('aim','gtalk')) && 
+		$postid > 0
+	 )
 {
 	global $db;
 	
-	$db->query_write("INSERT INTO " . TABLE_PREFIX . "imnotification
-											(userid,postid,threadid)
+	$db->query_write("INSERT INTO " . TABLE_PREFIX . "vbotnotificaion
+											(userid,datumid,notificationtype)
 											VALUES
-											($touser[userid],$postid,$threadid);
-										");
-										
+											($touser[userid],$postid,'newpost');
+										");        
+				
 	// this prevents the email notification from being sent
 	$touser['email'] = '';
 }

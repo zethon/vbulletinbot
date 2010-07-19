@@ -162,14 +162,14 @@ $server->register(
 );  
 
 $server->register(
-    'GetIMNotifications',
+    'GetPostNotifications',   
     array('DoDelete'=>'xsd:boolean'),
-    array('return'=>'tns:IMNotificationsResult'),
+    array('return'=>'tns:PostNotificationsResult'),
     $namespace,
     false,
     'rpc',
     'encoded',
-    'Get IM Notifications'
-);           
+    'Get Post notifications to be sent to subscribed users'
+);        
             
 ?>
