@@ -60,11 +60,11 @@ namespace VBulletinBot
 			}
 		}
 
-        public void ParseIDList(VBEntity[] list)
+        public void ParseIDList(IVBEntity[] list)
         {
             IDList.Clear();
 
-            foreach (VBEntity item in list)
+            foreach (IVBEntity item in list)
             {
                 IDList.Add(item.DatabaseID.ToString());
             }

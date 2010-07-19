@@ -5,7 +5,7 @@ using System.Text;
 
 namespace VBulletinBot.VBotService
 {
-    public partial class Forum : VBEntity
+    public partial class Forum : IVBEntity
     {
         public int DatabaseID
         {
