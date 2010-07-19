@@ -58,24 +58,7 @@
           <xsd:element name="DateLineText" type="xsd:string" />
           <xsd:element name="IpAddress" type="xsd:string" />
           <xsd:element name="IsNew" type="xsd:boolean" />
-        </xsd:all>
-      </xsd:complexType>
-      <xsd:complexType name="IMNotificationInfo">
-        <xsd:all>
-          <xsd:element name="IMNotificationID" type="xsd:int" />
-          <xsd:element name="InstantIMService" type="xsd:string" />
-          <xsd:element name="InstantIMScreenname" type="xsd:string" />
-          <xsd:element name="PostDateLine" type="xsd:int" />
-          <xsd:element name="ThreadTitle" type="xsd:string" />
-          <xsd:element name="NewPostUsername" type="xsd:string" />
-        </xsd:all>
-      </xsd:complexType>
-      <xsd:complexType name="IMNotification">
-        <xsd:all>
-          <xsd:element name="IMNotificationInfo" type="tns:IMNotificationInfo" />
-          <xsd:element name="Post" type="tns:Post" />
-          <xsd:element name="Thread" type="tns:Thread" />
-          <xsd:element name="Forum" type="tns:Forum" />
+          <xsd:element name="PostIndex" type="xsd:int" />
         </xsd:all>
       </xsd:complexType>
       <xsd:complexType name="ForumListResult">
@@ -123,6 +106,27 @@
           <xsd:element name="IMNotificationList" type="tns:IMNotificationArray" />
         </xsd:all>
       </xsd:complexType>
+      <xsd:complexType name="IMNotificationInfo">
+        <xsd:all>
+          <xsd:element name="IMNotificationID" type="xsd:int" />
+          <xsd:element name="InstantIMService" type="xsd:string" />
+          <xsd:element name="InstantIMScreenname" type="xsd:string" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="PostNotification">
+        <xsd:all>
+          <xsd:element name="IMNotificationInfo" type="tns:IMNotificationInfo" />
+          <xsd:element name="Post" type="tns:Post" />
+          <xsd:element name="Thread" type="tns:Thread" />
+          <xsd:element name="Forum" type="tns:Forum" />
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="PostNotificationsResult">
+        <xsd:all>
+          <xsd:element name="Result" type="tns:RequestResult" />
+          <xsd:element name="PostNotificationList" type="tns:PostNotificationArray" />
+        </xsd:all>
+      </xsd:complexType>
       <xsd:complexType name="RemoteUserArray">
         <xsd:complexContent mixed="false">
           <xsd:restriction base="SOAP-ENC:Array">
@@ -151,10 +155,10 @@
           </xsd:restriction>
         </xsd:complexContent>
       </xsd:complexType>
-      <xsd:complexType name="IMNotificationArray">
+      <xsd:complexType name="PostNotificationArray">
         <xsd:complexContent mixed="false">
           <xsd:restriction base="SOAP-ENC:Array">
-            <xsd:attribute wsdl:arrayType="tns:IMNotification[]" ref="SOAP-ENC:arrayType" />
+            <xsd:attribute wsdl:arrayType="tns:PostNotification[]" ref="SOAP-ENC:arrayType" />
           </xsd:restriction>
         </xsd:complexContent>
       </xsd:complexType>
@@ -267,11 +271,11 @@
   <wsdl:message name="PostNewThreadResponse">
     <wsdl:part name="return" type="tns:PostReplyResult" />
   </wsdl:message>
-  <wsdl:message name="GetIMNotificationsRequest">
+  <wsdl:message name="GetPostNotificationsRequest">
     <wsdl:part name="DoDelete" type="xsd:boolean" />
   </wsdl:message>
-  <wsdl:message name="GetIMNotificationsResponse">
-    <wsdl:part name="return" type="tns:IMNotificationsResult" />
+  <wsdl:message name="GetPostNotificationsResponse">
+    <wsdl:part name="return" type="tns:PostNotificationsResult" />
   </wsdl:message>
   <wsdl:portType name="VBotServicePortType">
     <wsdl:operation name="WhoAmI">
@@ -344,10 +348,10 @@
       <wsdl:input message="tns:PostNewThreadRequest" />
       <wsdl:output message="tns:PostNewThreadResponse" />
     </wsdl:operation>
-    <wsdl:operation name="GetIMNotifications">
-      <documentation>Get IM Notifications</documentation>
-      <wsdl:input message="tns:GetIMNotificationsRequest" />
-      <wsdl:output message="tns:GetIMNotificationsResponse" />
+    <wsdl:operation name="GetPostNotifications">
+      <documentation>Get Post notifications to be sent to subscribed users</documentation>
+      <wsdl:input message="tns:GetPostNotificationsRequest" />
+      <wsdl:output message="tns:GetPostNotificationsResponse" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="VBotServiceBinding" type="tns:VBotServicePortType">
@@ -478,8 +482,8 @@
         <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetIMNotifications">
-      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/GetIMNotifications" style="rpc" />
+    <wsdl:operation name="GetPostNotifications">
+      <soap:operation soapAction="http://www.anothermessageboard.com/vbulletinbot.php/GetPostNotifications" style="rpc" />
       <wsdl:input>
         <soap:body use="encoded" namespace="http://www.anothermessageboard.com" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
       </wsdl:input>
