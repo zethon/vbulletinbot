@@ -37,10 +37,10 @@ namespace VBulletinBot
             set { _bAppQuit = value; }
         }
 
-        System.Timers.Timer _notTimer = null;
-        System.Timers.Timer NotificationTimer
+        System.Timers.Timer _postNotificationTimer = null;
+        System.Timers.Timer PostNotificationTimer
         {
-            get { return _notTimer; }
+            get { return _postNotificationTimer; }
         }
 
 
@@ -71,10 +71,10 @@ namespace VBulletinBot
             int iTimer = 0;
             if (int.TryParse(botconfig.AutoInterval, out iTimer))
             {
-                _notTimer = new System.Timers.Timer(1000 * 60 * iTimer);
-                _notTimer.Elapsed += new ElapsedEventHandler(_notTimer_Elapsed);
-                _notTimer.Enabled = true;
-                _notTimer.Start();
+                _postNotificationTimer = new System.Timers.Timer(1000 * 60 * iTimer);
+                _postNotificationTimer.Elapsed += new ElapsedEventHandler(postNotificationElapsed);
+                _postNotificationTimer.Enabled = true;
+                _postNotificationTimer.Start();
             }
 
             if (botconfig.AutoConnect)
@@ -86,35 +86,43 @@ namespace VBulletinBot
             return true;
         }
 
-        public void _notTimer_Elapsed(object sender, ElapsedEventArgs e)
+        public void postNotificationElapsed(object sender, ElapsedEventArgs e)
         {
             log.Info("Notification Timer Elapsed()");
             if (_conComp.Connections != null && _conComp.Connections.Count() > 0)
             {
-                VBotService.IMNotificationsResult result = BotService.Instance.GetIMNotifications(true);
+                VBotService.PostNotificationsResult result = BotService.Instance.GetPostNotifications(false);
 
                 if (result.Result.Code == 0)
                 {
-                    if (result.IMNotificationList != null && result.IMNotificationList.Count() > 0)
+                    if (result.PostNotificationList != null && result.PostNotificationList.Count() > 0)
                     {
-                        log.Info(string.Format("{0} post notifications recieved", result.IMNotificationList.Count()));
+                        log.Info(string.Format("{0} post notifications recieved", result.PostNotificationList.Count()));
 
-                        foreach(VBotService.IMNotification not in result.IMNotificationList)
+                        foreach (VBotService.PostNotification not in result.PostNotificationList)
                         {
                             Connection c = _conComp.GetConnection(not.IMNotificationInfo.InstantIMService);
-                            string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
 
-                            string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
+                            if (c != null)
+                            {
+                                string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
 
-                            // TODO: get the index of the post
-                            //strResponse += c.FetchTemplate(@"postbit",new object[] { not, 0 });
+                                string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
 
-                            strResponse += FetchPostBit(not.Post, 0,c.NewLine) + c.NewLine;
-                            strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
+                                // TODO: get the index of the post
+                                //strResponse += c.FetchTemplate(@"postbit",new object[] { not, 0 });
 
-                            ResponseChannel rc = new VBulletinBot.ResponseChannel(strScreenName, c);
-                            rc.SendMessage(strResponse);
-                            System.Threading.Thread.Sleep(2000);
+                                strResponse += FetchPostBit(not.Post, not.Post.PostIndex, c.NewLine) + c.NewLine;
+                                strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
+
+                                ResponseChannel rc = new VBulletinBot.ResponseChannel(strScreenName, c);
+                                rc.SendMessage(strResponse);
+                                System.Threading.Thread.Sleep(2000);
+                            }
+                            else
+                            {
+                                log.WarnFormat("Could not get Connection object frop composite: {0}", not.IMNotificationInfo.InstantIMService);
+                            }
                         }
                     }
                     else
