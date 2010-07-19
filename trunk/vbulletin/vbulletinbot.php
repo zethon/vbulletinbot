@@ -114,8 +114,11 @@ function GetPostByIndex($who,$threadid,$index,$showbbcode = false)
             {
                 $postinfo['pagetext'] = strip_bbcode($postinfo['pagetext'],true,false,false);  
             }
+            $postinfo['datelinetext'] = vbdate($vbulletin->options['dateformat'],$postinfo['dateline'],true)." ".vbdate($vbulletin->options['timeformat'],$postinfo['dateline'],true);
+            
             
             $retval['Post'] = ConsumeArray($postinfo,$structtypes['Post']);    
+            
         }
     
         if ($postinfo['postid'] > 0)
@@ -133,7 +136,7 @@ function GetPostByIndex($who,$threadid,$index,$showbbcode = false)
     
 }
 
-function GetIMNotifications($dodelete)
+function GetPostNotifications($dodelete)
 {
     global $db,$vbulletin,$server,$structtypes,$lastpostarray;
     
@@ -150,26 +153,26 @@ function GetIMNotifications($dodelete)
         $result['Text'] = 'vbb_invalid_servicepw';
         return array('Result'=>$result);
     }   
-
+    
     $query = "
         SELECT 
-            imnotification.*, 
-            post.*, 
-            thread.*, 
-            forum.*, 
-            post.dateline as postdateline,
-            thread.title as threadtitle,
-            user.username AS newpostusername,
+            vbotnotification.*,                         
+            post.*,                                   
+            thread.*,                                 
+            forum.*,                                  
+            post.dateline as postdateline,            
+            thread.title as threadtitle,              
+            user.username AS newpostusername,         
             user.instantimnotification AS instantimnotification,  
             user.instantimscreenname AS instantimscreenname,  
-            user.instantimservice AS instantimservice
-        FROM " . TABLE_PREFIX . "imnotification AS imnotification 
-        LEFT JOIN " . TABLE_PREFIX . "user AS user ON (imnotification.userid = user.userid)
-        LEFT JOIN " . TABLE_PREFIX . "post AS post ON (imnotification.postid = post.postid)
+            user.instantimservice AS instantimservice 
+        FROM ".TABLE_PREFIX."vbotnotification AS vbotnotification
+        LEFT JOIN " . TABLE_PREFIX . "user AS user ON (vbotnotification.userid = user.userid)  
+        LEFT JOIN " . TABLE_PREFIX . "post AS post ON (vbotnotification.datumid = post.postid)
         LEFT JOIN " . TABLE_PREFIX . "thread AS thread ON (post.threadid = thread.threadid)
         LEFT JOIN " . TABLE_PREFIX . "forum AS forum ON (thread.forumid = forum.forumid)
-
-        ORDER By imnotification.dateline ASC 
+        WHERE (notificationtype = 'newpost')
+        ORDER By vbotnotification.dateline ASC  
     ";
     
     $notificationlist = array();
@@ -177,25 +180,42 @@ function GetIMNotifications($dodelete)
     $postnotifications = $db->query_read_slave($query);        
     while ($notification = $db->fetch_array($postnotifications))
     {    
+        if ($notification['postid'] > 0 && $notification['threadid'] > 0)
+        {
+            $indexq = "
+                SELECT COUNT(postid) as postindex
+                FROM ".TABLE_PREFIX."post AS post
+                WHERE (threadid = $notification[threadid] AND postid <= $notification[postid]);";
+                
+            $index = $db->query_first($indexq);             
+            $notification['postindex'] = $index['postindex'];
+        }
+        
         $notification['pagetext'] = strip_bbcode($notification['pagetext'],true,false,false);
-
+        $notification['datelinetext'] = vbdate($vbulletin->options['dateformat'],$notification['dateline'],true)." ".vbdate($vbulletin->options['timeformat'],$notification['dateline'],true); 
+        
         $temp['IMNotificationInfo'] = ConsumeArray($notification,$structtypes['IMNotificationInfo']);          
         $temp['Thread'] = ConsumeArray($notification,$structtypes['Thread']);           
         $temp['Post'] = ConsumeArray($notification,$structtypes['Post']);           
         $temp['Forum'] = ConsumeArray($notification,$structtypes['Forum']);           
         
-        if ($dodelete)
+        // delete the notification if we tell it to or no corresponding post exists (happens if a mod deletes a post)
+        if ($dodelete || $notification['postid'] == 0 || $notification['threadid'] == 0)
         {
-            $db->query_write("DELETE FROM " . TABLE_PREFIX . "imnotification WHERE (imnotificationid = $notification[imnotificationid]);");
+            $db->query_write("DELETE FROM " . TABLE_PREFIX . "vbotnotification WHERE (vbotnotificationid = $notification[vbotnotificationid]);");
         }
         
-        array_push($notificationlist,$temp);
+        if ($notification['postid'] > 0)
+        {
+            array_push($notificationlist,$temp);
+        }
+        
+        unset($temp);
     }    
                                   
     $result['Code'] = 0;
-    $result['Text'] = print_r($notificationlist,true);
     $retval['Result'] = $result;
-    $retval['IMNotificationList'] = $notificationlist;
+    $retval['PostNotificationList'] = $notificationlist;
     
     return $retval;
 }
@@ -555,7 +575,8 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             {
                 $thread['isnew'] = false;
             }
-
+            $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true)." ".vbdate($vbulletin->options['timeformat'],$postinfo['dateline'],true);
+            
             $thread = ConsumeArray($thread,$structtypes['Thread']);            
             array_push($threadlist,$thread);
         }        

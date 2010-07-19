@@ -38,6 +38,7 @@ $structtypes['Thread'] = array(
         'IsSubscribed' => array('IsSubscribed', 'type'=>'xsd:boolean'),
         'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
         'DateLine' => array('DateLine','type'=>'xsd:int'), 
+        'DateLineText' => array('DateLineText','type'=>'xsd:string'),
     ); 
     
 $structtypes['Post'] = array(
@@ -46,24 +47,10 @@ $structtypes['Post'] = array(
         'PageText' => array('PageText','type'=>'xsd:string'),
         'Title' => array('Title','type'=>'xsd:string'),
         'DateLine' => array('DateLine','type'=>'xsd:int'),
+        'DateLineText' => array('DateLineText','type'=>'xsd:string'),
         'IpAddress' => array('IpAddress','type'=>'xsd:string'),
         'IsNew' => array('IsNew', 'type'=>'xsd:boolean'),
-    );
-    
-$structtypes['IMNotificationInfo'] = array(
-        'IMNotificationID' => array('IMNotificationID','type'=>'xsd:int'),
-        'InstantIMService' => array('InstantIMService','type'=>'xsd:string'),
-        'InstantIMScreenname' => array('InstantIMScreenname','type'=>'xsd:string'),
-        'PostDateLine' => array('PostDateLine','type'=>'xsd:int'),
-        'ThreadTitle' => array('ThreadTitle','type'=>'xsd:string'),
-        'NewPostUsername' => array('NewPostUsername','type'=>'xsd:string'),        
-    );    
-            
-$structtypes['IMNotification'] = array(
-        'IMNotificationInfo' => array('IMNotificationInfo','type'=>'tns:IMNotificationInfo'),
-        'Post' => array('Post','type'=>'tns:Post'),
-        'Thread' => array('Thread','type'=>'tns:Thread'),
-        'Forum' => array('Forum','type'=>'tns:Forum'),
+        'PostIndex' => array('PostIndex', 'type'=>'xsd:int')
     );
                 
 $structtypes['ForumListResult'] = array(
@@ -102,7 +89,28 @@ $structtypes['PostReplyResult']  = array(
 $structtypes['IMNotificationsResult']  = array(
         'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
         'IMNotificationList' => array('name'=>'PostID','type'=>'tns:IMNotificationArray'),
-    );  
+    );
+    
+    
+// PostNotifcation structures    
+$structtypes['IMNotificationInfo'] = array(
+        'IMNotificationID' => array('IMNotificationID','type'=>'xsd:int'),
+        'InstantIMService' => array('InstantIMService','type'=>'xsd:string'),
+        'InstantIMScreenname' => array('InstantIMScreenname','type'=>'xsd:string'),
+    );    
+            
+$structtypes['PostNotification'] = array(
+        'IMNotificationInfo' => array('IMNotificationInfo','type'=>'tns:IMNotificationInfo'),
+        'Post' => array('Post','type'=>'tns:Post'),
+        'Thread' => array('Thread','type'=>'tns:Thread'),
+        'Forum' => array('Forum','type'=>'tns:Forum'),
+    );    
+    
+$structtypes['PostNotificationsResult'] = array(
+        'Result' => array('name'=>'Result','type'=>'tns:RequestResult'),
+        'PostNotificationList' => array('name'=>'PostNotificationList','type'=>'tns:PostNotificationArray'),
+    );
+
         
 foreach ($structtypes as $key => $val)
 {
@@ -162,14 +170,14 @@ $server->wsdl->addComplexType(
 ); 
 
 $server->wsdl->addComplexType(
-        'IMNotificationArray', 
+        'PostNotificationArray', 
         'complexType',
         'array',
         '',
         'SOAP-ENC:Array',
         array(),
-        array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:IMNotification[]')),
-        'tns:IMNotification'
+        array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:PostNotification[]')),
+        'tns:PostNotification'
 );
 
 function ConsumeArray($datarray,$destarray)
