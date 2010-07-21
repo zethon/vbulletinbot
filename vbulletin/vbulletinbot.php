@@ -1,8 +1,4 @@
 <?php
-//-----------------------------------------------------------------------------
-// $RCSFile: vbotservice.php $ $Revision: 1.19 $
-// $Date: 2010/01/05 06:14:58 $
-//-----------------------------------------------------------------------------
 
 // hack for vbulletin 4.0 and CSRF Protection
 $_POST["vb4"] = "";
@@ -24,7 +20,6 @@ require_once(DIR . '/includes/class_dm_threadpost.php');
 require_once(DIR . '/includes/class_xml.php');
 require_once(DIR . '/includes/functions_bigthree.php');
 require_once(DIR . '/includes/functions_forumlist.php');
-require_once(DIR . '/includes/functions_vbot.php');
 require_once(DIR . '/includes/functions_newpost.php');
 
 // #######################################################################
@@ -32,16 +27,24 @@ require_once(DIR . '/includes/functions_newpost.php');
 // #######################################################################
 
 
- /**
- * ProcessSimpleType method
- * @param string $who name of the person we'll say hello to
- * @return string $helloText the hello  string
- */
-function ProcessSimpleType($who) 
+
+
+function fetch_userid_by_service($service,$username)
 {
-	$test = print_r($_SERVER,true);
-	$who = "[$test]:$who";
-	return "Hello $who";
+    global $db,$vbulletin;
+    
+    $userinfo = $db->query_first(sprintf("SELECT * 
+                                            FROM " . TABLE_PREFIX . "user 
+                                            WHERE 
+                                                (instantimservice = '%s')
+                                                AND 
+                                                (instantimscreenname = '%s');
+                                            ",
+                                            mysql_real_escape_string($service),
+                                            mysql_real_escape_string($username)
+                                            ));
+    
+    return $userinfo['userid'];
 }
 
 function ErrorResult($text)
@@ -82,8 +85,13 @@ function RegisterService($who)
         else
         {
             unset($vbulletin->userinfo);
+
             $vbulletin->userinfo = fetch_userinfo($userid);
+            
             $permissions = cache_permissions($vbulletin->userinfo);            
+
+            // allows vbdate() to function properly
+            $vbulletin->options['hourdiff'] = (date('Z', TIMENOW) / 3600 - $vbulletin->userinfo['timezoneoffset']) * 3600;
             
 		    // everything is ok
 		    $result['Code'] = 0;
@@ -575,7 +583,8 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             {
                 $thread['isnew'] = false;
             }
-            $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true)." ".vbdate($vbulletin->options['timeformat'],$postinfo['dateline'],true);
+            
+            $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true)." ".vbdate($vbulletin->options['timeformat'],$thread['lastpost'],true);
             
             $thread = ConsumeArray($thread,$structtypes['Thread']);            
             array_push($threadlist,$thread);
