@@ -86,12 +86,12 @@ function RegisterService($who)
         {
             unset($vbulletin->userinfo);
 
-            $vbulletin->userinfo = fetch_userinfo($userid);
+            $vbulletin->userinfo =& fetch_userinfo($userid);
+            $permissions = cache_permissions($vbulletin->userinfo);        
             
-            $permissions = cache_permissions($vbulletin->userinfo);            
-
-            // allows vbdate() to function properly
             $vbulletin->options['hourdiff'] = (date('Z', TIMENOW) / 3600 - $vbulletin->userinfo['timezoneoffset']) * 3600;
+            fetch_options_overrides($vbulletin->userinfo);    
+            fetch_time_data();
             
 		    // everything is ok
 		    $result['Code'] = 0;
@@ -490,6 +490,7 @@ function ListPosts($who,$threadid,$pagenumber,$perpage)
             $post['isnew'] = false;
         }        
         
+        $post['datelinetext'] = vbdate($vbulletin->options['dateformat'],$post['dateline'],true, true, false)." ".vbdate($vbulletin->options['timeformat'],$post['dateline'],true);
         $post['pagetext'] = strip_bbcode($post['pagetext'],true,false,false); 
         array_push($postlist,ConsumeArray($post,$structtypes['Post']));
     }    
@@ -573,7 +574,7 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             
         $threads = $db->query_read_slave($threadssql);        
         $threadlist = array();
-    
+           
         while ($thread = $db->fetch_array($threads))
         {   
             $thread['issubscribed'] = $thread['subscribethreadid'] > 0;
@@ -584,10 +585,10 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
                 $thread['isnew'] = false;
             }
             
-            $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true)." ".vbdate($vbulletin->options['timeformat'],$thread['lastpost'],true);
+            $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true,true,false)." ".vbdate($vbulletin->options['timeformat'],$thread['lastpost']);
             
             $thread = ConsumeArray($thread,$structtypes['Thread']);            
-            array_push($threadlist,$thread);
+            array_push($threadlist,$thread);            
         }        
     }      
     
