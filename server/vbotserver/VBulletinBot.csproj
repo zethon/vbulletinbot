@@ -91,9 +91,10 @@
     <Compile Include="AIMConnection.cs" />
     <Compile Include="BotConfigSection.cs" />
     <Compile Include="Forum.cs" />
-    <Compile Include="VBEntity.cs" />
+    <Compile Include="IVBEntity.cs" />
     <Compile Include="LocalUser.cs" />
     <Compile Include="Post.cs" />
+    <Compile Include="Templater.cs" />
     <Compile Include="UserLocationType.cs" />
     <Compile Include="VBotDB.cs">
       <DependentUpon>vbotDB.dbml</DependentUpon>
@@ -191,10 +192,10 @@
     <None Include="Web References\VBotService\GetThreadResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\IMNotificationsResult.datasource">
+    <None Include="Web References\VBotService\PostListResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\VBotService\PostListResult.datasource">
+    <None Include="Web References\VBotService\PostNotificationsResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web References\VBotService\PostReplyResult.datasource">
@@ -231,7 +232,13 @@
       <CachedSettingsPropName>VBulletinBot_VBotService_VBotService</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="templates.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>copy "$(ProjectDir)\templates.xml" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
