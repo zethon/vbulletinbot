@@ -106,16 +106,19 @@ namespace VBulletinBot
                             if (c != null)
                             {
                                 string strScreenName = not.IMNotificationInfo.InstantIMScreenname;
-
                                 string strResponse = c.NewLine + "Forum: '" + not.Forum.Title + "'" + c.NewLine + "Thread: '" + not.Thread.ThreadTitle + "'" + c.NewLine;
 
-                                // TODO: get the index of the post
-                                //strResponse += c.FetchTemplate(@"postbit",new object[] { not, 0 });
+                                ResponseChannel rc = new ResponseChannel(strScreenName, c);
+                                strResponse = rc.FetchTemplate("postnotificationbit", 
+                                    new object[] { 
+                                        not.Forum.Title, 
+                                        not.Thread.ThreadTitle,
+                                        not.Post.PageText, 
+                                        not.Post.PostIndex, 
+                                        not.Post.DateLineText, 
+                                        not.Post.Username, 
+                                        not.Thread.ThreadID });
 
-                                strResponse += FetchPostBit(not.Post, not.Post.PostIndex, c.NewLine) + c.NewLine;
-                                strResponse += "(Type 'gt " + not.Thread.ThreadID.ToString() + "' to go to the thread. Type 'im off' to turn off IM Notification)";
-
-                                ResponseChannel rc = new VBulletinBot.ResponseChannel(strScreenName, c);
                                 rc.SendMessage(strResponse);
                                 System.Threading.Thread.Sleep(2000);
                             }
@@ -355,18 +358,6 @@ namespace VBulletinBot
             return retval;
         }
 
-        public string FetchPostBit(VBotService.Post post, int iIndex, string strNewLine)
-        {
-            string strResponse = string.Empty;
-
-            string strPageText = post.PageText;
-            strResponse += strNewLine;
-            strResponse += string.Format("{0}", strPageText) + strNewLine;
-            strResponse += string.Format("Post #{0} {1} by {2}", iIndex, post.DateLineText, post.Username);
-
-            return strResponse;
-        }
-
         public Result GotoForumIndex(int iIndex, LocalUser user)
         {
             return GotoForumIndex(iIndex, user, false);
@@ -548,7 +539,9 @@ namespace VBulletinBot
                 {
                     if (r.Post != null && r.Post.PostID > 0)
                     {
-                        string strText = FetchPostBit(r.Post, iChoice, ResponseChannel.Connection.NewLine);
+                        string strText = ResponseChannel.FetchTemplate(@"postbit",
+                            new object[] {r.Post.PageText,iChoice,r.Post.DateLineText,r.Post.Username});
+
                         user.SaveLastPostIndex(iChoice);
                         rs = new Result(ResultCode.Success, strText);
                     }
@@ -1594,7 +1587,7 @@ namespace VBulletinBot
                 }
                 else
                 {
-                    _commands.ExecuteCommand(strInput);
+                    _commands.ExecuteCommand(strInput,false);
                 }
 
             } while (!AppQuit);
