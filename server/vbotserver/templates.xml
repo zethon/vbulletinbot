@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<templates>
+  <template name="postbit" style="default">
+    <order>PageText,Index,DateLineText,Username</order>
+    <text>
+      <![CDATA[${PageText}
+Post #${Index} ${DateLineText} by ${Username}]]>
+    </text>      
+  </template>
+
+  <template name="postnotificationbit" style="default">
+    <order>ForumTitle,ThreadTitle,PageText,Index,DateLineText,Username,ThreadId</order>
+    <text>
+      <![CDATA[Forum: ${ForumTitle}
+Thread: ${ThreadTitle}
+${PageText}
+Post #${Index} ${DateLineText} by ${Username}
+(Type 'gt ${ThreadId}' to go to the thread. Type 'im off' to turn off IM Notification)]]>
+    </text>
+  </template>
+
+  <template name="forum_list" style="default">
+    <order>ForumTitle,ForumList</order>
+    <text>
+      <![CDATA[Subforums in '${ForumTitle}'
+${ForumList}]]>
+      </text>
+    
+  </template>
+  
+  <template name="forum_list_inline" style="default">
+    <order>Index,IsNew,ForumTitle</order>
+    <text>
+      <![CDATA[${Index}. ${IsNew}${ForumTitle}
+]]>    
+    </text>
+  </template>
+
+  <template name="thread_list_inline" style="default">
+    <order>Index,IsSubscribed,IsNew,ThreadTitle,ThreadId,ReplyCount,DateLineText,LastPost</order>
+    <text>
+      <![CDATA[${Index}. ${IsSubscribed}${IsNew}${ThreadTitle}${ThreadId} (${ReplyCount}) - ${DateLineText} by ${LastPost}
+]]>
+    </text>
+  </template>
+
+  <template name="thread_list" style="default">
+    <order>ForumTitle,PageNumber,TotalPages,PerPage,PageList</order>
+    <text>
+      <![CDATA[Threads in '${ForumTitle}'
+Page ${PageNumber} of ${TotalPages} (${PerPage} per page)
+${PageList}]]>
+    </text>
+  </template>
+
+  <template name="post_list" style="default">
+    <order>ThreadTitle,PageNumber,TotalPages,PerPage,PageList</order>
+    <text>
+      <![CDATA[Thread: ${ThreadTitle}
+Posts: Page ${PageNumber} of ${TotalPages} (${PerPage} per page)
+${PageList}]]>
+    </text>    
+    
+  </template>
+
+  <template name="post_list_inline" style="default">
+    <order>Index,IsNew,ShortPostText,DateLineText,LastPost</order>
+    <text>
+      <![CDATA[${Index}. ${IsNew}"${ShortPostText}" - ${DateLineText} by ${LastPost}
+]]>
+    </text>    
+    
+  </template>
+
+</templates>

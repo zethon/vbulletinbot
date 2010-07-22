@@ -86,7 +86,7 @@ namespace VBulletinBot
         public string FetchTemplate(string strTemplateName, object[] parameters)
         {
             string strRet = string.Empty;
-            XElement q = GetTemplateElement("postbit");
+            XElement q = GetTemplateElement(strTemplateName);
 
             if (q != null)
             {
@@ -116,7 +116,7 @@ namespace VBulletinBot
         public string FetchTemplate(string strTemplateName, Dictionary<string, object> d)
         {
             string strRet = string.Empty;
-            XElement q = GetTemplateElement("postbit");
+            XElement q = GetTemplateElement(strTemplateName);
 
             if (q != null)
             {
