@@ -13,6 +13,20 @@ namespace VBulletinBot
         {
         }
 
+        [ConfigurationProperty("templatefile", IsRequired = true)]
+        public string TemplateFile
+        {
+            get
+            {
+                return (base["templatefile"] as string);
+            }
+
+            set
+            {
+                base["templatefile"] = value;
+            }
+        }
+
         [ConfigurationProperty("webservicepw", IsRequired = true)]
         public string WebServicePassword
         {
