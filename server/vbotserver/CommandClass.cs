@@ -51,6 +51,16 @@ namespace VBulletinBot
             }
         }
 
+        protected class MethodAliasAttribute : System.Attribute
+        {
+            public string[] Aliases;
+
+            public MethodAliasAttribute(string[] aliases)
+            {
+                Aliases = aliases;
+            }
+        }
+
         private Controller _controller = null;
 
         private string _strUsername = string.Empty;
@@ -74,6 +84,7 @@ namespace VBulletinBot
         }
 
         [CommandMethod("connect", "connect all services")]
+        [MethodAlias(new string[] { "/connect", "/c" })]
         public void Connect()
         {
             _controller.Connections.Connect();
@@ -97,6 +108,7 @@ namespace VBulletinBot
         }
 
         [CommandMethod("help", "this is it")]
+        [MethodAlias(new string[] { "/?", "help", "?" })]
         public void Help()
         {
             Type t = this.GetType();
@@ -120,10 +132,10 @@ namespace VBulletinBot
             }
         }
 
-        [CommandMethod("nottimer", "elapse the im notifcation timer")]
+        //[MethodAlias(new string[] { "/t", "/test", "test" })]
         public void NotTimer()
         {
-            _controller._notTimer_Elapsed(null, null);
+            _controller.postNotificationElapsed(null, null);
         }
 
 
@@ -136,17 +148,51 @@ namespace VBulletinBot
             }
         }
 
+        [CommandMethod("rtf", "reload template file")]
+        [MethodAlias(new string[] { "/rtf" })]
+        public void ReloadTemplateFile()
+        {
+            Templater.Reload();
+            log.Info("Template file reloaded");
+        }
+
+
+        [MethodAlias(new string[] { "/t", "/test", "test" })]
         public void Test(CommandParser parser)
         {
-            UserCredentials uc = new UserCredentials();
-            uc.ServiceName = @"gtalk";
-            uc.Username = @"aclaure@gmail.com";
+            Connection c = new GTalkConnection("testuser", "testpass");
+            ResponseChannel rc = new ResponseChannel("aimname", c);
 
-            VBotService.PostReplyResult res = BotService.Instance.PostNewThread(uc, 2, @"title", "page text");
+            Dictionary<string, object> d = new Dictionary<string, object>()
+                {
+                    {"PageText","this is the pagettext"},
+                    {"Index",8},
+                    {"DateLineText","Today at 5pm"},
+                    {"Username","Manchy"},
+                };
+
+            string str = rc.FetchTemplate(@"postbit", new object[] { "text",3,"Yesterday @ 3pm","Frank Power"} );
+            log.Debug(str);
+
+
+            //VBotService.PostNotificationsResult result = BotService.Instance.GetPostNotifications(true);
+
+            //UserCredentials uc = new UserCredentials();
+            //uc.ServiceName = @"gtalk";
+            //uc.Username = @"aclaure@gmail.com";
+
+            //VBotService.PostReplyResult res = BotService.Instance.PostNewThread(uc, 2, @"title", "page text");//
+
+            //UserCredentials uc1 = new UserCredentials();
+            //uc1.ServiceName = @"aim";
+            //uc1.Username = @"zethon";
+
+            //VBotService.RequestResult res = BotService.Instance.WhoAmI(uc);
 
         }
 
         [CommandMethod("whoami", "[username] [service alias]")]
+        [MethodAlias(new string[] { "/w","/whoami" })]
         public void WhoAmI(CommandParser parser)
         {
             try
@@ -179,12 +225,42 @@ namespace VBulletinBot
             }
         }
 
-        public void ExecuteCommand(string strCommand)
+        public void ExecuteCommand(string strCommand, bool bUseMethodName)
         {
             CommandParser parser = new CommandParser(strCommand, this);
             parser.Parse();
 
-            MethodInfo mi = this.GetType().GetMethod(parser.ApplicationName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo mi = null;
+
+            if (bUseMethodName)
+            {
+                mi = this.GetType().GetMethod(parser.ApplicationName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
+            }
+
+            if (mi == null)
+            {
+                foreach (MethodInfo mit in this.GetType().GetMethods())
+                {
+                    foreach (object obj in mit.GetCustomAttributes(false))
+                    {
+                        MethodAliasAttribute maa = obj as MethodAliasAttribute;
+
+                        if (maa != null)
+                        {
+                            if (maa.Aliases != null && maa.Aliases.Contains(parser.ApplicationName))
+                            {
+                                mi = mit;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (mi != null)
+                    {
+                        break;
+                    }
+                }
+            }
 
             if (mi != null)
             {
@@ -201,7 +277,9 @@ namespace VBulletinBot
                         foreach (ParameterInfo m in mi.GetParameters())
                         {
                             if (m.ParameterType == typeof(string))
-                                oparams[oparams.Length - 1] = parser.Parameters[oparams.Length - 1];
+                            {
+                                oparams[oparams.Length - 1] = parser.WorkingString;
+                            }
                             else if (m.ParameterType == typeof(CommandParser))
                                 oparams[oparams.Length - 1] = parser;
                         }
@@ -213,7 +291,7 @@ namespace VBulletinBot
                 }
                 catch (Exception e)
                 {
-                    log.Debug("Execute Command Exception", e);
+                    log.Error("Commands.ExecuteCommand exception: " + e.Message);
                 }
             }
             else
