@@ -704,7 +704,8 @@ namespace VBulletinBot
                     forums = res.ForumList;
                 }
 
-                string strResponse = ResponseChannel.Connection.NewLine + "Subforums in `" + loc.Title + "`" + ResponseChannel.Connection.NewLine;
+                string strResponse = string.Empty;
+
                 bool bForumsExist = false;
                 string strIsNew = string.Empty;
 
@@ -720,7 +721,7 @@ namespace VBulletinBot
                         }
 
                         bForumsExist = true;
-                        strResponse += iCount.ToString() + ". " + strIsNew + foruminfo.Title+ ResponseChannel.NewLine;
+                        strResponse += ResponseChannel.FetchTemplate("forum_list_inline", new object[] { iCount, strIsNew, foruminfo.Title });
                         iCount++;
                     }
 
@@ -730,10 +731,12 @@ namespace VBulletinBot
                 if (!bForumsExist)
                 {
                     strResponse += "No subforums";
+                    strResponse = ResponseChannel.FetchTemplate("forum_list", new object[] { loc.Title, strResponse });    
                     resval = new Result(ResultCode.Error, strResponse);
                 }
                 else
                 {
+                    strResponse = ResponseChannel.FetchTemplate("forum_list", new object[] { loc.Title, strResponse });
                     resval = new Result(ResultCode.Success, strResponse);
                 }
 
@@ -784,15 +787,15 @@ namespace VBulletinBot
                     result = BotService.Instance.ListPosts(uc, (int)loc.LocationRemoteID, iPageNumber, iPerPage);
                 }
 
-                string strResponse = ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
+                string strResponse = string.Empty; //  ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
 
                 double dTotalPosts = (double)(result.Thread.ReplyCount + 1);
                 int iTotalPages = (int)Math.Ceiling(dTotalPosts / (double)iPerPage);
 
-                if (iPageNumber <= iTotalPages)
-                {
-                    strResponse += string.Format("Posts: Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.NewLine;
-                }
+                //if (iPageNumber <= iTotalPages)
+                //{
+                //    //strResponse += string.Format("Posts: Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.NewLine;
+                //}
 
                 string strIsNew = string.Empty;
                 if (result.PostList.Count() > 0)
@@ -806,16 +809,31 @@ namespace VBulletinBot
                             strIsNew = "*";
                         }
 
-                        strResponse += string.Format("{0}. {1}\"{2}\" - {3} by {4}" + ResponseChannel.NewLine,
+                        strResponse += ResponseChannel.FetchTemplate("post_list_inline", new object[] { 
                                             iCount,
                                             strIsNew,
                                             postInfo.GetShortPostText(),
                                             postInfo.DateLineText,
                                             postInfo.Username
-                                        );
+                        });
+
+                        //strResponse += string.Format("{0}. {1}\"{2}\" - {3} by {4}" + ResponseChannel.NewLine,
+                        //                    iCount,
+                        //                    strIsNew,
+                        //                    postInfo.GetShortPostText(),
+                        //                    postInfo.DateLineText,
+                        //                    postInfo.Username
+                        //                );
 
                         iCount++;
                     }
+
+                    strResponse = ResponseChannel.FetchTemplate("post_list", new object[] { 
+                        loc.Title, 
+                        iPageNumber,
+                        iTotalPages,
+                        iPerPage,
+                        strResponse });
 
                     rc = ResultCode.Success;
                 }
@@ -887,21 +905,15 @@ namespace VBulletinBot
                         }
                     }
 
-                    strResponse += ResponseChannel.Connection.NewLine + "Threads in `" + loc.Title + "`" + ResponseChannel.Connection.NewLine;
-
                     bool bForumsExist = false;
                     string strIsNew = string.Empty;
                     string strIsSubscribed = string.Empty;
+                    int iTotalPages = 0;
 
                     if (r.ThreadList.Count() > 0)
                     {
-                        int iTotalPages = (int)Math.Ceiling((double)r.ThreadCount / (double)iPerPage);
+                        iTotalPages = (int)Math.Ceiling((double)r.ThreadCount / (double)iPerPage);
                         iTotalPages += 1;
-
-                        if (iPageNumber <= iTotalPages)
-                        {
-                            strResponse += string.Format("Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.Connection.NewLine;
-                        }
 
                         int iCount = 1;
                         foreach (VBotService.Thread thread in r.ThreadList)
@@ -922,7 +934,8 @@ namespace VBulletinBot
 
                             bForumsExist = true;
 
-                            strResponse += string.Format("{0}. {1}{2}{3}{4} ({5}) - {6} by {7}" + ResponseChannel.Connection.NewLine,
+                            strResponse += ResponseChannel.FetchTemplate("thread_list_inline", 
+                                new object[] {
                                                 iCount,
                                                 strIsSubscribed,
                                                 strIsNew,
@@ -931,14 +944,15 @@ namespace VBulletinBot
                                                 thread.ReplyCount + 1,
                                                 thread.DateLineText,
                                                 thread.LastPoster
-                                            );
+                                });
+
                             iCount++;
                         }
                     }
 
                     if (!bForumsExist)
                     {
-                        strResponse += "There are no threads in this forum.";
+                        strResponse = "There are no threads in this forum.";
                         rc = ResultCode.Error;
                     }
                     else
@@ -947,6 +961,9 @@ namespace VBulletinBot
                         loc.PerPage = iPerPage;
                         loc.ParseIDList(r.ThreadList);                        
                         loc.SaveLocation();
+
+                        strResponse = ResponseChannel.FetchTemplate("thread_list", 
+                            new object[] { loc.Title, iPageNumber, iTotalPages, iPerPage, strResponse });
 
                         rc = ResultCode.Success;
                     }
