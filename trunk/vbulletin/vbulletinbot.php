@@ -26,7 +26,25 @@ require_once(DIR . '/includes/functions_newpost.php');
 // ######################## START MAIN SCRIPT ############################
 // #######################################################################
 
+function correct_forum_counters($threadid, $forumid) 
+{
+        
+    // select lastpostid from thread where threadid =  $threadid
+    // select dateline from post where postid = $postid
+    // update thread set lastpost =  $time where threadid = $threadid
 
+    global $db;
+    $lastpostid = $db->query_first("SELECT lastpostid FROM " . TABLE_PREFIX . "thread WHERE threadid = '".$threadid."'");
+    $dateline = $db->query_first("SELECT dateline FROM " . TABLE_PREFIX . "post WHERE postid = '".$lastpostid['lastpostid']."'");
+
+    // Update thread table and threadread table to reflect new post
+    $db->query_write("UPDATE " . TABLE_PREFIX . "thread SET lastpost = '".$dateline['dateline']."' WHERE threadid = '".$threadid."'");
+    $db->query_write("UPDATE " . TABLE_PREFIX . "threadread SET readtime = '".($dateline['dateline']-1)."' WHERE threadid = '".$threadid."' AND readtime >= '".($dateline['dateline']-1)."'");
+
+    // Update forum table and forumread to reflect new post
+    $db->query_write("UPDATE " . TABLE_PREFIX . "forum SET lastpost = '".$dateline['dateline']."' WHERE forumid = '".$forumid."'");
+    $db->query_write("UPDATE " . TABLE_PREFIX . "forumread SET readtime = '".($dateline['dateline']-1)."' WHERE forumid = '".$forumid."' AND readtime >= '".($dateline['dateline']-1)."'");
+} 
 
 
 function fetch_userid_by_service($service,$username)
