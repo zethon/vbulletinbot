@@ -3,7 +3,8 @@
   <template name="postbit" style="default">
     <order>PageText,Index,DateLineText,Username</order>
     <text>
-      <![CDATA[${PageText}
+      <![CDATA[
+${PageText}
 Post #${Index} ${DateLineText} by ${Username}]]>
     </text>      
   </template>
