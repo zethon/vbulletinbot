@@ -787,15 +787,10 @@ namespace VBulletinBot
                     result = BotService.Instance.ListPosts(uc, (int)loc.LocationRemoteID, iPageNumber, iPerPage);
                 }
 
-                string strResponse = string.Empty; //  ResponseChannel.NewLine + "Thread: " + loc.Title + ResponseChannel.NewLine;
+                string strResponse = string.Empty;
 
                 double dTotalPosts = (double)(result.Thread.ReplyCount + 1);
                 int iTotalPages = (int)Math.Ceiling(dTotalPosts / (double)iPerPage);
-
-                //if (iPageNumber <= iTotalPages)
-                //{
-                //    //strResponse += string.Format("Posts: Page {0} of {1} ({2} per page)", iPageNumber, iTotalPages, iPerPage) + ResponseChannel.NewLine;
-                //}
 
                 string strIsNew = string.Empty;
                 if (result.PostList.Count() > 0)
@@ -816,14 +811,6 @@ namespace VBulletinBot
                                             postInfo.DateLineText,
                                             postInfo.Username
                         });
-
-                        //strResponse += string.Format("{0}. {1}\"{2}\" - {3} by {4}" + ResponseChannel.NewLine,
-                        //                    iCount,
-                        //                    strIsNew,
-                        //                    postInfo.GetShortPostText(),
-                        //                    postInfo.DateLineText,
-                        //                    postInfo.Username
-                        //                );
 
                         iCount++;
                     }
@@ -910,7 +897,7 @@ namespace VBulletinBot
                     string strIsSubscribed = string.Empty;
                     int iTotalPages = 0;
 
-                    if (r.ThreadList.Count() > 0)
+                    if (r.ThreadList != null && r.ThreadList.Count() > 0)
                     {
                         iTotalPages = (int)Math.Ceiling((double)r.ThreadCount / (double)iPerPage);
                         iTotalPages += 1;
@@ -1145,7 +1132,7 @@ namespace VBulletinBot
                 else
                 {
                     // TODO: this should throw an exception
-                    user.ResponseChannel.SendMessage(@"Could not make " + strField + " as read.");
+                    user.ResponseChannel.SendMessage(@"Could not mark " + strField + " as read.");
                     log.Error("Unknown `strField` in MarkRead()");
                 }
 
@@ -1294,9 +1281,7 @@ namespace VBulletinBot
 
             if (forumLoc != null)
             {
-                string strResponse = string.Format("New Thread:{0}Current Forum: {1}{0}", user.ResponseChannel.NewLine, forumLoc.Title);
-                strResponse += @"Enter new thread title:";
-
+                string strResponse = user.ResponseChannel.FetchTemplate(@"new_thread", new object[] { forumLoc.Title });
                 user.ResponseChannel.SendMessage(strResponse);
 
                 string strThreadTitle = GetString(user);
@@ -1307,8 +1292,9 @@ namespace VBulletinBot
                     return;
                 }
 
-                strResponse = @"Enter post text:";
+                strResponse = user.ResponseChannel.FetchTemplate("enter_post_text");
                 user.ResponseChannel.SendMessage(strResponse);
+                
                 string strPost = GetString(user);
 
                 if (GetConfirmation(user))
@@ -1324,6 +1310,10 @@ namespace VBulletinBot
                     {
                         user.ResponseChannel.SendMessage(@"There was an error submitting the post.");
                     }
+                }
+                else
+                {
+                    user.ResponseChannel.SendMessage(@"New thread cancelled");
                 }
             }
             else
@@ -1373,20 +1363,23 @@ namespace VBulletinBot
                 {
                     if (GetConfirmation(user))
                     {
+                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
                         int iOriginalPostId = 0;
+
                         if (bDoQuote != null && (bool)bDoQuote)
                         {
-                            UserLocation postLost = UserLocation.LoadLocation(UserLocationType.POST, user);
                             int iPostIndex = user.PostIndex;
 
                             if (postLoc != null && iPostIndex > 0)
                             {
-                                // user.PostIndex is 1 based array, IDList is zero based
-                                iOriginalPostId = postLoc.GetIDListIndexOf(iPostIndex-1);
+                                VBotService.GetPostResult quotepost = BotService.Instance.GetPostByIndex(uc, (int)postLoc.LocationRemoteID, iPostIndex, false);
+
+                                if (quotepost.Result.Code == 0 && quotepost.Post != null)
+                                {
+                                    iOriginalPostId = quotepost.Post.PostID;
+                                }
                             }
                         }
-
-                        VBotService.UserCredentials uc = BotService.Credentialize(user.ResponseChannel);
 
                         log.DebugFormat("PostReply Parameters: LocationRemoteID: {0}, iOriginalPostId: {1}", postLoc.LocationRemoteID, iOriginalPostId);
                         VBotService.PostReplyResult r = BotService.Instance.PostReply(uc, (int)postLoc.LocationRemoteID, strPostText, iOriginalPostId);
