@@ -84,6 +84,22 @@ Enter new thread title:]]>
 
   <template name="enter_post_text" style="default">
     <text><![CDATA[Enter post text:]]></text>
-    
   </template>
+
+  <!-- service errors -->
+  <template name="invalid_user" style="default">
+    <text><![CDATA[Unknown user. Please update your profile.]]></text>
+  </template>
+
+  <template name="vbb_service_turned_off" style="default">
+    <text><![CDATA[vBulletin bot is currently not running.]]></text>
+  </template>
+
+  <template name="vbb_invalid_servicepw" style="default">
+    <text><![CDATA[Unauthorized client.]]></text>
+  </template>
+
+
+
+
 </templates>
