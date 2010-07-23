@@ -293,7 +293,7 @@ function GetThread($who,$threadid)
     $thread = $db->query_first($threadssql);     
     
     // TODO: Remove this HACK!
-    $thread['threadtitle'] = $thread['title'];
+    $thread['threadtitle'] = $thread['title'] = unhtmlspecialchars($threadinfo['title'],true);
     
     $retval['Thread'] = ConsumeArray($thread,$structtypes['Thread']);                 
     
@@ -476,7 +476,7 @@ function ListPosts($who,$threadid,$pagenumber,$perpage)
     
     
     // TODO: the client expects 'threadtitle', remove this HACK
-    $threadinfo['threadtitle'] = $threadinfo['title'];
+    $threadinfo['title'] = $threadinfo['threadtitle'] = unhtmlspecialchars($threadinfo['title'],true);
     
     $retval['Thread'] = ConsumeArray($threadinfo,$structtypes['Thread']);
     
@@ -512,6 +512,8 @@ function ListPosts($who,$threadid,$pagenumber,$perpage)
         
         $post['datelinetext'] = vbdate($vbulletin->options['dateformat'],$post['dateline'],true, true, false)." ".vbdate($vbulletin->options['timeformat'],$post['dateline'],true);
         $post['pagetext'] = strip_bbcode($post['pagetext'],true,false,false); 
+        $post['pagetext']  = unhtmlspecialchars($post['pagetext'] ,true);   
+        
         array_push($postlist,ConsumeArray($post,$structtypes['Post']));
     }    
     
@@ -605,6 +607,9 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             {
                 $thread['isnew'] = false;
             }
+            
+            $thread['threadtitle'] = unhtmlspecialchars($thread['threadtitle'],true);   
+            $thread['title'] = unhtmlspecialchars($thread['threadtitle'],true);
             
             $thread['datelinetext'] = vbdate($vbulletin->options['dateformat'],$thread['lastpost'],true,true,false)." ".vbdate($vbulletin->options['timeformat'],$thread['lastpost']);
             
