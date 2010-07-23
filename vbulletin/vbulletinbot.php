@@ -217,7 +217,7 @@ function GetPostNotifications($dodelete)
         }
         
         $notification['pagetext'] = strip_bbcode($notification['pagetext'],true,false,false);
-        $notification['datelinetext'] = vbdate($vbulletin->options['dateformat'],$notification['dateline'],true)." ".vbdate($vbulletin->options['timeformat'],$notification['dateline'],true); 
+        $notification['datelinetext'] = vbdate($vbulletin->options['dateformat'],$notification['postdateline'],true)." ".vbdate($vbulletin->options['timeformat'],$notification['postdateline'],true); 
         
         $temp['IMNotificationInfo'] = ConsumeArray($notification,$structtypes['IMNotificationInfo']);          
         $temp['Thread'] = ConsumeArray($notification,$structtypes['Thread']);           
