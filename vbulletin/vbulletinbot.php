@@ -45,7 +45,6 @@ function correct_forum_counters($threadid, $forumid)
     $db->query_write("UPDATE " . TABLE_PREFIX . "forumread SET readtime = '".($dateline['dateline']-1)."' WHERE forumid = '".$forumid."' AND readtime >= '".($dateline['dateline']-1)."'");
 } 
 
-
 function fetch_userid_by_service($service,$username)
 {
     global $db,$vbulletin;
@@ -125,7 +124,8 @@ function GetPostByIndex($who,$threadid,$index,$showbbcode = false)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
+        $retval['Result'] = $result;
+        return $retval;
     }    
     
     if ($index > 0)
@@ -252,8 +252,9 @@ function GetThread($who,$threadid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }   
+        $retval['Result'] = $result;
+        return $retval;
+    }  
     
     $threadinfo = $thread = fetch_threadinfo($threadid);    
     $forum = fetch_foruminfo($thread['forumid']);
@@ -309,7 +310,8 @@ function ListForums($who,$forumid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
+        $retval['Result'] = $result;
+        return $retval;
     }
 
     $userid = $vbulletin->userinfo['userid'];
@@ -438,7 +440,8 @@ function ListPosts($who,$threadid,$pagenumber,$perpage)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
+        $retval['Result'] = $result;
+        return $retval;
     }    
     
     // *********************************************************************************
@@ -526,7 +529,8 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
+        $retval['Result'] = $result;
+        return $retval;
     }
 
     // get the total threads count    
@@ -538,7 +542,7 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
         if (!($forumperms & $vbulletin->bf_ugp_forumpermissions['canview']))
         {
             // TODO: handle this properly
-            //print_error_xml('no_permission_fetch_threadsxml');
+            print_error_xml('no_permission_fetch_threadsxml');
         }            
         
         $userid = $vbulletin->userinfo['userid'];
@@ -613,7 +617,7 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
     $retval['Result'] = $result;
     $retval['ThreadList'] = $threadlist;
     $retval['ThreadCount'] = $threadcount['threadcount'];
-    
+
     return $retval;
 }
 
@@ -624,8 +628,9 @@ function MarkForumRead($who,$forumid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }   
+        $retval['Result'] = $result;
+        return $retval;
+    }  
 
     $foruminfo = fetch_foruminfo($forumid);
     mark_forum_read($foruminfo,$vbulletin->userinfo['userid'],TIMENOW);
@@ -643,8 +648,9 @@ function MarkThreadRead($who,$threadid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }   
+        $retval['Result'] = $result;
+        return $retval;
+    }
 
     $threadinfo = fetch_threadinfo($threadid);
     $foruminfo = fetch_foruminfo($threadinfo['forumid']);
@@ -664,8 +670,9 @@ function PostReply($who,$threadid,$pagetext,$quotepostid = 0)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }     
+        $retval['Result'] = $result;
+        return $retval;
+    } 
 
     $threadinfo = fetch_threadinfo($threadid);
     $foruminfo = fetch_foruminfo($threadinfo['forumid'],false);
@@ -727,7 +734,8 @@ function PostNewThread($who,$forumid,$title,$pagetext)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
+        $retval['Result'] = $result;
+        return $retval;
     }
     
     $insertid = 0;
@@ -796,8 +804,9 @@ function SetIMNotification($who,$on)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }   
+        $retval['Result'] = $result;
+        return $retval;
+    } 
 
     $userid = $vbulletin->userinfo['userid'];
     $onoff = 0;
@@ -825,8 +834,9 @@ function SubscribeThread($who,$threadid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }   
+        $retval['Result'] = $result;
+        return $retval;
+    }
     
     $threadinfo = fetch_threadinfo($threadid);
     $foruminfo = fetch_foruminfo($threadinfo['forumid'],false);
@@ -895,8 +905,9 @@ function UnSubscribeThread($who,$threadid)
     $result = RegisterService($who);
     if ($result['Code'] != 0)
     {
-        return $result;
-    }    
+        $retval['Result'] = $result;
+        return $retval;
+    }  
     
     if (is_numeric($threadid))
     { // delete this specific thread subscription
@@ -931,11 +942,12 @@ function WhoAmI($who)
 {
 	global $db,$vbulletin,$server,$structtypes;
 	
-	$result = RegisterService($who);
-	if ($result['Code'] != 0)
-	{
-		return $result;
-	}
+    $result = RegisterService($who);
+   
+    if ($result['Code'] != 0)
+    {
+        return $result;
+    }
 	
 	$retuser = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']);
 
