@@ -28,7 +28,6 @@ require_once(DIR . '/includes/functions_newpost.php');
 
 function correct_forum_counters($threadid, $forumid) 
 {
-        
     // select lastpostid from thread where threadid =  $threadid
     // select dateline from post where postid = $postid
     // update thread set lastpost =  $time where threadid = $threadid
