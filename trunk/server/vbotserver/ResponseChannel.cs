@@ -49,7 +49,7 @@ namespace VBulletinBot
         private XElement GetTemplateElement(string strTemplate)
         {
             // try to load a connection specific template
-            var q = (from c in Templater.Templates.Descendants(@"template")
+            var q = (from c in Templater.I.Descendants(@"template")
                      where
                          (string)c.Attribute(@"name") == strTemplate
                          && (string)c.Attribute(@"style") == this.Connection.Alias
@@ -58,7 +58,7 @@ namespace VBulletinBot
             if (q == null)
             {
                 // load the default template
-                q = (from c in Templater.Templates.Descendants(@"template")
+                q = (from c in Templater.I.Descendants(@"template")
                      where
                          (string)c.Attribute(@"name") == strTemplate
                          && (string)c.Attribute(@"style") == @"default"
@@ -74,13 +74,13 @@ namespace VBulletinBot
                 log.ErrorFormat("No 'text' element in template: {0}", strTemplate);
                 q = null;
             }
-            else if (q.Element(@"order") == null)
-            {
-                log.ErrorFormat("No 'order' element in template: {0}", strTemplate);
-                q = null;
-            }
 
             return q;
+        }
+
+        public string FetchTemplate(string strTemplateName)
+        {
+            return FetchTemplate(strTemplateName, new object[] { });
         }
 
         public string FetchTemplate(string strTemplateName, object[] parameters)
@@ -88,25 +88,28 @@ namespace VBulletinBot
             string strRet = string.Empty;
             XElement q = GetTemplateElement(strTemplateName);
 
-            if (q != null)
+            if (q != null && (q.Element(@"order") != null || (q.Element(@"order") == null && parameters == null || parameters.Count() == 0)))
             {
                 strRet = q.Element(@"text").Value;
 
-                string[] strVars = Regex.Split(q.Element(@"order").Value, @"\,");
-                string strTemp = string.Empty;
-                int iCount = 0;
-
-                foreach (string strVar in strVars)
+                if (q.Element(@"order") != null)
                 {
-                    if (iCount >= parameters.Count())
+                    string[] strVars = Regex.Split(q.Element(@"order").Value, @"\,");
+                    string strTemp = string.Empty;
+                    int iCount = 0;
+
+                    foreach (string strVar in strVars)
                     {
-                        break;
+                        if (iCount >= parameters.Count())
+                        {
+                            break;
+                        }
+
+                        strTemp = "${" + strVar + "}";
+                        strRet = strRet.Replace(strTemp, parameters[iCount].ToString());
+
+                        iCount++;
                     }
-
-                    strTemp = "${" + strVar + "}";
-                    strRet = strRet.Replace(strTemp, parameters[iCount].ToString());
-
-                    iCount++;
                 }
             }
 
@@ -118,7 +121,7 @@ namespace VBulletinBot
             string strRet = string.Empty;
             XElement q = GetTemplateElement(strTemplateName);
 
-            if (q != null)
+            if (q != null && q.Element(@"order") != null)
             {
                 strRet = q.Element(@"text").Value;
                 string[] strVars = Regex.Split(q.Element(@"order").Value, @"\,");
