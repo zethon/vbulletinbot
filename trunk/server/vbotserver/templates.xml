@@ -72,4 +72,18 @@ ${PageList}]]>
     
   </template>
 
+  <template name="new_thread" style="default">
+    <order>ForumTitle</order>
+    <text>
+      <![CDATA[New Thread:
+Current Forum: ${ForumTitle}
+Enter new thread title:]]>
+    </text>
+    
+  </template>
+
+  <template name="enter_post_text" style="default">
+    <text><![CDATA[Enter post text:]]></text>
+    
+  </template>
 </templates>
