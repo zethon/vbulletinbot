@@ -14,7 +14,7 @@ namespace VBulletinBot
 
         private static XDocument _templates = null;
 
-        public static XDocument Templates
+        public static XDocument I
         {
             get
             {
