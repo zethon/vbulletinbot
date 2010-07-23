@@ -597,7 +597,7 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             
         $threads = $db->query_read_slave($threadssql);        
         $threadlist = array();
-           
+        
         while ($thread = $db->fetch_array($threads))
         {   
             $thread['issubscribed'] = $thread['subscribethreadid'] > 0;
@@ -616,7 +616,7 @@ function ListThreads($who,$forumid,$pagenumber,$perpage)
             $thread = ConsumeArray($thread,$structtypes['Thread']);            
             array_push($threadlist,$thread);            
         }        
-    }      
+    }   
     
     $result['RemoteUser'] = ConsumeArray($vbulletin->userinfo,$structtypes['RemoteUser']);   
     $retval['Result'] = $result;
@@ -983,6 +983,12 @@ include (DIR . '/includes/services_vbot.php');
 $HTTP_RAW_POST_DATA = isset($GLOBALS['HTTP_RAW_POST_DATA']) 
                 ? $GLOBALS['HTTP_RAW_POST_DATA'] : '';
 
+// temporarily override the board's yestoday setting to show "Today"/"Yesterday"
+if ($vbulletin->options['yestoday'] == 2)
+{
+    $vbulletin->options['yestoday'] = 1;
+}                
+                
 // pass our posted data (or nothing) to the soap service    
 //$server->debug_flag = true;
 $server->service($HTTP_RAW_POST_DATA);                
