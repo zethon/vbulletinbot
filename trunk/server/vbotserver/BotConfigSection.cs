@@ -180,13 +180,5 @@ namespace VBulletinBot
                 return (IMServiceElement)BaseGet(index);
             }
         }
-
-        public IMServiceElement this[string Name]
-        {
-            get
-            {
-                return (IMServiceElement)BaseGet(Name);
-            }
-        }
     }
 }
