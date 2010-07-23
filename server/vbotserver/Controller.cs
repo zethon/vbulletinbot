@@ -166,10 +166,12 @@ namespace VBulletinBot
                 try
                 {
                     ResponseChannel = new ResponseChannel(im.User, conn);
-                    LocalUser user = LocalUser.GetUser(ResponseChannel);
 
-                    if (user != null && user.LocalUserID > 0)
+                    VBotService.RequestResult result = BotService.Instance.WhoAmI(BotService.Credentialize(ResponseChannel));
+                    if (result.Code == 0)
                     {
+                        LocalUser user = LocalUser.GetUser(ResponseChannel, result.RemoteUser);
+
                         #region if
 
                         if (_inputs.ContainsKey(user.LocalUserID) && _inputs[user.LocalUserID].State == InputStateEnum.Waiting)
@@ -204,9 +206,8 @@ namespace VBulletinBot
                     }
                     else
                     {
-                        string strResponse = @"Unknown screen name. Please add this screen name to your user profile.";
-                        conn.SendMessage(new InstantMessage(im.User, strResponse));
-                        log.DebugFormat(@"Unknown user: '{0}' ({1})",im.User,conn.Alias);
+                        log.ErrorFormat("GetUser failed: {0}", result.Text);
+                        ResponseChannel.SendMessage(ResponseChannel.FetchTemplate(result.Text));
                     }
                 }
                 catch (Exception ex)
@@ -701,6 +702,12 @@ namespace VBulletinBot
                 if (forums == null)
                 {
                     VBotService.ForumListResult res = BotService.Instance.ListForums(BotService.Credentialize(ResponseChannel), (int)loc.LocationRemoteID);
+
+                    if (res.Result.Code != 0)
+                    {
+                        log.ErrorFormat("Could not list forums: {0}", res.Result.Text);
+                        return new Result(ResultCode.Error, ResponseChannel.FetchTemplate(res.Result.Text));
+                    }
                     forums = res.ForumList;
                 }
 
@@ -785,6 +792,12 @@ namespace VBulletinBot
                 {
                     VBotService.UserCredentials uc = BotService.Credentialize(ResponseChannel);
                     result = BotService.Instance.ListPosts(uc, (int)loc.LocationRemoteID, iPageNumber, iPerPage);
+
+                    if (result.Result.Code != 0)
+                    {
+                        log.ErrorFormat("Could not list posts: {0}", result.Result.Text);
+                        return new Result(ResultCode.Error, ResponseChannel.FetchTemplate(result.Result.Text));
+                    }
                 }
 
                 string strResponse = string.Empty;
@@ -878,9 +891,8 @@ namespace VBulletinBot
                     if (r.Result.Code != 0)
                     {
                         log.ErrorFormat("Could not list threads: {0}", r.Result.Text);
-                        return new Result(ResultCode.Error, "Could not view threads. Please try again.");
+                        return new Result(ResultCode.Error, ResponseChannel.FetchTemplate(r.Result.Text));
                     }
-
 
                     bool bShowIDs = false;
                     foreach (string strOption in options)
@@ -1372,7 +1384,8 @@ namespace VBulletinBot
 
                             if (postLoc != null && iPostIndex > 0)
                             {
-                                VBotService.GetPostResult quotepost = BotService.Instance.GetPostByIndex(uc, (int)postLoc.LocationRemoteID, iPostIndex, false);
+                                VBotService.GetPostResult quotepost = 
+                                    BotService.Instance.GetPostByIndex(uc, (int)postLoc.LocationRemoteID, user.PostIndex, false);
 
                                 if (quotepost.Result.Code == 0 && quotepost.Post != null)
                                 {

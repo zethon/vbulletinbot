@@ -74,6 +74,40 @@ namespace VBulletinBot
             VBotDB.Instance.SubmitChanges();
         }
 
+        static public LocalUser GetUser(ResponseChannel rc, VBotService.RemoteUser remoteUser)
+        {
+            LocalUser luser = VBotDB.Instance.LocalUsers.FirstOrDefault(
+                u => u.Screenname == rc.ToName && u.Service == rc.Connection.Alias);
+
+            if (luser == null)
+            {
+
+                luser = new LocalUser
+                {
+                    Screenname = rc.ToName,
+                    Service = rc.Connection.Alias,
+                    BoardUserID = remoteUser.UserID,
+                    LastUpdate = DateTime.Now
+                };
+
+                VBotDB.Instance.LocalUsers.InsertOnSubmit(luser);
+                VBotDB.Instance.SubmitChanges();
+
+            }
+            else
+            {
+                luser.LastUpdate = DateTime.Now;
+                VBotDB.Instance.SubmitChanges();
+            }
+
+            if (luser != null)
+            {
+                luser.ResponseChannel = rc;
+            }
+
+            return luser;
+        }
+
         static public LocalUser GetUser(ResponseChannel rc)
         {
             LocalUser luser = VBotDB.Instance.LocalUsers.FirstOrDefault(
